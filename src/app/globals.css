@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
+  --bg: #ffffff;
+  --ink: #111111;
+  --muted: #6b6b6b;
+  --rule: #e4e4e4;
+  --accent: #e0381f;
+  color-scheme: light;
 }
 
 html,
@@ -10,9 +15,15 @@ body {
 }
 
 body {
-  background: #0a0a0a;
-  color: #f5f5f5;
-  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Helvetica Neue", Helvetica, Arial, ui-sans-serif, system-ui,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
 }
