@@ -436,7 +436,7 @@ Single long-lived `feat/phase-b-scaffold` cut from `main`. 13 serial commits, on
 
 ## 16. Adjacent projects (read-only context)
 
-- **journalkit** — `~/journalkit/`, `https://github.com/wangzi/journalkit`. The engine. Deployed at `studio.stillinlove.co`. **Do not import journalkit code at runtime;** copy patterns only where useful (env validation, server-only client). Reference for `tsconfig.json`, `.gitignore`.
+- **journalkit** — `~/Desktop/journalkit/`, `https://github.com/wangzi/journalkit`. The engine. Deployed at `studio.stillinlove.co`. **Do not import journalkit code at runtime;** copy patterns only where useful (env validation, server-only client). Reference for `tsconfig.json`, `.gitignore`.
 - **PRD source** — `~/Desktop/session2_tii/canonical_prd.md`. Canonical V1 source of truth. Read PRD §8, §9, §13, §14, §15, §17, §18 in detail before changing reader behavior.
 - **Prototype** — `~/Desktop/session2_tii/journalkit_responsive_reader.html`. The visual reference TII ports from. Read once end-to-end.
 - **Halftime** — `~/halftime/`. Multi-tenant social feed; journalkit's pattern source. Out of scope for TII; read-only.
