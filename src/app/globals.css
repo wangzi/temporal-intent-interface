@@ -308,6 +308,14 @@ body.nav-open .scrim {
   position: relative;
   padding: 5.5vh 0 5.5vh var(--content-pad);
   border: 0;
+  /* Gaussian magnification lens. ReaderControlsIsland writes `--scale`
+     per rAF tick (focal point = dot line at 40vh, NOT viewport center).
+     transform-origin pinned to the spine line so the temporal axis
+     stays fixed and only content scales rightward. No CSS transition —
+     the 60Hz update cadence is the animation. */
+  transform: scale(var(--scale, 1));
+  transform-origin: var(--spine-x, 28px) center;
+  will-change: transform;
 }
 
 .e-meta {

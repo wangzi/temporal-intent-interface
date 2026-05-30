@@ -32,6 +32,19 @@ import { usePathname, useRouter } from "next/navigation";
 const DOT_VH = 0.4; // matches `--dot-vh: 40` in globals.css
 const SETTLE_MS = 350;
 
+// Magnifier lens — see src/components/lab/ScrollMagnifier.tsx for the
+// standalone, fuller-effect version. Tuned-down constants here because
+// the reader has tall entries (≥1 entry ≈ 25-35% of viewport) and a
+// dense visual hierarchy already.
+//
+// Focal point = the red dot line at 40vh. NOT the viewport center.
+// `LENS_RADIUS_VH` controls how quickly the scale falls off; smaller
+// = tighter lens, larger = broader.
+const MAG_MAX_SCALE = 1.22;
+const MAG_MIN_SCALE = 0.92;
+const MAG_FALLOFF = 0.5;
+const MAG_LENS_RADIUS_VH = 0.5; // half the viewport — normalises distance
+
 function positionDot(): void {
   const spine = document.querySelector<HTMLElement>(".spine");
   const dot = document.getElementById("dot");
@@ -101,6 +114,40 @@ function setDotBig(big: boolean): void {
   else dot.classList.remove("big");
 }
 
+// Gaussian magnification anchored at the dot line (40vh).
+// Writes `--scale` per entry as an inline CSS variable; the `.entry`
+// CSS rule in globals.css reads it and applies `transform: scale(...)`
+// with the spine as the transform origin so the temporal axis stays
+// pinned and only content magnifies rightward.
+//
+//   focal_y      = innerHeight * DOT_VH                  (≈ 40vh)
+//   normalized   = clamp(0..1, distance / (innerHeight * MAG_LENS_RADIUS_VH))
+//   focusAmount  = exp(-(normalized / MAG_FALLOFF)^2)
+//   scale        = MAG_MIN_SCALE + (MAG_MAX_SCALE - MAG_MIN_SCALE) * focusAmount
+//
+// Under prefers-reduced-motion, the gradient is stripped so the active
+// entry's only focus signal is the existing .e-label red and dot.big.
+function applyMagnification(entries: HTMLElement[], reduced: boolean): void {
+  if (reduced) {
+    for (const el of entries) {
+      el.style.removeProperty("--scale");
+    }
+    return;
+  }
+  const focalY = window.innerHeight * DOT_VH;
+  const lensRadius = window.innerHeight * MAG_LENS_RADIUS_VH;
+  for (const el of entries) {
+    const rect = el.getBoundingClientRect();
+    const center = rect.top + rect.height / 2;
+    const distance = Math.abs(center - focalY);
+    const normalized = Math.min(1, distance / lensRadius);
+    const focusAmount = Math.exp(-Math.pow(normalized / MAG_FALLOFF, 2));
+    const scale =
+      MAG_MIN_SCALE + (MAG_MAX_SCALE - MAG_MIN_SCALE) * focusAmount;
+    el.style.setProperty("--scale", scale.toFixed(3));
+  }
+}
+
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   const tag = target.tagName;
@@ -143,10 +190,14 @@ export function ReaderControlsIsland(): null {
     );
     positionDot();
     if (entries.length === 0) return;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const idx = nearestEntryIndex(entries);
     setActiveClass(entries, idx);
     enrichOnly(entries, idx);
     setDotBig(true);
+    applyMagnification(entries, reduced);
   }, []);
 
   // Effect: scroll / resize / keyboard.
@@ -155,6 +206,9 @@ export function ReaderControlsIsland(): null {
       document.querySelectorAll<HTMLElement>("[data-entry-index]"),
     );
 
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     let ticking = false;
     let currentActive = entries.length ? nearestEntryIndex(entries) : -1;
     let settleTimer: number | null = null;
@@ -184,6 +238,7 @@ export function ReaderControlsIsland(): null {
             currentActive = idx;
           }
           collapseAll(entries);
+          applyMagnification(entries, reduced);
         }
         scheduleSettle();
         ticking = false;
@@ -198,6 +253,7 @@ export function ReaderControlsIsland(): null {
         setActiveClass(entries, idx);
         currentActive = idx;
       }
+      applyMagnification(entries, reduced);
       scheduleSettle();
     }
 
