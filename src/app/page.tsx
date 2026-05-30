@@ -5,6 +5,10 @@
 // snapshot at most a minute stale. The engine client validates the
 // response against the §9 contract; on error we render an empty
 // state rather than crash.
+//
+// Filtering: the engine call is always unfiltered so that the
+// NavigationRail can list every intent_label as a filter option;
+// the visible <ol> is filtered in-component when ?filter=... is set.
 
 import { listPosts } from "@/lib/engine/client";
 import { postYear } from "@/lib/format";
@@ -12,12 +16,27 @@ import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
 import { Footer } from "@/components/reader/Footer";
+import { NavigationRail } from "@/components/reader/NavigationRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { Spine } from "@/components/reader/Spine";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
+import { TimeIndex } from "@/components/reader/TimeIndex";
 import { TitleIntentLayer } from "@/components/reader/TitleIntentLayer";
 
 export const revalidate = 60;
+
+function uniqueYears(posts: PostSummary[]): string[] {
+  const seen = new Set<string>();
+  const order: string[] = [];
+  for (const p of posts) {
+    const y = postYear(p.published_at);
+    if (!seen.has(y)) {
+      seen.add(y);
+      order.push(y);
+    }
+  }
+  return order;
+}
 
 export default async function Home({
   searchParams,
@@ -31,27 +50,36 @@ export default async function Home({
   // Server-stable "now" for relative-ago strings within this SSR.
   const now = Date.now();
 
-  let posts: PostSummary[] = [];
+  let allPosts: PostSummary[] = [];
   try {
-    const response = await listPosts({ sort, filter });
-    posts = response.posts;
+    const response = await listPosts({ sort });
+    allPosts = response.posts;
   } catch (err) {
     // Engine error — render an empty archive rather than blow up.
-    // Real error reporting lands in a later step.
     // eslint-disable-next-line no-console
     console.error("[home] engine error:", err);
   }
 
+  const visiblePosts = filter
+    ? allPosts.filter((p) => p.intent_label === filter)
+    : allPosts;
+  const years = uniqueYears(allPosts);
+
   return (
-    <TemporalLayout>
+    <TemporalLayout
+      rail={<NavigationRail posts={allPosts} currentFilter={filter} />}
+      timeIndex={<TimeIndex years={years} />}
+    >
       <Spine />
-      <p className="now-label">Now · latest</p>
+      <p className="now-label">
+        {filter ? `Filtered · ${filter}` : "Now · latest"}
+      </p>
       <ol
         id="feed"
         aria-label="Entries in reverse chronological order"
         style={{ listStyle: "none" }}
       >
-        {posts.map((p, i) => (
+        {visiblePosts.map((p, i) => (
           <li
             key={p.post_id}
             className="entry"
@@ -62,7 +90,7 @@ export default async function Home({
             <TitleIntentLayer post={p} now={now} />
           </li>
         ))}
-        {posts.length === 0 ? (
+        {visiblePosts.length === 0 ? (
           <li
             style={{
               padding: "5.5vh 0 5.5vh var(--content-pad)",
@@ -71,7 +99,7 @@ export default async function Home({
               color: "var(--system-faint)",
             }}
           >
-            No entries.
+            {filter ? `No entries for ${filter}.` : "No entries."}
           </li>
         ) : null}
       </ol>
