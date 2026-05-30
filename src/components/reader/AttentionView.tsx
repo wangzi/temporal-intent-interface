@@ -3,6 +3,8 @@
 // The back link is a real <a href="/"> so it works JS-off. JS-on
 // keyboard layer (step 7) maps Escape → router.back().
 
+import Link from "next/link";
+
 import {
   formatAbsoluteDate,
   readingTimeLabel,
@@ -17,7 +19,7 @@ export function AttentionView({ post }: { post: PostDetail }) {
   return (
     <article aria-labelledby={headingId} className="attn-inner">
       <Spine />
-      <a className="attn-back mono" href="/">
+      <Link className="attn-back mono" href="/">
         <svg
           width="13"
           height="13"
@@ -30,7 +32,7 @@ export function AttentionView({ post }: { post: PostDetail }) {
           <path d="M15 18l-6-6 6-6" />
         </svg>
         back
-      </a>
+      </Link>
       <header>
         <div className="attn-label mono" data-text-origin="canonical">
           {post.intent_label}

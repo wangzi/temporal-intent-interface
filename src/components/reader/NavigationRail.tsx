@@ -6,6 +6,8 @@
 // so JS-off readers navigate via URL changes, not React state. Filter
 // state lives in the URL.
 
+import Link from "next/link";
+
 import type { PostSummary } from "@/lib/engine/types";
 
 function uniqueIntentLabels(posts: PostSummary[]): string[] {
@@ -36,27 +38,27 @@ export function NavigationRail({
       </span>
       <div className="rail-section">
         <h2>Read</h2>
-        <a
+        <Link
           className={`navlink${noFilter ? " on" : ""}`}
           href="/"
           aria-current={noFilter ? "page" : undefined}
         >
           Latest
-        </a>
+        </Link>
       </div>
       <div className="rail-section">
         <h2>Intents</h2>
         {intents.map((label) => {
           const isActive = currentFilter === label;
           return (
-            <a
+            <Link
               key={label}
               className={`navlink${isActive ? " on" : ""}`}
               href={`/?filter=${encodeURIComponent(label)}`}
               aria-current={isActive ? "page" : undefined}
             >
               {label}
-            </a>
+            </Link>
           );
         })}
       </div>

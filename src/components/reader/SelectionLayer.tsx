@@ -15,6 +15,14 @@
 //       a textarea so the reader can select + copy manually.
 //   - Esc dismisses any UI.
 //
+// Keyboard parity (PRD §15 — "Accessible Thinking Mode, required"):
+//   - On mount, every <p data-text-origin="canonical"> inside
+//     .attn-body gets tabindex="0" so keyboard users can focus it.
+//   - When such a paragraph is focused and the reader presses
+//     Enter or Space, the paragraph's text is treated as the
+//     "selection" and the same Copy Prompt flow fires. This gives
+//     pointer-free access to Copy Prompt.
+//
 // PRD §17.29: never fails. No network calls; offline-safe.
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -88,6 +96,60 @@ export function SelectionLayer({ post }: { post: PostForPrompt }) {
       }
     };
   }, []);
+
+  // Keyboard parity for Copy Prompt: make canonical paragraphs in the
+  // post body focusable; Enter/Space on a focused paragraph copies it.
+  useEffect(() => {
+    const paragraphs = document.querySelectorAll<HTMLElement>(
+      '.attn-body p[data-text-origin="canonical"]',
+    );
+    paragraphs.forEach((p) => {
+      p.setAttribute("tabindex", "0");
+      p.setAttribute(
+        "aria-label",
+        `Paragraph. Press Enter to copy a prompt for this paragraph.`,
+      );
+    });
+
+    async function copyParagraph(text: string): Promise<void> {
+      const prompt = buildPrompt(post, text);
+      const ok = await copyToClipboard(prompt);
+      if (ok) {
+        setState({ kind: "copied" });
+        window.setTimeout(() => {
+          setState((s) => (s.kind === "copied" ? { kind: "idle" } : s));
+        }, COPIED_TOAST_MS);
+      } else {
+        setState({ kind: "manual", text: prompt });
+      }
+    }
+
+    function onKey(e: KeyboardEvent): void {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      // Only paragraphs inside .attn-body tagged as canonical text.
+      const para = target.closest<HTMLElement>(
+        '.attn-body p[data-text-origin="canonical"]',
+      );
+      if (!para || para !== target) return;
+      const text = (para.textContent ?? "").trim();
+      if (text.length < MIN_LENGTH) return;
+      e.preventDefault();
+      void copyParagraph(text);
+    }
+
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      // Clean up: not strictly necessary, but tidy for unmount during
+      // route changes within the SPA.
+      paragraphs.forEach((p) => {
+        p.removeAttribute("tabindex");
+        p.removeAttribute("aria-label");
+      });
+    };
+  }, [post]);
 
   // When the manual dialog opens, preselect the text so paste is one
   // keystroke away.
@@ -206,7 +268,7 @@ export function SelectionLayer({ post }: { post: PostForPrompt }) {
             marginBottom: "12px",
           }}
         >
-          Couldn't auto-copy · select all + copy
+          Couldn&apos;t auto-copy · select all + copy
         </p>
         <textarea
           ref={dialogRef}

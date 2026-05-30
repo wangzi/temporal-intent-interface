@@ -14,6 +14,7 @@
 // hamburger is rendered with aria-expanded so a screen reader knows
 // when the menu is collapsed even without visual style.
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import type { PostSummary } from "@/lib/engine/types";
@@ -78,24 +79,24 @@ export function TopBar({
           z<b>.</b>
         </span>
         <nav className="topbar-nav" aria-label="Sections">
-          <a
+          <Link
             className={`navlink${noFilter ? " on" : ""}`}
             href="/"
             aria-current={noFilter ? "page" : undefined}
           >
             Latest
-          </a>
+          </Link>
           {intents.map((label) => {
             const isActive = currentFilter === label;
             return (
-              <a
+              <Link
                 key={label}
                 className={`navlink${isActive ? " on" : ""}`}
                 href={`/?filter=${encodeURIComponent(label)}`}
                 aria-current={isActive ? "page" : undefined}
               >
                 {label}
-              </a>
+              </Link>
             );
           })}
         </nav>
