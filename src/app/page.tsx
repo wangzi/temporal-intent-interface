@@ -12,6 +12,7 @@ import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
 import { Footer } from "@/components/reader/Footer";
+import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { Spine } from "@/components/reader/Spine";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
 import { TitleIntentLayer } from "@/components/reader/TitleIntentLayer";
@@ -76,6 +77,7 @@ export default async function Home({
       </ol>
       <Footer />
       <Dot />
+      <ReaderControlsIsland />
     </TemporalLayout>
   );
 }

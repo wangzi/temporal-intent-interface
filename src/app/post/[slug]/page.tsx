@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 
 import { Dot } from "@/components/reader/Dot";
 import { Footer } from "@/components/reader/Footer";
+import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
 import { AttentionView } from "@/components/reader/AttentionView";
 import {
@@ -66,6 +67,7 @@ export default async function PostPage({
         <AttentionView post={post} />
         <Footer />
         <Dot />
+        <ReaderControlsIsland />
       </TemporalLayout>
     );
   } catch (err) {
