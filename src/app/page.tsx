@@ -1,54 +1,81 @@
-// Step 1 — scaffold placeholder. Real archive route lands in Step 3.
-// Verifies: fonts load, design tokens apply, build pipeline works.
-export default function Home() {
+// Archive index — public reverse-chronological feed of published
+// posts. SSR per PRD §17.4: renders fully without JavaScript.
+//
+// ISR with revalidate=60 so anonymous readers always get a fresh
+// snapshot at most a minute stale. The engine client validates the
+// response against the §9 contract; on error we render an empty
+// state rather than crash.
+
+import { listPosts } from "@/lib/engine/client";
+import { postYear } from "@/lib/format";
+import type { PostSummary, SortOrder } from "@/lib/engine/types";
+
+import { Dot } from "@/components/reader/Dot";
+import { Footer } from "@/components/reader/Footer";
+import { Spine } from "@/components/reader/Spine";
+import { TemporalLayout } from "@/components/reader/TemporalLayout";
+import { TitleIntentLayer } from "@/components/reader/TitleIntentLayer";
+
+export const revalidate = 60;
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string; filter?: string }>;
+}) {
+  const sp = await searchParams;
+  const sort: SortOrder = sp.sort === "oldest" ? "oldest" : "newest";
+  const filter = sp.filter && sp.filter !== "all" ? sp.filter : undefined;
+
+  // Server-stable "now" for relative-ago strings within this SSR.
+  const now = Date.now();
+
+  let posts: PostSummary[] = [];
+  try {
+    const response = await listPosts({ sort, filter });
+    posts = response.posts;
+  } catch (err) {
+    // Engine error — render an empty archive rather than blow up.
+    // Real error reporting lands in a later step.
+    // eslint-disable-next-line no-console
+    console.error("[home] engine error:", err);
+  }
+
   return (
-    <main className="mx-auto max-w-2xl px-6 py-24">
-      <p
-        className="mono"
-        style={{
-          fontSize: "0.6875rem",
-          letterSpacing: "0.16em",
-          textTransform: "uppercase",
-          color: "var(--system-faint)",
-          marginBottom: "32px",
-        }}
+    <TemporalLayout>
+      <Spine />
+      <p className="now-label">Now · latest</p>
+      <ol
+        id="feed"
+        aria-label="Entries in reverse chronological order"
+        style={{ listStyle: "none" }}
       >
-        Phase B · scaffolding
-      </p>
-      <h1
-        style={{
-          fontFamily: "var(--serif)",
-          fontSize: "var(--t-title-read)",
-          lineHeight: 1.12,
-          letterSpacing: "-0.015em",
-          color: "var(--ink)",
-          marginBottom: "24px",
-        }}
-      >
-        z<span style={{ color: "var(--dot)" }}>.</span>
-      </h1>
-      <p
-        style={{
-          fontFamily: "var(--serif)",
-          fontSize: "var(--t-body)",
-          lineHeight: 1.62,
-          color: "var(--ink-soft)",
-          maxWidth: "var(--measure)",
-        }}
-      >
-        The Temporal Intent Interface is being built. The archive view lands at
-        Step 3 of the Phase B scaffold; the post route at Step 4.
-      </p>
-      <p
-        className="mono"
-        style={{
-          fontSize: "0.75rem",
-          color: "var(--system)",
-          marginTop: "32px",
-        }}
-      >
-        z.stillinlove.co
-      </p>
-    </main>
+        {posts.map((p, i) => (
+          <li
+            key={p.post_id}
+            className="entry"
+            data-entry-index={i}
+            data-year={postYear(p.published_at)}
+            data-label={p.intent_label}
+          >
+            <TitleIntentLayer post={p} now={now} />
+          </li>
+        ))}
+        {posts.length === 0 ? (
+          <li
+            style={{
+              padding: "5.5vh 0 5.5vh var(--content-pad)",
+              fontFamily: "var(--mono)",
+              fontSize: "0.8125rem",
+              color: "var(--system-faint)",
+            }}
+          >
+            No entries.
+          </li>
+        ) : null}
+      </ol>
+      <Footer />
+      <Dot />
+    </TemporalLayout>
   );
 }
