@@ -593,7 +593,8 @@ body.nav-open .scrim {
    Vertical = navigation everywhere. Horizontal is layout only.
    ============================================================ */
 
-/* Mobile portrait: single column, hamburger, base type. */
+/* Mobile portrait: single column, hamburger, base type, bottom-sheet
+   menu instead of slide-from-left rail. */
 @media (max-width: 700px) {
   :root {
     --spine-x: 28px;
@@ -601,6 +602,58 @@ body.nav-open .scrim {
   }
   .col {
     padding-right: 18px;
+  }
+
+  /* The inline topbar filter chips belong to 701–1079px only. On
+     mobile the same options live inside the bottom sheet. */
+  .topbar-nav {
+    display: none;
+  }
+
+  /* Bottom-sheet rail (replaces slide-from-left on mobile). Anchored
+     to the bottom edge; full-width; slides up via translateY. The
+     scrim above darkens the rest of the viewport (z-index 45 sits
+     below the rail at 50). */
+  .rail {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 72vh;
+    border-right: none;
+    border-top: 1px solid var(--rule);
+    border-radius: 14px 14px 0 0;
+    padding: 18px 22px 32px;
+    transform: translateY(102%);
+    transition: transform 0.3s var(--ease);
+    overflow-y: auto;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.12);
+    gap: 22px;
+  }
+  body.nav-open .rail {
+    transform: translateY(0);
+  }
+
+  /* Drag-handle affordance at the top of the sheet. */
+  .rail::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--rule);
+    border-radius: 999px;
+    margin: 0 auto 6px;
+  }
+
+  /* Tighter list spacing inside the sheet. */
+  .rail-section h2 {
+    margin-bottom: 10px;
+  }
+  .rail a,
+  .rail button.navlink {
+    padding: 9px 0;
+    font-size: 0.875rem;
   }
 }
 
