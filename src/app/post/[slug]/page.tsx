@@ -10,6 +10,7 @@ import { notFound } from "next/navigation";
 import { Dot } from "@/components/reader/Dot";
 import { Footer } from "@/components/reader/Footer";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
+import { SelectionLayer } from "@/components/reader/SelectionLayer";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
 import { AttentionView } from "@/components/reader/AttentionView";
 import {
@@ -68,6 +69,13 @@ export default async function PostPage({
         <Footer />
         <Dot />
         <ReaderControlsIsland />
+        <SelectionLayer
+          post={{
+            title: post.title,
+            intent_label: post.intent_label,
+            intent_statement: post.intent_statement,
+          }}
+        />
       </TemporalLayout>
     );
   } catch (err) {

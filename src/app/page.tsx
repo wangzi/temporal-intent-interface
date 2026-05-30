@@ -22,6 +22,7 @@ import { Spine } from "@/components/reader/Spine";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
 import { TimeIndex } from "@/components/reader/TimeIndex";
 import { TitleIntentLayer } from "@/components/reader/TitleIntentLayer";
+import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
 
@@ -67,6 +68,7 @@ export default async function Home({
 
   return (
     <TemporalLayout
+      topBar={<TopBar posts={allPosts} currentFilter={filter} />}
       rail={<NavigationRail posts={allPosts} currentFilter={filter} />}
       timeIndex={<TimeIndex years={years} />}
     >

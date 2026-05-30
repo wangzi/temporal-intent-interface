@@ -1,10 +1,10 @@
 // Persistent navigation rail at ≥1080px; slides in via `body.nav-open`
-// at mobile (the toggle button lands in Step 11 — TopBar).
+// at mobile (toggled by <TopBar>'s hamburger). Pure server component.
 //
-// The rail itself is a server component; filter links are real
-// <a href="/?filter=..."> so JS-off readers (when the topbar's
-// hamburger lands and toggles `nav-open`) navigate via URL changes,
-// not in-page React state. Filter state lives in the URL.
+// The scrim that backs the slide-in lives in <TopBar> (which needs
+// the click handler). Filter links are real <a href="/?filter=...">
+// so JS-off readers navigate via URL changes, not React state. Filter
+// state lives in the URL.
 
 import type { PostSummary } from "@/lib/engine/types";
 
@@ -30,39 +30,36 @@ export function NavigationRail({
   const intents = uniqueIntentLabels(posts);
   const noFilter = !currentFilter;
   return (
-    <>
-      <div className="scrim" id="rail-scrim" aria-hidden="true" />
-      <nav className="rail" aria-label="Reader navigation">
-        <span className="brand">
-          z<b>.</b>
-        </span>
-        <div className="rail-section">
-          <h2>Read</h2>
-          <a
-            className={`navlink${noFilter ? " on" : ""}`}
-            href="/"
-            aria-current={noFilter ? "page" : undefined}
-          >
-            Latest
-          </a>
-        </div>
-        <div className="rail-section">
-          <h2>Intents</h2>
-          {intents.map((label) => {
-            const isActive = currentFilter === label;
-            return (
-              <a
-                key={label}
-                className={`navlink${isActive ? " on" : ""}`}
-                href={`/?filter=${encodeURIComponent(label)}`}
-                aria-current={isActive ? "page" : undefined}
-              >
-                {label}
-              </a>
-            );
-          })}
-        </div>
-      </nav>
-    </>
+    <nav className="rail" id="reader-rail" aria-label="Reader navigation">
+      <span className="brand">
+        z<b>.</b>
+      </span>
+      <div className="rail-section">
+        <h2>Read</h2>
+        <a
+          className={`navlink${noFilter ? " on" : ""}`}
+          href="/"
+          aria-current={noFilter ? "page" : undefined}
+        >
+          Latest
+        </a>
+      </div>
+      <div className="rail-section">
+        <h2>Intents</h2>
+        {intents.map((label) => {
+          const isActive = currentFilter === label;
+          return (
+            <a
+              key={label}
+              className={`navlink${isActive ? " on" : ""}`}
+              href={`/?filter=${encodeURIComponent(label)}`}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {label}
+            </a>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
