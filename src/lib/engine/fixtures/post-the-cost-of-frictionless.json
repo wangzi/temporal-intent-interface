@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-004",
+    "slug": "the-cost-of-frictionless",
+    "title": "The Cost of Frictionless",
+    "published_at": "2026-03-31T00:00:00Z",
+    "reading_time": 4,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "Automation Without Taste",
+    "intent_statement": "Warn that automating judgment away can degrade the meaning it was meant to serve.",
+    "central_question": "What gets removed when we remove every step?",
+    "core_insight": "Some friction is the place where taste and intent actually live.",
+    "core_insight_visible": true,
+    "topics": ["automation", "taste", "judgment"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">Frictionless is not free. Each removed step also removes a moment where a human could have applied taste.</p><p data-text-origin=\"canonical\">Automation without judgment scales output and flattens meaning at the same time.</p><p data-text-origin=\"canonical\">The aim is not maximum speed. The aim is to spend attention on the parts that deserve it.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2026-03-31T00:00:00Z"
+  }
+}

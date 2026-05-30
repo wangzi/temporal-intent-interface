@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-001",
+    "slug": "why-technology-still-needs-humanity",
+    "title": "Why Technology Still Needs Humanity",
+    "published_at": "2026-05-25T00:00:00Z",
+    "reading_time": 2,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "Humanity & Technology",
+    "intent_statement": "Explore whether technology can amplify human judgment without replacing agency.",
+    "central_question": "Can a tool extend human judgment without quietly replacing it?",
+    "core_insight": "Technology becomes meaningful when joined to context, judgment, and care.",
+    "core_insight_visible": true,
+    "topics": ["tools", "judgment", "agency"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">Technology alone is not enough. The question is whether tools can amplify human judgment without replacing it.</p><p data-text-origin=\"canonical\">A good tool does not erase the human. It gives the human a clearer surface for choice — more signal, less noise, and a shorter path between intent and action.</p><p data-text-origin=\"canonical\">The failure mode is automation that hides its reasoning. When a system decides without showing why, it does not extend judgment; it quietly substitutes for it.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2026-05-25T00:00:00Z"
+  }
+}

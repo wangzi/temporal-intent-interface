@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-008",
+    "slug": "you-are-here",
+    "title": "You Are Here",
+    "published_at": "2025-10-14T00:00:00Z",
+    "reading_time": 2,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "Temporal Interfaces",
+    "intent_statement": "Propose a single fixed marker for 'now' through which all content flows.",
+    "central_question": "Where do you stand when you are reading time?",
+    "core_insight": "One stable point of attention is calmer than a marker that chases the page.",
+    "core_insight_visible": true,
+    "topics": ["dot", "attention", "stillness"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">The dot is not a badge or a mascot. It is a you-are-here point — closer to a cursor or a recording light.</p><p data-text-origin=\"canonical\">Content moves through the fixed dot. The reader's attention stays still while time passes by.</p><p data-text-origin=\"canonical\">Stillness at the center is what makes the motion legible.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2025-10-14T00:00:00Z"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-002",
+    "slug": "reading-as-an-active-operation",
+    "title": "Reading as an Active Operation",
+    "published_at": "2026-05-14T00:00:00Z",
+    "reading_time": 3,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "AI-Native Reading",
+    "intent_statement": "Argue that reading should become an operation the reader performs, not content the reader receives.",
+    "central_question": "What changes if a page can be thought with, not just read?",
+    "core_insight": "The unit of reading shifts from the page to the passage you choose to act on.",
+    "core_insight_visible": true,
+    "topics": ["reading", "attention", "ai-native"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">Most reading interfaces assume one entry, one order, one isolated page. But thought has recurrence, revision, and relationship.</p><p data-text-origin=\"canonical\">An AI-native reader treats a passage as a starting point for cognition: remember it, challenge it, project from it, branch to a related thought.</p><p data-text-origin=\"canonical\">The interface should stay quiet until the reader acts. AI is summoned from focus, never pushed onto the page.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2026-05-14T00:00:00Z"
+  }
+}

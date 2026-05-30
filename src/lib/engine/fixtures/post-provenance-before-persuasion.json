@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-006",
+    "slug": "provenance-before-persuasion",
+    "title": "Provenance Before Persuasion",
+    "published_at": "2026-01-21T00:00:00Z",
+    "reading_time": 2,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "AI-Native Reading",
+    "intent_statement": "Insist that generated text must be visibly distinct from authored prose, always.",
+    "central_question": "What makes a generated sentence trustworthy?",
+    "core_insight": "Trust comes from seeing where a thought came from, not from how smooth it reads.",
+    "core_insight_visible": true,
+    "topics": ["provenance", "trust", "ai"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">Generated text earns its place only when it cannot be mistaken for the author.</p><p data-text-origin=\"canonical\">Serif is the author; mono is the system. The seam is a feature, not a flaw.</p><p data-text-origin=\"canonical\">Provenance that is only metadata is not trust. The reader has to be able to see the source.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2026-01-21T00:00:00Z"
+  }
+}

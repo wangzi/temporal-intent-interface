@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-005",
+    "slug": "a-journal-is-a-field-not-a-list",
+    "title": "A Journal Is a Field, Not a List",
+    "published_at": "2026-02-13T00:00:00Z",
+    "reading_time": 3,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "Memory Systems",
+    "intent_statement": "Reframe the archive as a temporal field of meaning rather than a stack of posts.",
+    "central_question": "How does an archive remember instead of forget?",
+    "core_insight": "Old entries are not buried; they are the ground the new ones stand on.",
+    "core_insight_visible": true,
+    "topics": ["memory", "archive", "compounding"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">A list forgets. A field remembers — it lets earlier thoughts stay reachable and keeps their relationships visible.</p><p data-text-origin=\"canonical\">The archive is memory. Traveling down the spine is traveling back through your own thinking.</p><p data-text-origin=\"canonical\">What compounds is not the count of posts but the connections between them.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2026-02-13T00:00:00Z"
+  }
+}

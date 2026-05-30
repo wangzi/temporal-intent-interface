@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-007",
+    "slug": "tools-that-return-attention",
+    "title": "Tools That Return Attention",
+    "published_at": "2025-12-07T00:00:00Z",
+    "reading_time": 3,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "Humanity & Technology",
+    "intent_statement": "Define a good tool as one that returns the reader's attention rather than consuming it.",
+    "central_question": "What is the right thing to measure a tool by?",
+    "core_insight": "Measure a tool by the attention it gives back, not the time it captures.",
+    "core_insight_visible": true,
+    "topics": ["tools", "attention", "engagement"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">An instrument is honest about what it is for. It points your attention and then gets out of the way.</p><p data-text-origin=\"canonical\">Engagement is the wrong target. Returned attention is the right one.</p><p data-text-origin=\"canonical\">A reader should leave with more clarity than they arrived with.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2025-12-07T00:00:00Z"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "post": {
+    "post_id": "p-003",
+    "slug": "time-is-the-honest-axis",
+    "title": "Time Is the Honest Axis",
+    "published_at": "2026-04-26T00:00:00Z",
+    "reading_time": 2,
+    "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+    "intent_label": "Temporal Interfaces",
+    "intent_statement": "Hold that the vertical axis must represent chronological truth and nothing else.",
+    "central_question": "What does the vertical line mean?",
+    "core_insight": "Mixing semantic distance into the time axis makes both unreadable.",
+    "core_insight_visible": true,
+    "topics": ["time", "interface", "trust"],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">The spine is time. Scrolling down travels backward into memory; the newest thought sits at the top.</p><p data-text-origin=\"canonical\">Meaning does not live on the vertical axis. Relationships branch sideways, as a separate, explainable view.</p><p data-text-origin=\"canonical\">Keeping the axis honest is what lets the reader trust where they are.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2026-04-26T00:00:00Z"
+  }
+}
