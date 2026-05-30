@@ -22,15 +22,20 @@
 .DS_Store
 *.pem
 
+# macOS Finder + iCloud duplicate-file pattern (e.g. `foo 2.tsx`)
+* 2.*
+*\ 2.*
+
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
-.env*.local
-.env
+# env (covers .env, .env.local, .env.development, etc.)
+.env*
+# But keep templates committed.
+!.env*.example
 
 # vercel
 .vercel

@@ -1,7 +1,8 @@
 {
-  "name": "z-stillinlove-co",
+  "name": "tii",
   "private": true,
   "version": "0.0.1",
+  "description": "Temporal Intent Interface — the public reader at z.stillinlove.co. Consumes journalkit's read API server-side; holds no durable state.",
   "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=20"
@@ -14,9 +15,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "next": "^15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "server-only": "^0.0.1",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",

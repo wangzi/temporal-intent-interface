@@ -1,18 +1,697 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Design tokens — PRD §13.
+   Light defaults; dark overrides below.
+   ============================================================ */
+@theme inline {
+  --color-field: #fcfcfa;
+  --color-ink: #1a1a1a;
+  --color-ink-soft: #3a3a3a;
+  --color-system: #6b6b6b;
+  --color-system-faint: #9a9a95;
+  --color-dot: #e5484d;
+  --color-branch: #c9c9c4;
+  --color-focus: #2b6cb0;
+  --color-rule: #ececE8;
+
+  --font-serif:
+    "Newsreader", Georgia, "Times New Roman", serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
 :root {
-  color-scheme: dark;
+  /* Aliases so prototype-ported CSS keeps reading `var(--ink)` etc. */
+  --field: var(--color-field);
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink-soft);
+  --system: var(--color-system);
+  --system-faint: var(--color-system-faint);
+  --dot: var(--color-dot);
+  --branch: var(--color-branch);
+  --focus: var(--color-focus);
+  --rule: var(--color-rule);
+
+  --serif: var(--font-serif);
+  --mono: var(--font-mono);
+
+  /* Fluid type — text size responds to horizontal space, then caps. */
+  --t-meta: 0.75rem;
+  --t-label: 0.8125rem;
+  --t-body: clamp(1.0625rem, 1rem + 0.4vw, 1.1875rem);
+  --t-insight: 0.9375rem;
+  --t-title-scan: clamp(1.35rem, 1.08rem + 1.05vw, 1.62rem);
+  --t-title-read: clamp(1.7rem, 1.25rem + 1.5vw, 2.15rem);
+
+  /* Layout — line-length cap never grows past --measure. */
+  --measure: 66ch;
+  --gutter: 0px;
+  --content-pad: 64px;
+  --rail-w: 0px;
+  --index-w: 0px;
+  --spine-x: 28px;
+  --dot-vh: 40;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
-html,
-body {
-  height: 100%;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-field: #0e0e0e;
+    --color-ink: #eceae4;
+    --color-ink-soft: #c4c0b6;
+    --color-system: #9a9a92;
+    --color-system-faint: #6b6b63;
+    --color-dot: #ff5a5f;
+    --color-branch: #3a3a36;
+    --color-rule: #222220;
+  }
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto;
 }
 
 body {
-  background: #0a0a0a;
-  color: #f5f5f5;
-  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--serif);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  min-height: 100%;
+}
+
+::selection {
+  background: rgba(229, 72, 77, 0.16);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+/* ============================================================
+   App shell — 3-track grid: [rail | reading area | time index]
+   ============================================================ */
+.app {
+  display: grid;
+  grid-template-columns: var(--rail-w) 1fr var(--index-w);
+  min-height: 100vh;
+}
+
+/* ============================================================
+   Top bar — mobile + tablet
+   ============================================================ */
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 18px;
+  background: color-mix(in srgb, var(--field) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.brand b {
+  color: var(--dot);
+  font-weight: 500;
+}
+
+.menu-btn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  margin-right: -10px;
+  color: var(--system);
+}
+
+.menu-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================================
+   Nav rail — slide panel (mobile) / persistent (laptop+)
+   ============================================================ */
+.rail {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  width: min(82vw, 300px);
+  background: var(--field);
+  border-right: 1px solid var(--rule);
+  padding: 26px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  transform: translateX(-102%);
+  transition: transform 0.26s var(--ease);
+}
+
+body.nav-open .rail {
+  transform: translateX(0);
+}
+
+.rail .brand {
+  font-size: 0.875rem;
+}
+
+.rail-section h2 {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  margin-bottom: 12px;
+}
+
+.rail a,
+.rail button.navlink {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--system);
+  padding: 7px 0;
+  transition: color 0.15s;
+}
+
+.rail a:hover,
+.rail button.navlink:hover {
+  color: var(--ink);
+}
+
+.rail .navlink.on {
+  color: var(--dot);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  background: rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.26s;
+}
+
+body.nav-open .scrim {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ============================================================
+   Reading column
+   ============================================================ */
+.reader {
+  grid-column: 2;
+  position: relative;
+  padding-top: 52px;
+}
+
+.col {
+  position: relative;
+  width: 100%;
+  max-width: calc(var(--measure) + var(--content-pad) + 24px);
+  margin: 0 auto;
+  padding: 0 20px 40vh 0;
+}
+
+/* Spine — vertical time line. Decorative; aria-hidden in markup. */
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 40vh;
+  left: var(--spine-x, 28px);
+  width: 1px;
+  background: linear-gradient(var(--branch), var(--branch));
+  opacity: 0.9;
+}
+
+.spine::after {
+  /* Quiet end-cap at the deep archive. */
+  content: "";
+  position: absolute;
+  left: -2px;
+  bottom: -1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--branch);
+}
+
+.now-label {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  padding: 24px 0 8px var(--content-pad);
+}
+
+/* ============================================================
+   Entries — Layer 1 (Title + Intent), idle + enriched
+   ============================================================ */
+.entry {
+  position: relative;
+  padding: 5.5vh 0 5.5vh var(--content-pad);
+  border: 0;
+}
+
+.e-meta {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+}
+
+.e-meta .dot-sep {
+  opacity: 0.5;
+  margin: 0 6px;
+}
+
+.e-label {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--system);
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+  transition: color 0.2s;
+}
+
+.e-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: var(--t-title-scan);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  max-width: var(--measure);
+}
+
+.e-title a,
+.e-title button {
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  display: inline;
+}
+
+.e-title a:hover,
+.e-title button:hover {
+  color: var(--dot);
+}
+
+.e-snippet {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-top: 8px;
+  max-width: var(--measure);
+}
+
+/* Scan-density: idle → enriched.
+   PROGRESSIVE-ENHANCEMENT NOTE:
+   JS-off readers see the .enrich block visible (no .collapsed class).
+   On JS hydration, ReaderControlsIsland adds .collapsed to non-active
+   entries, measured-height-style, so the transition starts smoothly. */
+.enrich {
+  max-width: var(--measure);
+  overflow: hidden;
+  max-height: 340px;
+  opacity: 1;
+  transition:
+    max-height 0.32s var(--ease),
+    opacity 0.26s var(--ease),
+    margin-top 0.3s var(--ease);
+  margin-top: 18px;
+}
+
+.enrich.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+}
+
+.enrich .k {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  display: block;
+  margin-bottom: 5px;
+}
+
+.enrich .statement {
+  font-family: var(--mono);
+  font-size: var(--t-insight);
+  line-height: 1.55;
+  color: var(--system);
+  margin-bottom: 16px;
+}
+
+.enrich .insight {
+  font-family: var(--mono);
+  font-size: var(--t-insight);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* Active entry. */
+.entry.active .e-label {
+  color: var(--dot);
+}
+
+/* ============================================================
+   Fixed dot — attention / now.
+   Positioned by ReaderControlsIsland on JS-on; CSS baseline keeps it
+   visible at 40vh / spine-x for JS-off readers.
+   ============================================================ */
+.dot {
+  position: fixed;
+  z-index: 30;
+  top: calc(var(--dot-vh, 40) * 1vh);
+  left: var(--spine-x, 28px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dot);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.2s var(--ease),
+    height 0.2s var(--ease),
+    box-shadow 0.2s;
+  pointer-events: none;
+}
+
+.dot.big {
+  width: 13px;
+  height: 13px;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--dot) 12%, transparent);
+}
+
+/* ============================================================
+   Time index — wide desktop only
+   ============================================================ */
+.timeindex {
+  grid-column: 3;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding-left: 18px;
+  border-left: 1px solid var(--rule);
+}
+
+.timeindex button {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--system-faint);
+  padding: 5px 8px;
+  text-align: left;
+  border-radius: 3px;
+}
+
+.timeindex button:hover {
+  color: var(--ink);
+}
+
+.timeindex button.on {
+  color: var(--dot);
+}
+
+/* ============================================================
+   Attention — the /post/[slug] route (NOT an overlay).
+   Same shell pattern, no modal positioning.
+   ============================================================ */
+.attn-inner {
+  position: relative;
+  max-width: calc(var(--measure) + 80px);
+  margin: 0 auto;
+  padding: 80px 28px 120px var(--content-pad);
+}
+
+.attn-inner .spine2 {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--spine-x, 28px);
+  width: 1px;
+  background: var(--branch);
+  opacity: 0.7;
+}
+
+.attn-back {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--system);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--field) 86%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.attn-back:hover {
+  color: var(--ink);
+}
+
+.attn-label {
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--system);
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+}
+
+.attn-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: var(--t-title-read);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  margin-bottom: 8px;
+}
+
+.attn-meta {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+  margin-bottom: 36px;
+}
+
+.attn-body p {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.62;
+  color: var(--ink);
+  margin-bottom: 1.25em;
+  max-width: var(--measure);
+}
+
+.attn-hint {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--system-faint);
+  margin-top: 42px;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+   Keyboard hint chip (laptop+)
+   ============================================================ */
+.kbd-hint {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 35;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--system-faint);
+  background: color-mix(in srgb, var(--field) 80%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  padding: 8px 11px;
+  display: none;
+  line-height: 1.7;
+}
+
+.kbd-hint kbd {
+  color: var(--system);
+  font-family: var(--mono);
+}
+
+/* ============================================================
+   Breakpoints — how horizontal space is spent.
+   Vertical = navigation everywhere. Horizontal is layout only.
+   ============================================================ */
+
+/* Mobile portrait: single column, hamburger, base type. */
+@media (max-width: 700px) {
+  :root {
+    --spine-x: 28px;
+    --content-pad: 56px;
+  }
+  .col {
+    padding-right: 18px;
+  }
+}
+
+/* Tablet / small laptop: wider margins, capped measure, inline top nav. */
+@media (min-width: 701px) and (max-width: 1079px) {
+  :root {
+    --spine-x: 40px;
+    --content-pad: 68px;
+  }
+  .menu-btn {
+    display: none;
+  }
+  .topbar {
+    padding: 0 30px;
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 24px;
+  }
+  .topbar-nav button {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--system);
+  }
+  .topbar-nav button:hover {
+    color: var(--ink);
+  }
+  .topbar-nav button.on {
+    color: var(--dot);
+  }
+}
+
+/* Laptop: persistent rail; measure holds; type steps up. */
+@media (min-width: 1080px) {
+  :root {
+    --rail-w: 248px;
+    --spine-x: 0px;
+    --content-pad: 64px;
+  }
+  .topbar {
+    display: none;
+  }
+  .rail {
+    transform: none;
+    position: fixed;
+    width: 248px;
+  }
+  .scrim {
+    display: none;
+  }
+  .reader {
+    padding-top: 0;
+    min-height: 100vh;
+  }
+  .col {
+    max-width: calc(var(--measure) + var(--content-pad) + 40px);
+    padding: 56px 40px 40vh 0;
+  }
+  .spine {
+    left: 0;
+  }
+  .now-label {
+    padding-top: 0;
+  }
+  .kbd-hint {
+    display: block;
+  }
+}
+
+/* Wide desktop: measure holds; extra width → margin + right-side time index. */
+@media (min-width: 1500px) {
+  :root {
+    --rail-w: 280px;
+    --index-w: 120px;
+  }
+  .timeindex {
+    display: flex;
+  }
+  .reader {
+    display: flex;
+    justify-content: center;
+  }
+  .col {
+    margin: 0 auto;
+  }
+}
+
+/* Reduced motion: kill all transitions + smooth scroll. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
