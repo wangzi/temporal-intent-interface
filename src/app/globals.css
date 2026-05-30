@@ -748,3 +748,83 @@ body.nav-open .scrim {
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================
+   Lab — ScrollMagnifier (experiment)
+   See src/components/lab/ScrollMagnifier.tsx for the math.
+   The component writes `--scale` and `--focus` per item via inline
+   style on every rAF tick; the rules below read those variables so
+   React state stays out of the scroll path.
+   ============================================================ */
+.scroll-magnifier {
+  position: relative;
+  height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  border-radius: 6px;
+  /* Centerline indicator — pure visual hint where the lens sits. */
+  background:
+    linear-gradient(
+      to bottom,
+      transparent calc(50% - 1px),
+      color-mix(in srgb, var(--rule) 60%, transparent) calc(50% - 1px),
+      color-mix(in srgb, var(--rule) 60%, transparent) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    );
+}
+
+.scroll-magnifier:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.scroll-magnifier-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* `--list-pad` is set in pixels by the component on mount + resize so
+     the first and last items can be vertically centered. */
+  padding-top: var(--list-pad, 35vh);
+  padding-bottom: var(--list-pad, 35vh);
+}
+
+.scroll-magnifier-item {
+  text-align: center;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  padding: 10px 0;
+  /* The component writes both vars per frame; CSS reads them.
+     No `transition` here — the rAF cadence is the animation. */
+  transform: scale(var(--scale, 1));
+  transform-origin: center center;
+  will-change: transform;
+  opacity: calc(0.4 + 0.6 * var(--focus, 0));
+}
+
+.scroll-magnifier-item[data-focused="true"] {
+  color: var(--ink);
+}
+
+/* Reduced motion: drop the gradient; mark only the focused item bigger
+   so the reader keeps the "focal point" affordance without smoothing. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-magnifier {
+    scroll-behavior: auto;
+  }
+  .scroll-magnifier-item {
+    transform: none;
+    opacity: 1;
+    will-change: auto;
+  }
+  .scroll-magnifier-item[data-focused="true"] {
+    transform: scale(1.5);
+    color: var(--ink);
+  }
+}
