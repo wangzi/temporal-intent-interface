@@ -356,6 +356,34 @@ GET endpoints do not start expensive generation
 the reader path never blocks on generation
 ```
 
+### 10.1 Wire contract — source of truth + lockstep
+
+Mirrors the same back-reference Atomic's `CLAUDE.md ## External Integrations` carries, so the three repos (TII, journalkit, Atomic) all point at one contract source instead of drifting.
+
+The TII ↔ journalkit wire contract is **frozen** at two synchronised references:
+
+| Source | Path | Authority |
+|---|---|---|
+| PRD §9 | `~/Desktop/session2_tii/canonical_prd.md` | Product spec — what each endpoint exposes and why |
+| journalkit §18.6 | `~/Desktop/journalkit/CLAUDE.md` | Engine spec — response shapes, auth, error envelopes |
+
+These must stay in lockstep. If they diverge, neither side ships the change until both are updated.
+
+**Lockstep rule (PRD §18.6):** any contract change ships as **two paired PRs** — one on `wangzi/journalkit` (engine endpoint), one on `wangzi/z` (TII caller) — each PR description referencing the other. Neither side deviates silently.
+
+**Working rule for this repo:**
+
+- **Do not invent endpoints.** If a route or field is missing, file an issue against journalkit (or flag in a sync to that session) before adding TII code that depends on it.
+- TII **consumes** the contract — it does not own it. Adding new fields to local fixtures (`src/lib/engine/fixtures/*.json`) is fine for experimentation, but those experiments are not the contract until they're round-tripped through PRD §9 + journalkit §18.6.
+- The `JOURNALKIT_API_KEY` boundary stays as documented above: server-only, never reachable from the browser.
+
+**Cross-repo cousins:**
+
+- **journalkit** — `~/Desktop/journalkit/`, `https://github.com/wangzi/journalkit`. The headless engine. Deployed at `studio.stillinlove.co` (PRD §10). Owns Supabase project `z_journal` (ref `zrbvwywfgdptvgbsgykb`); Google OAuth + `allowed_authors` allowlist.
+- **Atomic** — `~/Desktop/Atomic/`, `https://github.com/wangzi/Atomic`. iOS voice-capture app. Also consumes journalkit's `/api/v1/*` (a different surface). Its `## External Integrations` section mirrors the same posture; this section is TII's matching back-reference.
+
+**Mock → engine swap status (2026-05-30):** TII's `/api/v1/*` BFF currently serves the 8 fixture posts (`p-001…p-008`, author `u-zi`) under `JOURNALKIT_FIXTURE_MODE=true`. The endpoints `/api/v1/intents/{post_id}/edges`, `/api/v1/site/now`, and `/api/v1/site/pinned` are 404 today — they are Phase C surfaces. The real engine read API is journalkit's PR 2 (planned, not implemented). Cutover = the paired-PR pattern above + flipping `JOURNALKIT_FIXTURE_MODE=false` and setting `JOURNALKIT_API_KEY` in Vercel env.
+
 ---
 
 ## 11. Code conventions
