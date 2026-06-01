@@ -1501,3 +1501,41 @@ body.nav-open .scrim {
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* --- stone-travel (FLIP) + header landing slot --- */
+.sheet-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sheet-played {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: transparent;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.sheet-played.is-machine {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.sheet-played.is-human {
+  background: transparent;
+  border-color: var(--ink);
+}
+.go-fly {
+  position: fixed;
+  z-index: 70;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+.go-fly[data-color="machine"] {
+  background: var(--ink);
+}
+.go-fly[data-color="human"] {
+  background: var(--field);
+  border: 1.5px solid var(--ink);
+}

@@ -12,14 +12,22 @@
 
 type Family = "machine" | "human";
 
-export function GoBoard({ onOpen }: { onOpen: (family: Family) => void }) {
+// onOpen receives the clicked stone's rect so the parent can fly a
+// matching stone from here into the review sheet (FLIP).
+export function GoBoard({
+  onOpen,
+}: {
+  onOpen: (family: Family, rect: DOMRect) => void;
+}) {
   return (
     <div className="go" role="group" aria-label="Review the moves">
       <div className="go-grid" aria-hidden="true" />
       <button
         type="button"
         className="go-stone go-stone--black"
-        onClick={() => onOpen("machine")}
+        onClick={(e) =>
+          onOpen("machine", e.currentTarget.getBoundingClientRect())
+        }
         aria-label="Open the review — the machine’s move, 37"
       >
         <span className="go-num" aria-hidden="true">37</span>
@@ -27,7 +35,9 @@ export function GoBoard({ onOpen }: { onOpen: (family: Family) => void }) {
       <button
         type="button"
         className="go-stone go-stone--white"
-        onClick={() => onOpen("human")}
+        onClick={(e) =>
+          onOpen("human", e.currentTarget.getBoundingClientRect())
+        }
         aria-label="Open the review — the human’s move, 78"
       >
         <span className="go-num" aria-hidden="true">78</span>

@@ -51,6 +51,7 @@ export function ReviewSheet({
   opening,
   moves,
   family,
+  played,
   onOpening,
   onToggle,
   onClose,
@@ -59,6 +60,8 @@ export function ReviewSheet({
   opening: Opening;
   moves: FooterMoves;
   family: Family;
+  /** Which stone has landed in the header (null until the fly finishes). */
+  played: Family | null;
   onOpening: (o: Opening) => void;
   onToggle: (k: keyof FooterMoves) => void;
   onClose: () => void;
@@ -94,7 +97,17 @@ export function ReviewSheet({
       >
         <div className="sheet-inner">
           <div className="sheet-head">
-            <span className="sheet-title mono">review</span>
+            <span className="sheet-head-left">
+              {/* The stone played from the board lands here (FLIP target). */}
+              <span
+                data-played-slot
+                className={`sheet-played${
+                  played ? ` is-${played}` : ""
+                }`}
+                aria-hidden="true"
+              />
+              <span className="sheet-title mono">review</span>
+            </span>
             <button
               type="button"
               className="sheet-close mono"
