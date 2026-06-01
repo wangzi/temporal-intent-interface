@@ -449,38 +449,86 @@ body.nav-open .scrim {
 }
 
 /* ============================================================
-   Time index — wide desktop only
+   Top years nav — laptop+ only. Auto-hides under a top-edge hover
+   strip (same UX as the left rail; rotated 90°).
    ============================================================ */
-.timeindex {
-  grid-column: 3;
-  position: sticky;
-  top: 0;
-  align-self: start;
-  height: 100vh;
+.topyears,
+.topyears-trigger {
   display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  padding-left: 18px;
-  border-left: 1px solid var(--rule);
 }
 
-.timeindex button {
-  font-family: var(--mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  color: var(--system-faint);
-  padding: 5px 8px;
-  text-align: left;
-  border-radius: 3px;
-}
+@media (min-width: 1080px) {
+  .topyears {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 48;
+    background: color-mix(in srgb, var(--field) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
+    transform: translateY(-100%);
+    transition: transform 0.28s var(--ease);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+  }
+  .topyears ol {
+    list-style: none;
+    margin: 0;
+    padding: 14px 40px;
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+  }
+  .topyears button {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--system-faint);
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+  .topyears button:hover {
+    color: var(--ink);
+  }
+  .topyears button.on {
+    color: var(--dot);
+  }
 
-.timeindex button:hover {
-  color: var(--ink);
-}
+  /* Hover trigger strip on the top edge — invisible 16px tall band
+     with a faint hairline as a discovery cue, mirrors the rail
+     trigger. */
+  .topyears-trigger {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    z-index: 47;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--rule) 80%, transparent),
+      transparent
+    );
+    transition: background 0.2s var(--ease);
+  }
+  .topyears-trigger:hover {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--system-faint) 30%, transparent),
+      transparent
+    );
+  }
 
-.timeindex button.on {
-  color: var(--dot);
+  /* Sibling selector: hovering the trigger reveals the panel; once
+     the panel is visible, hover-on-panel keeps it open. */
+  .topyears-trigger:hover ~ .topyears,
+  .topyears:hover {
+    transform: translateY(0);
+  }
 }
 
 /* ============================================================
@@ -804,15 +852,11 @@ body.nav-open .scrim {
   }
 }
 
-/* Wide desktop: measure holds; extra width → margin + right-side time index. */
+/* Wide desktop: measure holds; extra width → margin only. (Years
+   live in the top-edge nav at all laptop+ breakpoints now; no
+   right-side time-index.) Note `--rail-w` stays 0 — rail is auto-hide
+   at every laptop+ width. */
 @media (min-width: 1500px) {
-  :root {
-    --rail-w: 280px;
-    --index-w: 120px;
-  }
-  .timeindex {
-    display: flex;
-  }
   .reader {
     display: flex;
     justify-content: center;
