@@ -23,6 +23,11 @@ export function TemporalLayout({
   return (
     <>
       {topBar}
+      {/* Hover trigger for the auto-hide rail at laptop+. Sits as a
+          thin invisible strip on the viewport's left edge; hovering
+          slides the rail into view via the `.rail-trigger:hover ~ .rail`
+          sibling selector in globals.css. */}
+      <div className="rail-trigger" aria-hidden="true" />
       {rail}
       <div className="app">
         <main className="reader" id="reader-main">

@@ -686,20 +686,33 @@ body.nav-open .scrim {
   }
 }
 
-/* Laptop: persistent rail; measure holds; type steps up. */
+/* Laptop: auto-hide rail + meta column left of spine; measure holds;
+   type steps up. */
 @media (min-width: 1080px) {
   :root {
-    --rail-w: 248px;
-    --spine-x: 0px;
+    /* No layout-reserved rail — it's auto-hide, floats over content. */
+    --rail-w: 0px;
+    /* Spine sits to the RIGHT of the meta column (was at col-left=0). */
+    --spine-x: 128px;
     --content-pad: 64px;
+    /* Width of the left-of-spine meta column. */
+    --meta-width: 112px;
   }
   .topbar {
     display: none;
   }
+  /* Auto-hide rail: off-screen by default; slides in on hover of the
+     left-edge trigger strip (`.rail-trigger`) or the rail itself. */
   .rail {
-    transform: none;
     position: fixed;
     width: 248px;
+    transform: translateX(-100%);
+    transition: transform 0.28s var(--ease);
+    box-shadow: 4px 0 18px rgba(0, 0, 0, 0.06);
+  }
+  .rail-trigger:hover ~ .rail,
+  .rail:hover {
+    transform: translateX(0);
   }
   .scrim {
     display: none;
@@ -709,17 +722,85 @@ body.nav-open .scrim {
     min-height: 100vh;
   }
   .col {
-    max-width: calc(var(--measure) + var(--content-pad) + 40px);
+    /* Wider col now that meta lives inside it on the left. */
+    max-width: calc(
+      var(--measure) + var(--meta-width) + var(--content-pad) + 40px
+    );
     padding: 56px 40px 40vh 0;
   }
   .spine {
-    left: 0;
+    left: var(--spine-x);
   }
+  /* Now-label aligns with the content column, not the meta gutter. */
   .now-label {
     padding-top: 0;
+    padding-left: calc(var(--spine-x) + var(--content-pad));
+  }
+  /* Push entry content past the spine; meta uses the now-free left gutter. */
+  .entry {
+    padding-left: calc(var(--spine-x) + var(--content-pad));
+  }
+  /* Meta column — vertically stacked, right-aligned against the spine. */
+  .e-meta {
+    position: absolute;
+    top: 5.5vh;
+    left: 0;
+    width: var(--meta-width);
+    padding-right: 12px;
+    text-align: right;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1.3;
+    font-size: 0.6875rem;
+    color: var(--system-faint);
+  }
+  /* Hide inline `·` separators; the line breaks ARE the separator. */
+  .e-meta .dot-sep {
+    display: none;
+  }
+  /* Block-flow each segment so they stack inside the flex column. */
+  .e-meta time,
+  .e-meta .e-meta-ago,
+  .e-meta > span:last-of-type {
+    display: block;
   }
   .kbd-hint {
     display: block;
+  }
+}
+
+/* Auto-hide rail trigger strip — only present at laptop+, where the
+   rail is hover-revealed (CSS-only). Sits over content as an invisible
+   16px wide hover zone on the viewport's left edge. */
+.rail-trigger {
+  display: none;
+}
+@media (min-width: 1080px) {
+  .rail-trigger {
+    display: block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 16px;
+    z-index: 49;
+    /* Visual hint: a faint hairline that thickens slightly on hover so
+       the affordance is discoverable without dominating. */
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--rule) 80%, transparent),
+      transparent
+    );
+    transition: background 0.2s var(--ease);
+  }
+  .rail-trigger:hover {
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--system-faint) 30%, transparent),
+      transparent
+    );
   }
 }
 
