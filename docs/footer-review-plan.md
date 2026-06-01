@@ -2,7 +2,11 @@
 
 **Branch:** `feat/footer-review` (off `main` @ 04cbee1)
 **Goal:** promote the lab's footer-review (Go stones → slide-up sheet → live move toggles) from `/lab/footer` into the **real reader footer** on `/` and `/post/[slug]`, without breaking SSR / JS-off.
-**Status:** PLAN — not yet built. Blocked on the decisions in §6 (chiefly: which layout is the default, and state scope).
+**Status:** ✅ BUILT on this branch (commit `62c5624`), preview-verified, **not merged to main** (awaits explicit authorization).
+
+**Resolved decisions (§6):** (1) default opening = **Closing column** · (2) state scope = **per-page reset** (A1) · (3) post-route footer = **full** (adds `listPosts()`) · (4) moves = **footer-only** in v1 · (5) live-visibility = **mini live-preview in the sheet** · (6) board = client-only, sole entry. All three openings stay selectable from the board — keeping all three (the reader chooses the footer's voice) rather than picking one winner.
+
+**Implementation note:** components stayed in their `components/lab/footer/` + `lib/lab/` paths for this pass (imported by the new `components/reader/FooterReview.tsx`); the namespace move out of `lab/` is a deferred cleanup. The old `Footer.tsx` is superseded but left in place (unimported).
 
 ---
 
