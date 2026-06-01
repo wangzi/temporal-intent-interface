@@ -80,6 +80,14 @@
 
 html {
   scroll-behavior: auto;
+  /* Opt out of scroll anchoring. The scan-density reveal animates
+     .enrich max-height (a layout property); with anchoring on, the
+     browser nudges scrollY to compensate, which fires a scroll event,
+     which the reader's scroll handler reacts to by toggling that same
+     .enrich — a self-sustaining expand/collapse oscillation that reads
+     as constant idle jitter. We manage scroll position ourselves
+     (fixed dot + keyboard nav), so anchoring is unwanted here. */
+  overflow-anchor: none;
 }
 
 body {
@@ -89,6 +97,7 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100%;
+  overflow-anchor: none;
 }
 
 ::selection {
