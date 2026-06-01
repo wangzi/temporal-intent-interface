@@ -64,12 +64,7 @@ export function FooterSpine({
             </li>
           )}
         </ul>
-
-        <p className="lf-spine-foot">
-          <a href="https://studio.stillinlove.co" className="lf-spine-studio">
-            studio / sign in →
-          </a>
-        </p>
+        {/* Studio bridge relocated to the Lab (review sheet). */}
       </div>
     </footer>
   );

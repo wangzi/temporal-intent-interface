@@ -177,6 +177,17 @@ export function ReviewSheet({
               ))}
             </ul>
           </div>
+
+          {/* The Lab's own footer: the Studio bridge lives here now, not
+              ambiently in the page footer — summoned with everything else. */}
+          <div className="sheet-foot">
+            <a
+              href="https://studio.stillinlove.co"
+              className="sheet-studio mono"
+            >
+              Studio / Sign in →
+            </a>
+          </div>
         </div>
       </section>
     </>

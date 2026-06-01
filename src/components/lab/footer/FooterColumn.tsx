@@ -64,10 +64,9 @@ export function FooterColumn({
 
         {moves.ask && <ArchiveAsk posts={posts} variant="column" />}
 
+        {/* The Studio bridge now lives in the Lab (review sheet), not here.
+            What remains is the terminus: a single red period. */}
         <p className="lf-col-foot">
-          <a href="https://studio.stillinlove.co" className="lf-col-studio">
-            Studio / Sign in →
-          </a>
           <span className="lf-period" aria-hidden="true">
             .
           </span>

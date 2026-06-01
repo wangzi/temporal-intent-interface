@@ -1288,13 +1288,17 @@ body.nav-open .scrim {
 
 /* --- the board: two stones on a faint corner lattice, bottom-right --- */
 .go {
-  /* Anchored to the spine column, not the right corner: the board's left
-     edge sits on the spine line (--spine-x), so the spine drops into the
-     lattice as its leftmost line and the two stones hang just below/right
-     of the spine's end — the trigger reads as the foot of the spine. */
-  position: fixed;
+  /* Docked at the spine's terminus, not floating. The board is absolute
+     inside .col (the same positioning context as the spine), so its left
+     edge lands on the spine line (--spine-x) automatically — no viewport
+     math, correct at every width. Its top sits at the footer's top edge
+     (--footer-h up from .col's bottom), exactly where the spine ends, so
+     the spine drops straight into the board's leftmost lattice line and
+     the two stones hang just below the join. The trigger IS the foot of
+     the spine. */
+  position: absolute;
   left: var(--spine-x);
-  bottom: 22px;
+  bottom: calc(var(--footer-h) - 132px);
   width: 132px;
   height: 132px;
   z-index: 35;
@@ -1303,16 +1307,19 @@ body.nav-open .scrim {
   position: absolute;
   inset: 0;
   opacity: 0.7;
+  /* Lines start at 0 (not 40) so the leftmost vertical line sits on the
+     board's left edge — i.e. on the spine line — making the spine and the
+     lattice one continuous line. */
   background-image:
     repeating-linear-gradient(
       to right,
-      transparent 0 39px,
-      var(--rule) 39px 40px
+      var(--rule) 0 1px,
+      transparent 1px 40px
     ),
     repeating-linear-gradient(
       to bottom,
-      transparent 0 39px,
-      var(--rule) 39px 40px
+      var(--rule) 0 1px,
+      transparent 1px 40px
     );
 }
 .go-stone {
@@ -1497,6 +1504,26 @@ body.nav-open .scrim {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+/* --- the Lab's own footer: the Studio bridge --- */
+.sheet-foot {
+  margin-top: 6px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+.sheet-studio {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--system);
+  transition: color 0.15s;
+}
+.sheet-studio:hover {
+  color: var(--ink);
+}
+.sheet-studio:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
 /* --- a move = a stone (filled = placed, outline = lifted) --- */

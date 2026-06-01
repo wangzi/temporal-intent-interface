@@ -71,9 +71,7 @@ export function FooterIndex({
             </dd>
           </div>
         )}
-        <Row term="Studio">
-          <a href="https://studio.stillinlove.co">sign in →</a>
-        </Row>
+        {/* Studio bridge relocated to the Lab (review sheet). */}
       </dl>
     </footer>
   );
