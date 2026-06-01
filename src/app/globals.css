@@ -52,6 +52,7 @@
   --index-w: 0px;
   --spine-x: 28px;
   --dot-vh: 40;
+  --footer-h: 300px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
@@ -275,14 +276,27 @@ body.nav-open .scrim {
   width: 100%;
   max-width: calc(var(--measure) + var(--content-pad) + 24px);
   margin: 0 auto;
-  padding: 0 20px 40vh 0;
+  /* No bottom padding: the footer sits flush at the col's bottom so
+     the spine can terminate precisely at the footer's top edge. The
+     scroll "reach" space (so the last entry can reach the dot line)
+     lives on #feed below, ABOVE the footer. */
+  padding: 0 20px 0 0;
 }
 
-/* Spine — vertical time line. Decorative; aria-hidden in markup. */
+/* Reach space: lets the oldest entry scroll up to the dot line at
+   40vh. Sits between the last entry and the footer; the spine runs
+   through it and stops at the footer top. */
+#feed {
+  padding-bottom: 40vh;
+}
+
+/* Spine — vertical time line. Decorative; aria-hidden in markup.
+   Terminates at the TOP of the footer (--footer-h up from col bottom),
+   so the timeline visually runs into the footer's top edge. */
 .spine {
   position: absolute;
   top: 0;
-  bottom: 40vh;
+  bottom: var(--footer-h);
   left: var(--spine-x, 28px);
   width: 1px;
   background: linear-gradient(var(--branch), var(--branch));
@@ -308,6 +322,32 @@ body.nav-open .scrim {
   text-transform: uppercase;
   color: var(--system-faint);
   padding: 24px 0 8px var(--content-pad);
+}
+
+/* ============================================================
+   Site footer — reserved placeholder zone (--footer-h tall).
+   The spine terminates at this footer's top edge. Today it carries
+   only the Studio bridge link; future footer content lands here.
+   ============================================================ */
+.site-footer {
+  position: relative;
+  min-height: var(--footer-h);
+  border-top: 1px solid var(--rule);
+  padding: 28px var(--content-pad) 28px var(--content-pad);
+  display: flex;
+  align-items: flex-start;
+}
+
+.site-footer-link {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  transition: color 0.15s;
+}
+
+.site-footer-link:hover {
+  color: var(--ink);
 }
 
 /* ============================================================
@@ -783,7 +823,8 @@ body.nav-open .scrim {
     max-width: calc(
       var(--measure) + var(--meta-width) + var(--content-pad) + 40px
     );
-    padding: 56px 40px 40vh 0;
+    /* Bottom padding 0 — footer is flush; reach lives on #feed. */
+    padding: 56px 40px 0 0;
   }
   .spine {
     left: var(--spine-x);
@@ -795,6 +836,10 @@ body.nav-open .scrim {
   }
   /* Push entry content past the spine; meta uses the now-free left gutter. */
   .entry {
+    padding-left: calc(var(--spine-x) + var(--content-pad));
+  }
+  /* Footer link aligns with entry content (past the spine). */
+  .site-footer {
     padding-left: calc(var(--spine-x) + var(--content-pad));
   }
   /* Meta column — vertically stacked, right-aligned against the spine. */
