@@ -831,6 +831,15 @@ body.nav-open .scrim {
   .spine {
     left: var(--spine-x);
   }
+  /* Post route (Attention): the spine is a left-margin rule, NOT the
+     archive's 128px meta gutter. --spine-x is 128px here (for the
+     archive meta column), but the post body has no meta gutter and
+     only clears --content-pad (64px) — so the shared token put the
+     spine *inside* the prose. Pin the post spine to the article's left
+     edge instead; the body (at --content-pad) clears it cleanly. */
+  .attn-inner .spine2 {
+    left: 0;
+  }
   /* Now-label aligns with the content column, not the meta gutter. */
   .now-label {
     padding-top: 0;
