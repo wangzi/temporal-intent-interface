@@ -1408,9 +1408,32 @@ body.nav-open .scrim {
   }
 }
 .sheet-inner {
-  max-width: 52rem;
+  max-width: 60rem;
   margin: 0 auto;
-  padding: 24px 28px 40px;
+  padding: 24px 28px 36px;
+}
+
+/* Side-by-side: controls (left) + a large live preview (right). */
+.sheet-grid {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) 1fr;
+  gap: 44px;
+  align-items: stretch;
+}
+.sheet-controls {
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 700px) {
+  .sheet-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  /* preview on top when stacked */
+  .sheet-preview {
+    order: -1;
+    min-height: 150px;
+  }
 }
 .sheet-head {
   display: flex;
@@ -1438,15 +1461,15 @@ body.nav-open .scrim {
   margin-bottom: 28px;
 }
 
-/* --- Mini live-preview ---------------------------------------------------
-   The current position, miniaturised at the top of the sheet. The real
-   footer sits under the open sheet, so this is how the reader sees a
-   move's effect on the whole board. A faithful scale-down on the page
-   field (#fcfcfa) framed by the white sheet; non-interactive. */
+/* --- Live preview (right column) -----------------------------------------
+   The current position rendered large in its own column, so a move's
+   effect on the whole footer is legible at a glance. The real footer sits
+   under the open sheet; this is how the reader sees it change. Stretches
+   to the controls' height; a faithful render on the page field (#fcfcfa)
+   framed by the white sheet; non-interactive. */
 .sheet-preview {
   position: relative;
-  height: 132px;
-  margin-bottom: 28px;
+  min-height: 240px;
   border: 1px solid var(--rule);
   border-radius: 6px;
   overflow: hidden;
@@ -1465,9 +1488,9 @@ body.nav-open .scrim {
   background: var(--field);
 }
 .sheet-preview-scale {
-  transform: scale(0.42);
+  transform: scale(0.6);
   transform-origin: top left;
-  width: 238.1%; /* 1 / 0.42 — the miniature fills the box width */
+  width: 166.67%; /* 1 / 0.6 — the preview fills the column width */
   pointer-events: none;
   user-select: none;
 }
@@ -1475,7 +1498,7 @@ body.nav-open .scrim {
    both inside the box so it reads as a compact position, not a full page. */
 .sheet-preview-scale .lf {
   border-top: 0;
-  padding-top: 18px;
+  padding-top: 22px;
   min-height: 0;
 }
 .sheet-preview-fade {
@@ -1506,11 +1529,12 @@ body.nav-open .scrim {
   gap: 2px;
 }
 
-/* --- the Lab's own footer: the Studio bridge --- */
+/* --- the Lab's own footer: the Studio bridge, right-aligned at the bottom --- */
 .sheet-foot {
-  margin-top: 6px;
+  margin-top: 28px;
   padding-top: 18px;
   border-top: 1px solid var(--rule);
+  text-align: right;
 }
 .sheet-studio {
   font-size: 0.75rem;

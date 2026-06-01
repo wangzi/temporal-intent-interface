@@ -126,56 +126,66 @@ export function ReviewSheet({
             </button>
           </div>
 
-          {preview ? (
-            <div className="sheet-preview" aria-hidden="true">
-              <span className="sheet-preview-tag mono">position</span>
-              <div className="sheet-preview-scale">{preview}</div>
-              <div className="sheet-preview-fade" />
-            </div>
-          ) : null}
-
-          <div className="sheet-section">
-            <p className="sheet-kicker mono">opening</p>
-            <div className="sheet-openings" role="radiogroup" aria-label="Opening">
-              {OPENINGS.map((o) => (
-                <button
-                  key={o.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={opening === o.id}
-                  className={`move${opening === o.id ? " is-on" : ""}`}
-                  onClick={() => onOpening(o.id)}
+          <div className="sheet-grid">
+            <div className="sheet-controls">
+              <div className="sheet-section">
+                <p className="sheet-kicker mono">opening</p>
+                <div
+                  className="sheet-openings"
+                  role="radiogroup"
+                  aria-label="Opening"
                 >
-                  <span className="move-stone" aria-hidden="true" />
-                  <span className="move-label">{o.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+                  {OPENINGS.map((o) => (
+                    <button
+                      key={o.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={opening === o.id}
+                      className={`move${opening === o.id ? " is-on" : ""}`}
+                      onClick={() => onOpening(o.id)}
+                    >
+                      <span className="move-stone" aria-hidden="true" />
+                      <span className="move-label">{o.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          <div className="sheet-section">
-            <p className="sheet-kicker mono">moves</p>
-            <ul className="sheet-moves">
-              {MOVES.map((m) => (
-                <li key={m.key}>
-                  <button
-                    type="button"
-                    aria-pressed={moves[m.key]}
-                    className={`move move--row${moves[m.key] ? " is-on" : ""}${
-                      m.family && m.family === family ? " is-framed" : ""
-                    }`}
-                    onClick={() => onToggle(m.key)}
-                  >
-                    <span className="move-stone" aria-hidden="true" />
-                    <span className="move-label">
-                      {m.num ? <em className="move-num">{m.num}</em> : null}
-                      {m.label}
-                    </span>
-                    <span className="move-gloss">{m.gloss}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+              <div className="sheet-section">
+                <p className="sheet-kicker mono">moves</p>
+                <ul className="sheet-moves">
+                  {MOVES.map((m) => (
+                    <li key={m.key}>
+                      <button
+                        type="button"
+                        aria-pressed={moves[m.key]}
+                        className={`move move--row${moves[m.key] ? " is-on" : ""}${
+                          m.family && m.family === family ? " is-framed" : ""
+                        }`}
+                        onClick={() => onToggle(m.key)}
+                      >
+                        <span className="move-stone" aria-hidden="true" />
+                        <span className="move-label">
+                          {m.num ? <em className="move-num">{m.num}</em> : null}
+                          {m.label}
+                        </span>
+                        <span className="move-gloss">{m.gloss}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Live position — a large preview filling the right column, so
+                a move's effect on the whole footer is legible at a glance. */}
+            {preview ? (
+              <div className="sheet-preview" aria-hidden="true">
+                <span className="sheet-preview-tag mono">position</span>
+                <div className="sheet-preview-scale">{preview}</div>
+                <div className="sheet-preview-fade" />
+              </div>
+            ) : null}
           </div>
 
           {/* The Lab's own footer: the Studio bridge lives here now, not
