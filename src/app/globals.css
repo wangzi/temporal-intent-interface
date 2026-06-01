@@ -332,8 +332,10 @@ body.nav-open .scrim {
 .site-footer {
   position: relative;
   min-height: var(--footer-h);
-  border-top: 1px solid var(--rule);
-  padding: 28px var(--content-pad) 28px var(--content-pad);
+  /* No top hairline — the spine itself is the divider. The link sits
+     directly under the spine's terminus: left edge aligned to the
+     spine (--spine-x), a small gap below the spine's end-cap dot. */
+  padding: 14px var(--content-pad) 28px var(--spine-x);
   display: flex;
   align-items: flex-start;
 }
@@ -838,10 +840,9 @@ body.nav-open .scrim {
   .entry {
     padding-left: calc(var(--spine-x) + var(--content-pad));
   }
-  /* Footer link aligns with entry content (past the spine). */
-  .site-footer {
-    padding-left: calc(var(--spine-x) + var(--content-pad));
-  }
+  /* Footer link stays aligned to the spine (base padding-left already
+     uses --spine-x, which is 128px at laptop) so the spine terminates
+     directly on top of the Studio link. No override needed. */
   /* Meta column — vertically stacked, right-aligned against the spine. */
   .e-meta {
     position: absolute;
