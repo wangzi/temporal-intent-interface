@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Dot } from "@/components/reader/Dot";
-import { Footer } from "@/components/reader/Footer";
+import { FooterReview } from "@/components/reader/FooterReview";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { SelectionLayer } from "@/components/reader/SelectionLayer";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
@@ -16,7 +16,9 @@ import { AttentionView } from "@/components/reader/AttentionView";
 import {
   EngineNotFoundError,
   getPost,
+  listPosts,
 } from "@/lib/engine/client";
+import type { PostSummary } from "@/lib/engine/types";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -63,10 +65,21 @@ export default async function PostPage({
 
   try {
     const { post } = await getPost(slug);
+
+    // The footer (threads / colophon / ask) describes the whole corpus,
+    // so the post route fetches the list too. Non-fatal: if it fails the
+    // footer degrades to an empty corpus and the post still renders.
+    let corpus: PostSummary[] = [];
+    try {
+      corpus = (await listPosts({})).posts;
+    } catch {
+      // swallow — footer degrades, post is unaffected
+    }
+
     return (
       <TemporalLayout>
         <AttentionView post={post} />
-        <Footer />
+        <FooterReview posts={corpus} />
         <Dot />
         <ReaderControlsIsland />
         <SelectionLayer

@@ -1426,6 +1426,56 @@ body.nav-open .scrim {
 .sheet-section {
   margin-bottom: 28px;
 }
+
+/* --- Mini live-preview ---------------------------------------------------
+   The current position, miniaturised at the top of the sheet. The real
+   footer sits under the open sheet, so this is how the reader sees a
+   move's effect on the whole board. A faithful scale-down on the page
+   field (#fcfcfa) framed by the white sheet; non-interactive. */
+.sheet-preview {
+  position: relative;
+  height: 132px;
+  margin-bottom: 28px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--field);
+}
+.sheet-preview-tag {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 2;
+  padding: 2px 5px;
+  font-size: 0.5625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  background: var(--field);
+}
+.sheet-preview-scale {
+  transform: scale(0.42);
+  transform-origin: top left;
+  width: 238.1%; /* 1 / 0.42 — the miniature fills the box width */
+  pointer-events: none;
+  user-select: none;
+}
+/* The previewed footer carries its own top rule + 300px min-height; drop
+   both inside the box so it reads as a compact position, not a full page. */
+.sheet-preview-scale .lf {
+  border-top: 0;
+  padding-top: 18px;
+  min-height: 0;
+}
+.sheet-preview-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36px;
+  background: linear-gradient(to bottom, transparent, var(--field));
+  pointer-events: none;
+}
 .sheet-kicker {
   font-size: 0.625rem;
   letter-spacing: 0.18em;

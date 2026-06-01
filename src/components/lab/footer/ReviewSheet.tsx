@@ -10,7 +10,7 @@
 //
 // Session-only state lives in the parent island; this is pure control.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import type { FooterMoves, Opening } from "@/lib/lab/footer-data";
 
@@ -52,6 +52,7 @@ export function ReviewSheet({
   moves,
   family,
   played,
+  preview,
   onOpening,
   onToggle,
   onClose,
@@ -62,6 +63,13 @@ export function ReviewSheet({
   family: Family;
   /** Which stone has landed in the header (null until the fly finishes). */
   played: Family | null;
+  /**
+   * A live miniature of the current footer position. Rendered non-
+   * interactively at the top of the sheet so the reader sees every move's
+   * effect on the whole board even though the real footer sits under the
+   * open sheet. Optional — the lab passes none.
+   */
+  preview?: ReactNode;
   onOpening: (o: Opening) => void;
   onToggle: (k: keyof FooterMoves) => void;
   onClose: () => void;
@@ -117,6 +125,14 @@ export function ReviewSheet({
               esc
             </button>
           </div>
+
+          {preview ? (
+            <div className="sheet-preview" aria-hidden="true">
+              <span className="sheet-preview-tag mono">position</span>
+              <div className="sheet-preview-scale">{preview}</div>
+              <div className="sheet-preview-fade" />
+            </div>
+          ) : null}
 
           <div className="sheet-section">
             <p className="sheet-kicker mono">opening</p>
