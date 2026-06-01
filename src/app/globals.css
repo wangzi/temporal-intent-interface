@@ -935,27 +935,27 @@ body.nav-open .scrim {
 }
 
 /* ============================================================
-   Lab — footer experiments (/lab/footer). `.labf-*` namespace,
-   scoped so nothing here touches the production footer. Reuses
-   the design tokens; one red accent only.
+   Lab — footer LAYOUT variants (/lab/footer). `.lf-*` namespace,
+   scoped so nothing here touches the production footer. Reuses the
+   design tokens; one red accent only; serif = author, mono = system.
    ============================================================ */
-.labf-page {
-  max-width: 52rem;
+.lf-page {
+  max-width: 56rem;
   margin: 0 auto;
   padding: 10vh 28px 6vh;
 }
-
-.labf-head {
-  margin-bottom: 8vh;
+.lf-head {
+  margin-bottom: 7vh;
 }
-.labf-head-kicker {
+.lf-head-kicker {
+  font-family: var(--mono);
   font-size: 0.6875rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--system-faint);
   margin-bottom: 12px;
 }
-.labf-head-title {
+.lf-head-title {
   font-family: var(--serif);
   font-size: var(--t-title-read);
   line-height: 1.1;
@@ -963,37 +963,35 @@ body.nav-open .scrim {
   color: var(--ink);
   margin-bottom: 14px;
 }
-.labf-head-lede {
+.lf-head-lede {
   font-family: var(--serif);
   font-size: var(--t-body);
   line-height: 1.6;
   color: var(--ink-soft);
   max-width: var(--measure);
 }
-
-/* Each experiment sits in its own bordered "footer zone" so it reads
-   as a footer, with a note above it. */
-.labf-section {
+.lf-section {
   margin-bottom: 9vh;
 }
-.labf-note {
+.lf-note {
   margin-bottom: 22px;
 }
-.labf-note-n {
+.lf-note-n {
+  font-family: var(--mono);
   font-size: 0.6875rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--dot);
   margin-bottom: 8px;
 }
-.labf-note-title {
+.lf-note-title {
   font-family: var(--serif);
   font-size: 1.5rem;
   letter-spacing: -0.01em;
   color: var(--ink);
   margin-bottom: 8px;
 }
-.labf-note-why {
+.lf-note-why {
   font-family: var(--mono);
   font-size: 0.8125rem;
   line-height: 1.55;
@@ -1001,133 +999,222 @@ body.nav-open .scrim {
   max-width: var(--measure);
 }
 
-/* The footer zone shell shared by all three experiments. */
-.labf {
+/* Shared footer-zone shell. */
+.lf {
   position: relative;
   min-height: 300px;
   border-top: 1px solid var(--rule);
-  padding: 30px 0 40px;
+  padding-top: 36px;
 }
-.labf-kicker {
+
+/* --- Variant A · Closing column --- */
+.lf-column-inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+.lf-col-threads {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-bottom: 1.4em;
+}
+.lf-col-thread {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+.lf-col-thread:hover {
+  color: var(--dot);
+  text-decoration-color: var(--dot);
+}
+.lf-col-colophon {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-bottom: 1.8em;
+}
+.lf-col-foot {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  color: var(--system);
+  margin-top: 1.6em;
+}
+.lf-col-studio {
+  color: var(--system);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.lf-col-studio:hover {
+  color: var(--ink);
+}
+.lf-period {
+  color: var(--dot);
+  font-weight: 600;
+}
+
+/* --- Variant B · The Index --- */
+.lf-index-kicker {
+  font-family: var(--mono);
   font-size: 0.6875rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--system-faint);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+}
+.lf-index-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 15px;
+}
+.lf-index-term {
+  flex: 0 1 auto;
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.lf-index-leader {
+  flex: 1 1 auto;
+  align-self: center;
+  min-width: 28px;
+  margin: 0 10px;
+  border-bottom: 1px dotted var(--system-faint);
+  opacity: 0.55;
+}
+.lf-index-ref {
+  flex: 0 0 auto;
+  max-width: 42%;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--system);
+}
+.lf-index-ref a {
+  color: var(--system);
+  transition: color 0.15s;
+}
+.lf-index-ref a:hover {
+  color: var(--dot);
+}
+.lf-index-row--ask .lf-index-ref {
+  max-width: 60%;
 }
 
-/* --- 1. Unresolved threads --- */
-.labf-thread-list {
+/* --- Variant C · Spine annotations --- */
+.lf-spine {
+  padding-left: 26px;
+}
+.lf-spine-stub {
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 28px;
+  width: 1px;
+  background: var(--branch);
+}
+.lf-spine-cap {
+  position: absolute;
+  left: 0;
+  top: 33px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+.lf-spine-stat {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: var(--system-faint);
+  margin-bottom: 22px;
+}
+.lf-spine-threads {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 11px;
 }
-.labf-thread {
-  display: block;
-  max-width: var(--measure);
+.lf-spine-node {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
-.labf-thread-q {
-  display: block;
+.lf-spine-glyph {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--branch);
+  flex: 0 0 auto;
+}
+.lf-spine-q {
   font-family: var(--serif);
-  font-size: 1.15rem;
+  font-size: 1.0625rem;
   line-height: 1.35;
   color: var(--ink);
   transition: color 0.15s;
 }
-.labf-thread:hover .labf-thread-q {
+.lf-spine-q:hover {
   color: var(--dot);
 }
-.labf-thread-label {
-  display: block;
-  margin-top: 4px;
-  font-size: 0.625rem;
+.lf-spine-node--end {
+  margin-top: 6px;
+  align-items: baseline;
+}
+.lf-spine-foot {
+  margin-top: 24px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+.lf-spine-studio {
   color: var(--system-faint);
-}
-
-/* --- 2. Provenance colophon --- */
-.labf-colophon-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 18px;
-  max-width: var(--measure);
-}
-@media (min-width: 720px) {
-  .labf-colophon-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px 40px;
-  }
-}
-.labf-colophon-grid dt {
-  font-size: 0.625rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--dot);
-  margin-bottom: 6px;
-}
-.labf-colophon-grid dd {
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  color: var(--system);
-}
-.labf-sep {
-  margin: 0 6px;
-  opacity: 0.5;
-}
-.labf-colophon-foot {
-  margin-top: 26px;
-  font-size: 0.75rem;
-  color: var(--system-faint);
-}
-.labf-link {
-  color: var(--system);
   transition: color 0.15s;
 }
-.labf-link:hover {
+.lf-spine-studio:hover {
   color: var(--ink);
 }
 
-/* --- 3. Ask the archive --- */
-.labf-ask-form {
+/* --- Shared "Ask the archive" island (variant-skinned) --- */
+.lf-ask-form {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  max-width: var(--measure);
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 8px;
+  align-items: baseline;
+  gap: 8px;
 }
-.labf-ask-input {
-  flex: 1;
+.lf-ask-caret {
+  color: var(--dot);
+  flex: 0 0 auto;
+}
+.lf-ask-input {
+  flex: 1 1 auto;
+  min-width: 0;
   border: none;
   background: none;
-  font-size: 0.9375rem;
-  color: var(--ink);
   outline: none;
+  color: var(--ink);
 }
-.labf-ask-input::placeholder {
+.lf-ask-input::placeholder {
   color: var(--system-faint);
 }
-.labf-ask-go {
-  font-size: 1rem;
-  color: var(--dot);
-  padding: 2px 8px;
+.lf-ask-results {
+  margin-top: 16px;
 }
-.labf-ask-results {
-  margin-top: 22px;
-}
-.labf-ask-list {
+.lf-ask-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
-.labf-ask-hit {
+.lf-ask-hit {
   display: block;
-  max-width: var(--measure);
 }
-.labf-ask-title {
+.lf-ask-title {
   display: block;
   font-family: var(--serif);
   font-size: 1.0625rem;
@@ -1135,27 +1222,40 @@ body.nav-open .scrim {
   color: var(--ink);
   transition: color 0.15s;
 }
-.labf-ask-hit:hover .labf-ask-title {
+.lf-ask-hit:hover .lf-ask-title {
   color: var(--dot);
 }
-.labf-ask-why {
+.lf-ask-why {
   display: block;
-  margin-top: 4px;
+  margin-top: 3px;
+  font-family: var(--mono);
   font-size: 0.6875rem;
   letter-spacing: 0.02em;
   color: var(--system-faint);
 }
-.labf-ask-empty {
+.lf-ask-empty {
+  font-family: var(--mono);
   font-size: 0.8125rem;
   color: var(--system);
 }
-
-.labf-page-foot {
-  margin-top: 6vh;
-  padding-top: 18px;
-  border-top: 1px solid var(--rule);
-  font-size: 0.625rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--system-faint);
+/* variant skins */
+.lf-ask--column .lf-ask-form {
+  max-width: var(--measure);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 7px;
+}
+.lf-ask--column .lf-ask-input {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+}
+.lf-ask--index .lf-ask-input,
+.lf-ask--spine .lf-ask-input {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+}
+.lf-ask--spine {
+  flex: 1 1 auto;
+}
+.lf-ask--spine .lf-ask-caret {
+  display: none;
 }
