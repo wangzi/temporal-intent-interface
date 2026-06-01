@@ -5,6 +5,24 @@
 
 import type { PostSummary } from "@/lib/engine/types";
 
+// ── The "moves" model (Go-review Lab) ───────────────────────────────
+// The reader composes a position: one OPENING (layout variant) plus a
+// set of MOVES (features) placed or lifted. Session-only.
+
+export type Opening = "column" | "index" | "spine";
+
+export type FooterMoves = {
+  threads: boolean; // move 78 — the human's open questions
+  colophon: boolean; // provenance + corpus stats
+  ask: boolean; // move 37 — the machine, summoned
+};
+
+export const DEFAULT_MOVES: FooterMoves = {
+  threads: true,
+  colophon: true,
+  ask: true,
+};
+
 export type CorpusStats = {
   count: number;
   oldest: string | null;

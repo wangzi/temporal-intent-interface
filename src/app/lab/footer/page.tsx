@@ -1,35 +1,23 @@
-// /lab/footer — review surface for three footer LAYOUT variants.
-// Not linked from production; off the reader. Fetches the corpus once
-// (fixtures in preview, real engine on production) and renders each
-// layout against live data so the *content* is held constant and only
-// the typographic composition differs.
+// /lab/footer — the Go-review Lab. A reader-facing surface where the
+// reader composes the footer's "position": two Go stones (bottom-right,
+// no label) open a white review sheet; choosing an OPENING (layout) and
+// placing MOVES (features) reconfigures the active footer live, in the
+// stage above. Session-only — nothing persists.
 //
-//   A · Closing column   — single 66ch serif passage; colophon as prose
-//   B · The Index        — back-of-book: questions → leaders → entries
-//   C · Spine annotations— content hangs off the spine terminus
+// Conceptual frame: AlphaGo. Black stone = the machine's move (37),
+// white = the human's move (78) — the journal's human/AI duality made
+// into an object, at the terminus of the timeline.
 //
-// All three compose the same functional content (open threads, colophon,
-// ask the archive, studio bridge) — different layout, same substance.
+// Mocked here off-production so the interaction can be tuned before it
+// touches the real reader footer.
 
 import { listPosts } from "@/lib/engine/client";
 import type { PostSummary } from "@/lib/engine/types";
 
-import { FooterColumn } from "@/components/lab/footer/FooterColumn";
-import { FooterIndex } from "@/components/lab/footer/FooterIndex";
-import { FooterSpine } from "@/components/lab/footer/FooterSpine";
+import { BoardLab } from "@/components/lab/footer/BoardLab";
 
 // Engine client fetches no-store → render per request (a lab surface).
 export const dynamic = "force-dynamic";
-
-function Note({ tag, title, why }: { tag: string; title: string; why: string }) {
-  return (
-    <header className="lf-note">
-      <p className="lf-note-n">{tag}</p>
-      <h2 className="lf-note-title">{title}</h2>
-      <p className="lf-note-why">{why}</p>
-    </header>
-  );
-}
 
 export default async function FooterLab() {
   let posts: PostSummary[] = [];
@@ -42,52 +30,19 @@ export default async function FooterLab() {
   }
 
   return (
-    <main className="lf-page">
-      <header className="lf-head">
-        <p className="lf-head-kicker">Lab · footer layouts</p>
-        <h1 className="lf-head-title">A footer worth having</h1>
+    <main className="boardlab-page">
+      <header className="boardlab-head">
+        <p className="lf-head-kicker">Lab · the review</p>
+        <h1 className="lf-head-title">Move 37 / Move 78</h1>
         <p className="lf-head-lede">
-          Three layout variants of one functional footer — open threads,
-          colophon, ask-the-archive, studio bridge — each composed
-          typographically, each rendered against the live corpus. The spine
-          terminates here, so the footer is the floor of the timeline: the
-          natural home for the whole-corpus and meta views the reading column
-          refuses. Pick one (or blend).
+          Two stones rest at the bottom-right — black, the machine’s move;
+          white, the human’s. Click either to slide up the review and play
+          the footer’s moves: choose an opening (the layout), place or lift
+          the features. The stage below reconfigures live. Nothing is saved.
         </p>
       </header>
 
-      <section className="lf-section">
-        <Note
-          tag="Variant A"
-          title="Closing column"
-          why="One 66ch serif passage. Threads woven into a sentence, colophon as prose, ask as one quiet line, a single red period as the terminus. Labels dropped — the most literary, most ‘z.’ treatment."
-        />
-        <FooterColumn posts={posts} />
-      </section>
-
-      <section className="lf-section">
-        <Note
-          tag="Variant B"
-          title="The Index"
-          why="Back-of-book. Each open question (serif) connects by a leader of dots to its entry (mono, right-aligned). Colophon and ask are index rows too. Most craft, most navigable — literally an index to the corpus."
-        />
-        <FooterIndex posts={posts} />
-      </section>
-
-      <section className="lf-section">
-        <Note
-          tag="Variant C"
-          title="Spine annotations"
-          why="The spine drops into the footer; its red end-cap becomes the first bullet. Corpus stat on the dot, threads branching as ├ nodes, ask as the └ terminus. Mono scaffolding, serif author questions — the most on-metaphor."
-        />
-        <FooterSpine posts={posts} />
-      </section>
-
-      <footer className="lf-spine-foot" style={{ marginTop: "8vh" }}>
-        <span style={{ color: "var(--system-faint)" }}>
-          lab branch · not production · review + pick a direction
-        </span>
-      </footer>
+      <BoardLab posts={posts} />
     </main>
   );
 }

@@ -8,7 +8,12 @@
 // navigable index to the corpus.
 
 import { ArchiveAsk } from "./ArchiveAsk";
-import { corpusStats, uniqueThreads } from "@/lib/lab/footer-data";
+import {
+  corpusStats,
+  uniqueThreads,
+  DEFAULT_MOVES,
+  type FooterMoves,
+} from "@/lib/lab/footer-data";
 import type { PostSummary } from "@/lib/engine/types";
 
 function Row({
@@ -31,7 +36,13 @@ function Row({
   );
 }
 
-export function FooterIndex({ posts }: { posts: PostSummary[] }) {
+export function FooterIndex({
+  posts,
+  moves = DEFAULT_MOVES,
+}: {
+  posts: PostSummary[];
+  moves?: FooterMoves;
+}) {
   const threads = uniqueThreads(posts);
   const { count, startYear } = corpusStats(posts);
 
@@ -39,22 +50,27 @@ export function FooterIndex({ posts }: { posts: PostSummary[] }) {
     <footer className="lf lf-index" aria-label="Footer">
       <p className="lf-index-kicker">Index</p>
       <dl className="lf-index-list">
-        {threads.map((t) => (
-          <Row key={t.slug} term={t.question} termOrigin="canonical">
-            <a href={`/post/${t.slug}`}>{t.title}</a>
+        {moves.threads &&
+          threads.map((t) => (
+            <Row key={t.slug} term={t.question} termOrigin="canonical">
+              <a href={`/post/${t.slug}`}>{t.title}</a>
+            </Row>
+          ))}
+        {moves.colophon && (
+          <Row term="Colophon">
+            human · summoned · no-track · {count} entries
+            {startYear ? ` · since ${startYear}` : ""}
           </Row>
-        ))}
-        <Row term="Colophon">
-          human · summoned · no-track · {count} entries
-          {startYear ? ` · since ${startYear}` : ""}
-        </Row>
-        <div className="lf-index-row lf-index-row--ask">
-          <dt className="lf-index-term">Ask</dt>
-          <span className="lf-index-leader" aria-hidden="true" />
-          <dd className="lf-index-ref">
-            <ArchiveAsk posts={posts} variant="index" />
-          </dd>
-        </div>
+        )}
+        {moves.ask && (
+          <div className="lf-index-row lf-index-row--ask">
+            <dt className="lf-index-term">Ask</dt>
+            <span className="lf-index-leader" aria-hidden="true" />
+            <dd className="lf-index-ref">
+              <ArchiveAsk posts={posts} variant="index" />
+            </dd>
+          </div>
+        )}
         <Row term="Studio">
           <a href="https://studio.stillinlove.co">sign in →</a>
         </Row>

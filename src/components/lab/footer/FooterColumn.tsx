@@ -7,17 +7,29 @@
 // prose carries it. The most literary / most "z." treatment.
 
 import { ArchiveAsk } from "./ArchiveAsk";
-import { asClause, corpusStats, uniqueThreads } from "@/lib/lab/footer-data";
+import {
+  asClause,
+  corpusStats,
+  uniqueThreads,
+  DEFAULT_MOVES,
+  type FooterMoves,
+} from "@/lib/lab/footer-data";
 import type { PostSummary } from "@/lib/engine/types";
 
-export function FooterColumn({ posts }: { posts: PostSummary[] }) {
+export function FooterColumn({
+  posts,
+  moves = DEFAULT_MOVES,
+}: {
+  posts: PostSummary[];
+  moves?: FooterMoves;
+}) {
   const threads = uniqueThreads(posts).slice(0, 4);
   const { count, startYear } = corpusStats(posts);
 
   return (
     <footer className="lf lf-column" aria-label="Footer">
       <div className="lf-column-inner">
-        {threads.length > 0 && (
+        {moves.threads && threads.length > 0 && (
           <p className="lf-col-threads" data-text-origin="canonical">
             Still turning over{" "}
             {threads.map((t, i) => (
@@ -36,19 +48,21 @@ export function FooterColumn({ posts }: { posts: PostSummary[] }) {
           </p>
         )}
 
-        <p className="lf-col-colophon">
-          All prose here is human. AI is summoned, never ambient — it
-          answers when you ask and stays silent otherwise. No tracking, no
-          account, nothing stored.
-          {count > 0 && (
-            <>
-              {" "}
-              {count} entries{startYear ? ` since ${startYear}` : ""}.
-            </>
-          )}
-        </p>
+        {moves.colophon && (
+          <p className="lf-col-colophon">
+            All prose here is human. AI is summoned, never ambient — it
+            answers when you ask and stays silent otherwise. No tracking, no
+            account, nothing stored.
+            {count > 0 && (
+              <>
+                {" "}
+                {count} entries{startYear ? ` since ${startYear}` : ""}.
+              </>
+            )}
+          </p>
+        )}
 
-        <ArchiveAsk posts={posts} variant="column" />
+        {moves.ask && <ArchiveAsk posts={posts} variant="column" />}
 
         <p className="lf-col-foot">
           <a href="https://studio.stillinlove.co" className="lf-col-studio">

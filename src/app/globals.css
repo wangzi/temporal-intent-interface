@@ -1259,3 +1259,245 @@ body.nav-open .scrim {
 .lf-ask--spine .lf-ask-caret {
   display: none;
 }
+
+/* ============================================================
+   Lab — the review (Go board + sheet). `.go-*` / `.sheet-*` /
+   `.move*` / `.stage*`. Reader-facing, live, session-only. Circles
+   and hairlines only; the one red accent appears solely as the faint
+   ring on the move you entered through.
+   ============================================================ */
+.boardlab-page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 10vh 28px 50vh;
+  min-height: 100vh;
+}
+.boardlab-head {
+  margin-bottom: 7vh;
+}
+.stage {
+  position: relative;
+}
+.stage-tag {
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  margin-bottom: 16px;
+}
+
+/* --- the board: two stones on a faint corner lattice, bottom-right --- */
+.go {
+  position: fixed;
+  right: 26px;
+  bottom: 22px;
+  width: 132px;
+  height: 132px;
+  z-index: 35;
+}
+.go-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      transparent 0 39px,
+      var(--rule) 39px 40px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 39px,
+      var(--rule) 39px 40px
+    );
+}
+.go-stone {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s var(--ease);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.go-stone--black {
+  left: 60px;
+  top: 88px;
+  background: var(--ink);
+}
+.go-stone--white {
+  left: 100px;
+  top: 48px;
+  background: var(--field);
+  border: 1.5px solid var(--ink);
+}
+.go-stone:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.go-stone:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.go-num {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.go-stone--black .go-num {
+  color: var(--field);
+}
+.go-stone--white .go-num {
+  color: var(--ink);
+}
+.go-stone:hover .go-num,
+.go-stone:focus-visible .go-num {
+  opacity: 0.85;
+}
+
+/* --- the sheet: white plane, slides up ~42vh, no shadow / no line --- */
+.sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.03);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+.sheet-scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  height: 42vh;
+  min-height: 320px;
+  /* Tonal step, not an edge: pure white over the #fcfcfa field. */
+  background: #ffffff;
+  border-radius: 10px 10px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.34s var(--ease);
+  overflow-y: auto;
+}
+.sheet.is-open {
+  transform: translateY(0);
+}
+@media (prefers-color-scheme: dark) {
+  .sheet {
+    background: #161616;
+  }
+}
+.sheet-inner {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 24px 28px 40px;
+}
+.sheet-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+.sheet-title {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+.sheet-close {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--system);
+  transition: color 0.15s;
+}
+.sheet-close:hover {
+  color: var(--ink);
+}
+.sheet-section {
+  margin-bottom: 28px;
+}
+.sheet-kicker {
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  margin-bottom: 14px;
+}
+.sheet-openings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+.sheet-moves {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* --- a move = a stone (filled = placed, outline = lifted) --- */
+.move {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: none;
+  border: none;
+  padding: 8px 0;
+  text-align: left;
+  cursor: pointer;
+}
+.move--row {
+  width: 100%;
+}
+.move-stone {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  align-self: center;
+  transition: background 0.15s, box-shadow 0.2s;
+}
+.move.is-on .move-stone {
+  background: var(--ink);
+}
+.move.is-framed .move-stone {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot) 16%, transparent);
+}
+.move-label {
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--ink);
+}
+.move-num {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.6875rem;
+  color: var(--dot);
+  margin-right: 8px;
+}
+.move-gloss {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--system-faint);
+  margin-left: 12px;
+}
+.move:hover .move-label {
+  color: var(--dot);
+}
+.move:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
