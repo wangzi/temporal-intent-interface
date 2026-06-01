@@ -38,11 +38,7 @@ import { ReviewSheet } from "@/components/lab/footer/ReviewSheet";
 import { FooterColumn } from "@/components/lab/footer/FooterColumn";
 import { FooterIndex } from "@/components/lab/footer/FooterIndex";
 import { FooterSpine } from "@/components/lab/footer/FooterSpine";
-import {
-  DEFAULT_MOVES,
-  type FooterMoves,
-  type Opening,
-} from "@/lib/lab/footer-data";
+import { type FooterMoves, type Opening } from "@/lib/lab/footer-data";
 import type { PostSummary } from "@/lib/engine/types";
 
 type Family = "machine" | "human";
@@ -57,11 +53,22 @@ const VARIANTS = {
 // the one the page boots into and JS-off readers receive.
 const DEFAULT_OPENING: Opening = "column";
 
+// The footer stays COLLAPSED until the reader summons it from the board.
+// All moves off → the variant renders just its closing line (the Studio
+// bridge + the red period). This is "AI summoned, never ambient" applied
+// to the footer itself: nothing ambient, everything on demand. JS-off
+// readers get this quiet footer; the rich content is a JS-on enhancement.
+const COLLAPSED_MOVES: FooterMoves = {
+  threads: false,
+  colophon: false,
+  ask: false,
+};
+
 const FLY_MS = 420;
 
 export function FooterReview({ posts }: { posts: PostSummary[] }) {
   const [opening, setOpening] = useState<Opening>(DEFAULT_OPENING);
-  const [moves, setMoves] = useState<FooterMoves>(DEFAULT_MOVES);
+  const [moves, setMoves] = useState<FooterMoves>(COLLAPSED_MOVES);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [family, setFamily] = useState<Family>("human");
   const [played, setPlayed] = useState<Family | null>(null);

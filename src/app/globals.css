@@ -1288,8 +1288,12 @@ body.nav-open .scrim {
 
 /* --- the board: two stones on a faint corner lattice, bottom-right --- */
 .go {
+  /* Anchored to the spine column, not the right corner: the board's left
+     edge sits on the spine line (--spine-x), so the spine drops into the
+     lattice as its leftmost line and the two stones hang just below/right
+     of the spine's end — the trigger reads as the foot of the spine. */
   position: fixed;
-  right: 26px;
+  left: var(--spine-x);
   bottom: 22px;
   width: 132px;
   height: 132px;
