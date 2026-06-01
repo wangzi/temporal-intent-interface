@@ -593,14 +593,17 @@ body.nav-open .scrim {
   padding: 80px 28px 120px var(--content-pad);
 }
 
-.attn-inner .spine2 {
-  position: absolute;
-  top: 0;
+/* The post route (AttentionView) renders the shared <Spine/> (.spine)
+   inside .attn-inner — NOT a `.spine2` element. Override the archive
+   geometry it would otherwise inherit: there's no 128px meta gutter on
+   a single post, so the spine is a plain left-margin rule at the
+   article's edge (the body, at --content-pad, clears it), and it spans
+   the full article height. `.attn-inner .spine` (0,2,0) outranks the
+   global `.spine` and its laptop `left: var(--spine-x)` (both 0,1,0),
+   so this wins at every breakpoint without a media query. */
+.attn-inner .spine {
+  left: 0;
   bottom: 0;
-  left: var(--spine-x, 28px);
-  width: 1px;
-  background: var(--branch);
-  opacity: 0.7;
 }
 
 .attn-back {
@@ -831,15 +834,8 @@ body.nav-open .scrim {
   .spine {
     left: var(--spine-x);
   }
-  /* Post route (Attention): the spine is a left-margin rule, NOT the
-     archive's 128px meta gutter. --spine-x is 128px here (for the
-     archive meta column), but the post body has no meta gutter and
-     only clears --content-pad (64px) — so the shared token put the
-     spine *inside* the prose. Pin the post spine to the article's left
-     edge instead; the body (at --content-pad) clears it cleanly. */
-  .attn-inner .spine2 {
-    left: 0;
-  }
+  /* (Post-route spine override now lives globally as `.attn-inner
+     .spine`, above — it wins by specificity at every breakpoint.) */
   /* Now-label aligns with the content column, not the meta gutter. */
   .now-label {
     padding-top: 0;
