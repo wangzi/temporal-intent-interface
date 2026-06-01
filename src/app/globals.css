@@ -933,3 +933,609 @@ body.nav-open .scrim {
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================
+   Lab — footer LAYOUT variants (/lab/footer). `.lf-*` namespace,
+   scoped so nothing here touches the production footer. Reuses the
+   design tokens; one red accent only; serif = author, mono = system.
+   ============================================================ */
+.lf-page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 10vh 28px 6vh;
+}
+.lf-head {
+  margin-bottom: 7vh;
+}
+.lf-head-kicker {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  margin-bottom: 12px;
+}
+.lf-head-title {
+  font-family: var(--serif);
+  font-size: var(--t-title-read);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.lf-head-lede {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: var(--measure);
+}
+.lf-section {
+  margin-bottom: 9vh;
+}
+.lf-note {
+  margin-bottom: 22px;
+}
+.lf-note-n {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dot);
+  margin-bottom: 8px;
+}
+.lf-note-title {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.lf-note-why {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--system);
+  max-width: var(--measure);
+}
+
+/* Shared footer-zone shell. */
+.lf {
+  position: relative;
+  min-height: 300px;
+  border-top: 1px solid var(--rule);
+  padding-top: 36px;
+}
+
+/* --- Variant A · Closing column --- */
+.lf-column-inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+.lf-col-threads {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-bottom: 1.4em;
+}
+.lf-col-thread {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+.lf-col-thread:hover {
+  color: var(--dot);
+  text-decoration-color: var(--dot);
+}
+.lf-col-colophon {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin-bottom: 1.8em;
+}
+.lf-col-foot {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  color: var(--system);
+  margin-top: 1.6em;
+}
+.lf-col-studio {
+  color: var(--system);
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.lf-col-studio:hover {
+  color: var(--ink);
+}
+.lf-period {
+  color: var(--dot);
+  font-weight: 600;
+}
+
+/* --- Variant B · The Index --- */
+.lf-index-kicker {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  margin-bottom: 22px;
+}
+.lf-index-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 15px;
+}
+.lf-index-term {
+  flex: 0 1 auto;
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.lf-index-leader {
+  flex: 1 1 auto;
+  align-self: center;
+  min-width: 28px;
+  margin: 0 10px;
+  border-bottom: 1px dotted var(--system-faint);
+  opacity: 0.55;
+}
+.lf-index-ref {
+  flex: 0 0 auto;
+  max-width: 42%;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--system);
+}
+.lf-index-ref a {
+  color: var(--system);
+  transition: color 0.15s;
+}
+.lf-index-ref a:hover {
+  color: var(--dot);
+}
+.lf-index-row--ask .lf-index-ref {
+  max-width: 60%;
+}
+
+/* --- Variant C · Spine annotations --- */
+.lf-spine {
+  padding-left: 26px;
+}
+.lf-spine-stub {
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 28px;
+  width: 1px;
+  background: var(--branch);
+}
+.lf-spine-cap {
+  position: absolute;
+  left: 0;
+  top: 33px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+.lf-spine-stat {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: var(--system-faint);
+  margin-bottom: 22px;
+}
+.lf-spine-threads {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.lf-spine-node {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.lf-spine-glyph {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--branch);
+  flex: 0 0 auto;
+}
+.lf-spine-q {
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--ink);
+  transition: color 0.15s;
+}
+.lf-spine-q:hover {
+  color: var(--dot);
+}
+.lf-spine-node--end {
+  margin-top: 6px;
+  align-items: baseline;
+}
+.lf-spine-foot {
+  margin-top: 24px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.lf-spine-studio {
+  color: var(--system-faint);
+  transition: color 0.15s;
+}
+.lf-spine-studio:hover {
+  color: var(--ink);
+}
+
+/* --- Shared "Ask the archive" island (variant-skinned) --- */
+.lf-ask-form {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.lf-ask-caret {
+  color: var(--dot);
+  flex: 0 0 auto;
+}
+.lf-ask-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--ink);
+}
+.lf-ask-input::placeholder {
+  color: var(--system-faint);
+}
+.lf-ask-results {
+  margin-top: 16px;
+}
+.lf-ask-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lf-ask-hit {
+  display: block;
+}
+.lf-ask-title {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  color: var(--ink);
+  transition: color 0.15s;
+}
+.lf-ask-hit:hover .lf-ask-title {
+  color: var(--dot);
+}
+.lf-ask-why {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--system-faint);
+}
+.lf-ask-empty {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--system);
+}
+/* variant skins */
+.lf-ask--column .lf-ask-form {
+  max-width: var(--measure);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 7px;
+}
+.lf-ask--column .lf-ask-input {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+}
+.lf-ask--index .lf-ask-input,
+.lf-ask--spine .lf-ask-input {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+}
+.lf-ask--spine {
+  flex: 1 1 auto;
+}
+.lf-ask--spine .lf-ask-caret {
+  display: none;
+}
+
+/* ============================================================
+   Lab — the review (Go board + sheet). `.go-*` / `.sheet-*` /
+   `.move*` / `.stage*`. Reader-facing, live, session-only. Circles
+   and hairlines only; the one red accent appears solely as the faint
+   ring on the move you entered through.
+   ============================================================ */
+.boardlab-page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 10vh 28px 50vh;
+  min-height: 100vh;
+}
+.boardlab-head {
+  margin-bottom: 7vh;
+}
+.stage {
+  position: relative;
+}
+.stage-tag {
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  margin-bottom: 16px;
+}
+
+/* --- the board: two stones on a faint corner lattice, bottom-right --- */
+.go {
+  position: fixed;
+  right: 26px;
+  bottom: 22px;
+  width: 132px;
+  height: 132px;
+  z-index: 35;
+}
+.go-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.7;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      transparent 0 39px,
+      var(--rule) 39px 40px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 39px,
+      var(--rule) 39px 40px
+    );
+}
+.go-stone {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s var(--ease);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.go-stone--black {
+  left: 60px;
+  top: 88px;
+  background: var(--ink);
+}
+.go-stone--white {
+  left: 100px;
+  top: 48px;
+  background: var(--field);
+  border: 1.5px solid var(--ink);
+}
+.go-stone:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+.go-stone:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.go-num {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.go-stone--black .go-num {
+  color: var(--field);
+}
+.go-stone--white .go-num {
+  color: var(--ink);
+}
+.go-stone:hover .go-num,
+.go-stone:focus-visible .go-num {
+  opacity: 0.85;
+}
+
+/* --- the sheet: white plane, slides up ~42vh, no shadow / no line --- */
+.sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.03);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+.sheet-scrim.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 61;
+  height: 42vh;
+  min-height: 320px;
+  /* Tonal step, not an edge: pure white over the #fcfcfa field. */
+  background: #ffffff;
+  border-radius: 10px 10px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.34s var(--ease);
+  overflow-y: auto;
+}
+.sheet.is-open {
+  transform: translateY(0);
+}
+@media (prefers-color-scheme: dark) {
+  .sheet {
+    background: #161616;
+  }
+}
+.sheet-inner {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 24px 28px 40px;
+}
+.sheet-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+.sheet-title {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+.sheet-close {
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--system);
+  transition: color 0.15s;
+}
+.sheet-close:hover {
+  color: var(--ink);
+}
+.sheet-section {
+  margin-bottom: 28px;
+}
+.sheet-kicker {
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  margin-bottom: 14px;
+}
+.sheet-openings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+.sheet-moves {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* --- a move = a stone (filled = placed, outline = lifted) --- */
+.move {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: none;
+  border: none;
+  padding: 8px 0;
+  text-align: left;
+  cursor: pointer;
+}
+.move--row {
+  width: 100%;
+}
+.move-stone {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  align-self: center;
+  transition: background 0.15s, box-shadow 0.2s;
+}
+.move.is-on .move-stone {
+  background: var(--ink);
+}
+.move.is-framed .move-stone {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot) 16%, transparent);
+}
+.move-label {
+  font-family: var(--serif);
+  font-size: 1rem;
+  color: var(--ink);
+}
+.move-num {
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: 0.6875rem;
+  color: var(--dot);
+  margin-right: 8px;
+}
+.move-gloss {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--system-faint);
+  margin-left: 12px;
+}
+.move:hover .move-label {
+  color: var(--dot);
+}
+.move:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* --- stone-travel (FLIP) + header landing slot --- */
+.sheet-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sheet-played {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: transparent;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.sheet-played.is-machine {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.sheet-played.is-human {
+  background: transparent;
+  border-color: var(--ink);
+}
+.go-fly {
+  position: fixed;
+  z-index: 70;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+.go-fly[data-color="machine"] {
+  background: var(--ink);
+}
+.go-fly[data-color="human"] {
+  background: var(--field);
+  border: 1.5px solid var(--ink);
+}
