@@ -1303,6 +1303,88 @@ body.nav-open .scrim {
   height: 132px;
   z-index: 35;
 }
+/* --- Studio bridge: right-aligned at the foot of the page. Docked in .col
+   so it sits at the footer's bottom-right, clear of the view-switch on the
+   left. Always rendered (JS-off readers get the bridge). --- */
+.footer-studio {
+  position: absolute;
+  right: 0;
+  bottom: 26px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--system);
+  transition: color 0.15s;
+}
+.footer-studio:hover {
+  color: var(--ink);
+}
+.footer-studio:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* --- Footer view-switch (production) -------------------------------------
+   The board at the foot of the spine, but as a single tap-to-cycle control:
+   tap → the footer re-renders in the next style (Column → Index → Spine).
+   Reuses the .go-grid lattice + .go-stone stones; a small caption names the
+   current style. Docked absolutely inside .col (same context as the spine),
+   nudged left so the lattice sits in the gutter beside the spine rather than
+   over the footer text. Client-only — see FooterReview. */
+.go-switch {
+  position: absolute;
+  left: max(0px, calc(var(--spine-x) - 66px));
+  bottom: calc(var(--footer-h) - 132px);
+  width: 132px;
+  height: 132px;
+  z-index: 35;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.go-switch-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  pointer-events: none;
+}
+.go-switch-now {
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+  color: var(--ink);
+  background: var(--field);
+  padding: 0 5px;
+}
+.go-switch-hint {
+  font-size: 0.5rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  background: var(--field);
+  padding: 0 4px;
+}
+.go-switch:hover .go-switch-now {
+  color: var(--dot);
+}
+.go-switch:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+/* The board doesn't fit the narrow gutter on small screens; scale it down. */
+@media (max-width: 1079px) {
+  .go-switch {
+    transform: scale(0.72);
+    transform-origin: bottom left;
+  }
+}
+
 .go-grid {
   position: absolute;
   inset: 0;
