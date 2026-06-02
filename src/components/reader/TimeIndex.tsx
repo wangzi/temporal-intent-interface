@@ -1,28 +1,28 @@
 "use client";
 
-// The timeline header. A grid-aligned band that echoes the entry grid
-// below it: the SORT-direction toggle sits in the meta column (right-
-// aligned against the spine, like each entry's date column), and the
-// YEARS align to the spine — the single vertical axis the whole reader
-// hangs on.
+// The timeline header — a persistent status line (always visible) plus a
+// hover-revealed year menu, hung on the entry grid (meta | spine | content).
 //
-// Auto-hides at ≥1080px under a top-edge hover strip (same pattern as the
-// left rail); hidden at <1080px (the topbar carries filters there).
+// ALWAYS visible (a discovery affordance — nothing fully hidden):
+//   • Sort-direction toggle, in the meta column: "Now → Past" (newest) /
+//     "Now ← Past" (oldest). One shared axis — only the arrow flips, so the
+//     glyphs line up exactly (mono = equal width). URL-driven (?sort=),
+//     preserves the filter, works JS-off.
+//   • A faint bash-terminal status line: today's date + how long since the
+//     last entry.
+// HOVER reveals:
+//   • The years (jump-to-year), aligned to the spine.
 //
-// Sort is URL-driven (?sort=) so it works JS-off and a link reproduces the
-// order. Year buttons scroll the first entry of that year onto the dot
-// line (client behaviour; honours prefers-reduced-motion).
+// Laptop+ only (the header is display:none below 1080px).
 
 import { useCallback } from "react";
 import Link from "next/link";
 
 const SORTS: { key: "newest" | "oldest"; label: string }[] = [
   { key: "newest", label: "Now → Past" },
-  { key: "oldest", label: "Past → Now" },
+  { key: "oldest", label: "Now ← Past" },
 ];
 
-// Build /?sort=…&filter=… preserving the active filter. newest is default
-// (omitted from the URL).
 function sortHref(sort: "newest" | "oldest", filter?: string): string {
   const sp = new URLSearchParams();
   if (sort !== "newest") sp.set("sort", sort);
@@ -45,10 +45,14 @@ export function TimeIndex({
   years,
   currentSort = "newest",
   currentFilter,
+  today,
+  lastEntryAgo,
 }: {
   years: string[];
   currentSort?: "newest" | "oldest";
   currentFilter?: string;
+  today?: string;
+  lastEntryAgo?: string;
 }) {
   const onClick = useCallback((year: string) => {
     const target = document.querySelector<HTMLElement>(
@@ -57,15 +61,11 @@ export function TimeIndex({
     if (target) scrollEntryToDot(target);
   }, []);
 
-  if (years.length === 0) return null;
-
   return (
-    <>
-      {/* Hover trigger: thin strip on the top edge reveals the panel. */}
-      <div className="topyears-trigger" aria-hidden="true" />
-      <div className="topyears">
-        <div className="topyears-inner">
-          {/* SORT — in the meta column, right-aligned against the spine. */}
+    <div className="topyears">
+      <div className="topyears-inner">
+        {/* Persistent status: sort toggle (meta column) + bash date line. */}
+        <div className="ty-status">
           <div className="ty-sort" role="group" aria-label="Sort order">
             {SORTS.map((s) => {
               const on = currentSort === s.key;
@@ -81,8 +81,19 @@ export function TimeIndex({
               );
             })}
           </div>
+          {today ? (
+            <p className="ty-date" aria-label="Archive status">
+              <span className="ty-prompt" aria-hidden="true">
+                $
+              </span>
+              {today}
+              {lastEntryAgo ? ` · last entry ${lastEntryAgo}` : ""}
+            </p>
+          ) : null}
+        </div>
 
-          {/* YEARS — aligned to the spine. */}
+        {/* Hover-revealed: years, aligned to the spine. */}
+        {years.length > 0 ? (
           <nav className="ty-years" aria-label="Jump to year">
             <ol>
               {years.map((year) => (
@@ -99,8 +110,8 @@ export function TimeIndex({
               ))}
             </ol>
           </nav>
-        </div>
+        ) : null}
       </div>
-    </>
+    </div>
   );
 }

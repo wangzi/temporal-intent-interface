@@ -11,7 +11,7 @@
 // the visible <ol> is filtered in-component when ?filter=... is set.
 
 import { listPosts } from "@/lib/engine/client";
-import { postYear } from "@/lib/format";
+import { postYear, relativeAgo } from "@/lib/format";
 import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
@@ -65,18 +65,30 @@ export default async function Home({
     : allPosts;
   const years = uniqueYears(allPosts);
 
+  // Bash-terminal status line: today's date (server-stable, ISO) + how long
+  // since the most recent entry (computed from the max published_at).
+  const today = new Date(now).toISOString().slice(0, 10);
+  const latest =
+    allPosts.length > 0
+      ? allPosts.reduce((a, b) => (a.published_at >= b.published_at ? a : b))
+      : null;
+  const lastEntryAgo = latest ? relativeAgo(latest.published_at, now) : "";
+
   return (
     <TemporalLayout
       topBar={<TopBar posts={allPosts} currentFilter={filter} />}
       rail={<NavigationRail posts={allPosts} currentFilter={filter} />}
       timeIndex={
-        <TimeIndex years={years} currentSort={sort} currentFilter={filter} />
+        <TimeIndex
+          years={years}
+          currentSort={sort}
+          currentFilter={filter}
+          today={today}
+          lastEntryAgo={lastEntryAgo}
+        />
       }
     >
       <Spine />
-      <p className="now-label">
-        {filter ? `Filtered · ${filter}` : "Now · latest"}
-      </p>
       <ol
         id="feed"
         aria-label="Entries in reverse chronological order"
