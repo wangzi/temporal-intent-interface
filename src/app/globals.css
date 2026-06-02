@@ -1002,15 +1002,20 @@ body.nav-open .scrim {
 /* Shared footer-zone shell. */
 .lf {
   position: relative;
-  min-height: 300px;
-  border-top: 1px solid var(--rule);
+  /* Hard cap: the footer is exactly --footer-h (never taller), so the spine
+     terminates at its top edge and the copy never spills. No top line — the
+     footer reads as a quiet continuation, not a separated band. */
+  height: var(--footer-h);
+  overflow: hidden;
   padding-top: 36px;
 }
 
 /* --- Variant A · Closing column --- */
+/* Wider copy: fill the reading column instead of a narrow centred measure. */
 .lf-column-inner {
-  max-width: var(--measure);
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
+  padding-right: 28px;
 }
 .lf-col-threads {
   font-family: var(--serif);
@@ -1323,68 +1328,42 @@ body.nav-open .scrim {
   outline-offset: 3px;
 }
 
-/* --- Footer view-switch (production) -------------------------------------
-   The board at the foot of the spine, but as a single tap-to-cycle control:
-   tap → the footer re-renders in the next style (Column → Index → Spine).
-   Reuses the .go-grid lattice + .go-stone stones; a small caption names the
-   current style. Docked absolutely inside .col (same context as the spine),
-   nudged left so the lattice sits in the gutter beside the spine rather than
-   over the footer text. Client-only — see FooterReview. */
-.go-switch {
+/* --- Footer view-switch: one quiet trigger at the footer's top-right -------
+   No stones, no lattice. A small cycle icon + the current style name; tap to
+   cycle Column → Index → Spine. Anchored in .col; the footer is a fixed
+   --footer-h, so the footer's top is exactly --footer-h up from .col's
+   bottom — the trigger sits just inside that top edge. Client-only. */
+.footer-switch {
   position: absolute;
-  left: max(0px, calc(var(--spine-x) - 66px));
-  /* Sits in the empty reach-space just ABOVE the footer (bottom edge on the
-     footer's top, where the spine ends) — never over the footer text. */
-  bottom: var(--footer-h);
-  width: 132px;
-  height: 132px;
+  right: 0;
+  bottom: calc(var(--footer-h) - 18px);
   z-index: 35;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   background: none;
   border: 0;
-  padding: 0;
+  padding: 6px 0;
   cursor: pointer;
-}
-.go-switch-cap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  pointer-events: none;
-}
-.go-switch-now {
+  color: var(--system);
   font-size: 0.6875rem;
-  letter-spacing: 0.05em;
-  text-transform: lowercase;
-  color: var(--ink);
-  background: var(--field);
-  padding: 0 5px;
-}
-.go-switch-hint {
-  font-size: 0.5rem;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--system-faint);
-  background: var(--field);
-  padding: 0 4px;
+  transition: color 0.15s;
 }
-.go-switch:hover .go-switch-now {
-  color: var(--dot);
+.footer-switch:hover {
+  color: var(--ink);
 }
-.go-switch:focus-visible {
+.footer-switch:focus-visible {
   outline: 2px solid var(--focus);
-  outline-offset: 4px;
-  border-radius: 8px;
+  outline-offset: 3px;
 }
-/* The board doesn't fit the narrow gutter on small screens; scale it down. */
-@media (max-width: 1079px) {
-  .go-switch {
-    transform: scale(0.72);
-    transform-origin: bottom left;
-  }
+.footer-switch-icon {
+  flex: 0 0 auto;
+  opacity: 0.8;
+}
+.footer-switch-label {
+  line-height: 1;
 }
 
 .go-grid {
