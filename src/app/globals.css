@@ -83,13 +83,10 @@
 
 html {
   scroll-behavior: auto;
-  /* Opt out of scroll anchoring. The scan-density reveal animates
-     .enrich max-height (a layout property); with anchoring on, the
-     browser nudges scrollY to compensate, which fires a scroll event,
-     which the reader's scroll handler reacts to by toggling that same
-     .enrich — a self-sustaining expand/collapse oscillation that reads
-     as constant idle jitter. We manage scroll position ourselves
-     (fixed dot + keyboard nav), so anchoring is unwanted here. */
+  /* Opt out of scroll anchoring. The scan-density reveal is opacity-only
+     (no layout change), so there's nothing for the browser to anchor
+     against; and the reader manages its own scroll (fixed dot + keyboard
+     nav). Left off so the browser never nudges scrollY under us. */
   overflow-anchor: none;
 }
 
@@ -419,27 +416,21 @@ body.nav-open .scrim {
   max-width: var(--measure);
 }
 
-/* Scan-density: idle → enriched.
+/* Scan-density: a by-distance opacity reveal.
    PROGRESSIVE-ENHANCEMENT NOTE:
-   JS-off readers see the .enrich block visible (no .collapsed class).
-   On JS hydration, ReaderControlsIsland adds .collapsed to non-active
-   entries, measured-height-style, so the transition starts smoothly. */
+   JS-off readers see every .enrich block fully visible. On JS,
+   ReaderControlsIsland sets each .enrich opacity from its distance to the
+   focus line (composited, no reflow), so the focused entry's detail reads
+   clearly and the rest fade back. */
+/* Scan-density reveal is opacity-only now (the island sets a per-entry
+   opacity from distance to the focus line) — never height, so scrolling
+   never reflows. JS-off: opacity 1 (fully visible). The short transition
+   smooths frame-to-frame and keyboard jumps without lagging the scroll. */
 .enrich {
   max-width: var(--measure);
-  overflow: hidden;
-  max-height: 340px;
   opacity: 1;
-  transition:
-    max-height 0.32s var(--ease),
-    opacity 0.26s var(--ease),
-    margin-top 0.3s var(--ease);
   margin-top: 18px;
-}
-
-.enrich.collapsed {
-  max-height: 0;
-  opacity: 0;
-  margin-top: 0;
+  transition: opacity 0.15s var(--ease);
 }
 
 .enrich .k {

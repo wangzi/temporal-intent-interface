@@ -4,33 +4,41 @@
 //   - scroll handler (rAF-throttled)
 //   - nearest-entry detection vs the dot line at ~40vh
 //   - .active class toggle on the matching <li data-entry-index="N">
-//   - .collapsed class toggle on each entry's .enrich block
-//   - 350ms settle timer → enrich the current active, dot.big
-//   - left-precision positioning of the fixed dot to the spine
+//   - scan-density REVEAL: each entry's .enrich fades in as it nears the
+//     focus line and out as it leaves — opacity only, no height change
+//   - dot.big settle cue + left-precision dot positioning
 //   - keyboard navigation (↑↓jk PgUp/PgDn Home/End Enter Esc)
 //
 // Mutates server-rendered DOM via querySelector; does not own React
 // state for the entry list (kept lean per plan §3).
 //
-// Hydration sequence:
-//   useLayoutEffect → collapse every .enrich EXCEPT the active's.
-//   Server paint shows all .enrich visible (JS-off contract); this
-//   layout-effect runs before the next paint, so JS-on readers see
-//   only the active enriched at first paint. On scroll, the active
-//   also collapses; on settle (350ms still), the active re-enriches.
+// Why opacity, not height: the reveal used to animate .enrich max-height,
+// a LAYOUT property. Animating it during scroll reflows every frame and
+// (with overflow-anchor:none) the collapse of off-screen entries shifts
+// the content under the reader — the stutter near titles. Opacity is
+// composited: it never triggers layout, so the scroll stays buttery and
+// the reveal is a smooth, gradual fade tied to scroll position.
+//
+// Hydration: server paint shows all .enrich fully visible (JS-off
+// contract). The layout-effect runs before the next paint and sets the
+// by-distance opacities, so JS-on readers see the focused reveal at first
+// paint with no flash.
 //
 // Keyboard:
-//   Archive route: arrows / j / k / Home / End scroll between entries;
-//   Enter opens /post/{slug} via router.push(); Esc closes the nav rail
-//   if open (step 8) else no-op.
-//   Post route: Esc calls router.back() (no other keys bound — the
-//   archive nav doesn't apply when there's only one article).
+//   Archive route: arrows / j / k / Home / End move between entries;
+//   Enter opens /post/{slug}; Esc closes the nav rail (handled elsewhere).
+//   Post route: Esc → router.back().
 
 import { useEffect, useLayoutEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const DOT_VH = 0.4; // matches `--dot-vh: 40` in globals.css
 const SETTLE_MS = 350;
+// Reveal ramp: an entry at the focus line is fully revealed (1); one this
+// fraction of the viewport away from it sits at MIN_REVEAL. A generous
+// range makes the fade gradual over scroll distance.
+const REVEAL_VH = 0.55;
+const MIN_REVEAL = 0.18;
 
 function positionDot(): void {
   const spine = document.querySelector<HTMLElement>(".spine");
@@ -42,17 +50,6 @@ function positionDot(): void {
 
 function dotLineY(): number {
   return window.innerHeight * DOT_VH;
-}
-
-// True when the viewport is within `threshold`px of the document bottom.
-// Near the foot of the page, animating .enrich heights changes the
-// document height, which clamps scrollY, which re-fires `scroll` — a
-// feedback loop that reads as jitter. We freeze scan-density there.
-function nearBottom(threshold = 48): boolean {
-  return (
-    window.scrollY + window.innerHeight >=
-    document.documentElement.scrollHeight - threshold
-  );
 }
 
 function nearestEntryIndex(entries: HTMLElement[]): number {
@@ -87,21 +84,19 @@ function setActiveClass(entries: HTMLElement[], idx: number): void {
   }
 }
 
-function collapseAll(entries: HTMLElement[]): void {
+// Set each entry's .enrich opacity from its distance to the focus line.
+// Opacity-only → composited → no reflow → buttery. Continuous → gradual.
+function revealByDistance(entries: HTMLElement[]): void {
+  const line = dotLineY();
+  const range = window.innerHeight * REVEAL_VH || 1;
   for (const el of entries) {
     const enrich = el.querySelector<HTMLElement>(".enrich");
-    enrich?.classList.add("collapsed");
-  }
-}
-
-function enrichOnly(entries: HTMLElement[], idx: number): void {
-  for (let i = 0; i < entries.length; i++) {
-    const el = entries[i];
-    if (!el) continue;
-    const enrich = el.querySelector<HTMLElement>(".enrich");
     if (!enrich) continue;
-    if (i === idx) enrich.classList.remove("collapsed");
-    else enrich.classList.add("collapsed");
+    const r = el.getBoundingClientRect();
+    const center = r.top + r.height / 2;
+    const t = 1 - Math.min(1, Math.abs(center - line) / range);
+    const op = MIN_REVEAL + (1 - MIN_REVEAL) * t;
+    enrich.style.opacity = op.toFixed(3);
   }
 }
 
@@ -147,16 +142,15 @@ export function ReaderControlsIsland(): null {
   const router = useRouter();
   const isPost = pathname?.startsWith("/post/") ?? false;
 
-  // Layout-effect: synchronously initialise classes before paint.
+  // Layout-effect: synchronously initialise classes + reveal before paint.
   useLayoutEffect(() => {
     const entries = Array.from(
       document.querySelectorAll<HTMLElement>("[data-entry-index]"),
     );
     positionDot();
     if (entries.length === 0) return;
-    const idx = nearestEntryIndex(entries);
-    setActiveClass(entries, idx);
-    enrichOnly(entries, idx);
+    setActiveClass(entries, nearestEntryIndex(entries));
+    revealByDistance(entries);
     setDotBig(true);
   }, []);
 
@@ -170,14 +164,11 @@ export function ReaderControlsIsland(): null {
     let currentActive = entries.length ? nearestEntryIndex(entries) : -1;
     let settleTimer: number | null = null;
 
+    // Settle only grows the dot back — the reveal itself is continuous, so
+    // it needs no settle step (and never animates layout).
     function scheduleSettle(): void {
-      if (settleTimer !== null) {
-        window.clearTimeout(settleTimer);
-      }
+      if (settleTimer !== null) window.clearTimeout(settleTimer);
       settleTimer = window.setTimeout(() => {
-        if (currentActive >= 0) {
-          enrichOnly(entries, currentActive);
-        }
         setDotBig(true);
         settleTimer = null;
       }, SETTLE_MS);
@@ -193,17 +184,10 @@ export function ReaderControlsIsland(): null {
             setActiveClass(entries, idx);
             currentActive = idx;
           }
+          revealByDistance(entries);
         }
-        if (nearBottom()) {
-          // Foot of the page: don't animate enrich heights (jitter). Keep
-          // the active entry enriched and the dot settled.
-          if (currentActive >= 0) enrichOnly(entries, currentActive);
-          setDotBig(true);
-        } else {
-          setDotBig(false);
-          if (entries.length > 0) collapseAll(entries);
-          scheduleSettle();
-        }
+        setDotBig(false);
+        scheduleSettle();
         ticking = false;
       });
     }
@@ -216,7 +200,7 @@ export function ReaderControlsIsland(): null {
         setActiveClass(entries, idx);
         currentActive = idx;
       }
-      scheduleSettle();
+      revealByDistance(entries);
     }
 
     function moveTo(idx: number): void {
@@ -226,9 +210,8 @@ export function ReaderControlsIsland(): null {
         setActiveClass(entries, clamped);
         currentActive = clamped;
       }
-      collapseAll(entries);
       setDotBig(false);
-      scrollEntryToDot(entries, clamped);
+      scrollEntryToDot(entries, clamped); // smooth scroll → onScroll reveals
       scheduleSettle();
     }
 

@@ -2,11 +2,10 @@
 // Key insight. Pure server markup.
 //
 // PROGRESSIVE-ENHANCEMENT NOTE (PRD §17.4 + plan §5):
-// The .enrich element ships visible (no .collapsed class) so JS-off
-// readers see the full content density. On JS hydration,
-// ReaderControlsIsland (step 5+) adds .collapsed to all but the
-// active entry, using a measured-height baseline so the close
-// animation is smooth instead of a layout shift.
+// The .enrich element ships fully visible (opacity 1) so JS-off readers
+// see the full content density. On JS, ReaderControlsIsland fades each
+// entry's .enrich by its distance to the focus line — opacity only, so
+// the reveal never reflows the page (see that file for the rationale).
 
 import type { PostSummary } from "@/lib/engine/types";
 
