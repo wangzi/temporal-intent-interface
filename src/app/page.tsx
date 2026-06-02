@@ -15,7 +15,6 @@ import { postYear } from "@/lib/format";
 import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
-import { FooterReview } from "@/components/reader/FooterReview";
 import { NavigationRail } from "@/components/reader/NavigationRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { Spine } from "@/components/reader/Spine";
@@ -105,10 +104,7 @@ export default async function Home({
           </li>
         ) : null}
       </ol>
-      {/* The footer describes the whole corpus, so it gets allPosts (not the
-          filtered view). Closing column is the default opening; the reader
-          can re-open it from the board. */}
-      <FooterReview posts={allPosts} />
+      {/* Footer hidden for now — FooterReview render removed. */}
       <Dot />
       <ReaderControlsIsland />
     </TemporalLayout>

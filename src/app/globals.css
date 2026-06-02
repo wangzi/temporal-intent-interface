@@ -52,7 +52,9 @@
   --index-w: 0px;
   --spine-x: 28px;
   --dot-vh: 40;
-  --footer-h: 300px;
+  /* Footer hidden for now → no reserved footer space, so the spine
+     terminates at the page bottom. Restore to 300px to bring it back. */
+  --footer-h: 0px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
