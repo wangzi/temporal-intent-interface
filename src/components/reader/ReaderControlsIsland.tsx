@@ -95,7 +95,8 @@ function revealByDistance(entries: HTMLElement[]): void {
   const activeIdx = nearestEntryIndex(entries);
   for (let i = 0; i < entries.length; i++) {
     const el = entries[i];
-    const enrich = el?.querySelector<HTMLElement>(".enrich");
+    if (!el) continue;
+    const enrich = el.querySelector<HTMLElement>(".enrich");
     if (!enrich) continue;
     if (i === activeIdx) {
       enrich.style.opacity = "1";
