@@ -606,22 +606,68 @@ body.nav-open .scrim {
   bottom: 0;
 }
 
+/* Bold circular "back" mark, on the OTHER side of the spine (in the left
+   margin) — a confident exit node, not a timid pill. The spine on the post
+   route sits at .attn-inner's left edge; right:100% pins the mark's right
+   edge to that edge, then the margin pushes it clear into the margin. */
 .attn-back {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: var(--system);
-  display: inline-flex;
+  position: absolute;
+  top: 70px;
+  right: 100%;
+  margin-right: 26px;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 7px;
-  padding: 8px 10px;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--field) 86%, transparent);
-  backdrop-filter: blur(8px);
-}
-
-.attn-back:hover {
+  gap: 9px;
+  text-decoration: none;
   color: var(--ink);
+}
+.attn-back-mark {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: var(--field);
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    transform 0.2s var(--ease);
+}
+.attn-back-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.attn-back:hover .attn-back-mark {
+  background: var(--ink);
+  color: var(--field);
+  transform: translateX(-4px);
+}
+.attn-back:focus-visible {
+  outline: none;
+}
+.attn-back:focus-visible .attn-back-mark {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+/* Narrow viewports: no room left of the spine — fall back to inline, above
+   the title, still bold. */
+@media (max-width: 700px) {
+  .attn-back {
+    position: static;
+    flex-direction: row;
+    gap: 10px;
+    margin: 0 0 30px 0;
+  }
+  .attn-back-mark {
+    width: 38px;
+    height: 38px;
+  }
 }
 
 .attn-label {

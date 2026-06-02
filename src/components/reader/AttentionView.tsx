@@ -19,19 +19,22 @@ export function AttentionView({ post }: { post: PostDetail }) {
   return (
     <article aria-labelledby={headingId} className="attn-inner">
       <Spine />
-      <Link className="attn-back mono" href="/">
-        <svg
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          aria-hidden="true"
-        >
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-        back
+      <Link className="attn-back" href="/" aria-label="Back to the archive">
+        <span className="attn-back-mark" aria-hidden="true">
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M14 6l-6 6 6 6" />
+          </svg>
+        </span>
+        <span className="attn-back-label mono">back</span>
       </Link>
       <header>
         <div className="attn-label mono" data-text-origin="canonical">
