@@ -534,44 +534,68 @@ body.nav-open .scrim {
   }
   .ty-status {
     position: relative;
-    min-height: 30px;
+    min-height: 44px;
   }
-  /* SORT — meta column, left-aligned. Both options share the "Now [arrow]
-     Past" axis; only the arrow flips (→ newest / ← oldest), so every glyph
-     lines up (mono = equal width). */
+  /* SORT — a two-state toggle at the head of the spine: ↓ Now (newest) /
+     ↑ Past (oldest). Arrow over label, side by side; the active state is
+     red + ink, the other recedes. URL-driven (?sort=). */
   .ty-sort {
-    position: absolute;
-    top: 1px;
-    left: 0;
+    padding-left: var(--spine-x);
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
+    gap: 30px;
   }
   .ty-sort-opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+  }
+  .ty-sort-arrow {
     font-family: var(--mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.04em;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--system-faint);
+    transition: color 0.15s, transform 0.2s var(--ease);
+  }
+  .ty-sort-label {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
     color: var(--system-faint);
     transition: color 0.15s;
   }
-  .ty-sort-opt:hover {
+  .ty-sort-opt:hover .ty-sort-arrow,
+  .ty-sort-opt:hover .ty-sort-label {
     color: var(--ink);
   }
-  .ty-sort-opt.on {
+  .ty-sort-opt.on .ty-sort-arrow {
     color: var(--dot);
   }
-  /* Bash-terminal status line — content area (on the spine axis), faint. */
+  .ty-sort-opt.on .ty-sort-label {
+    color: var(--ink);
+  }
+  /* DATE — in the meta column, styled exactly like an entry's date column:
+     right-aligned against the spine, stacked, faint mono. The header's meta
+     block, mirroring every entry's meta block below it. */
   .ty-date {
-    padding-left: var(--spine-x);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--meta-width);
+    padding-right: 12px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1.3;
     font-family: var(--mono);
     font-size: 0.6875rem;
-    letter-spacing: 0.02em;
     color: var(--system-faint);
   }
   .ty-prompt {
     color: var(--branch);
-    margin-right: 7px;
+    margin-right: 2px;
   }
   /* YEARS — the hover-revealed menu, aligned to the spine axis. */
   .ty-years {

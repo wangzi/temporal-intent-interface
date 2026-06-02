@@ -18,9 +18,9 @@
 import { useCallback } from "react";
 import Link from "next/link";
 
-const SORTS: { key: "newest" | "oldest"; label: string }[] = [
-  { key: "newest", label: "Now → Past" },
-  { key: "oldest", label: "Now ← Past" },
+const SORTS: { key: "newest" | "oldest"; arrow: string; label: string }[] = [
+  { key: "newest", arrow: "↓", label: "Now" },
+  { key: "oldest", arrow: "↑", label: "Past" },
 ];
 
 function sortHref(sort: "newest" | "oldest", filter?: string): string {
@@ -75,20 +75,33 @@ export function TimeIndex({
                   className={`ty-sort-opt${on ? " on" : ""}`}
                   href={sortHref(s.key, currentFilter)}
                   aria-current={on ? "true" : undefined}
+                  aria-label={
+                    s.key === "newest" ? "Newest first" : "Oldest first"
+                  }
                 >
-                  {s.label}
+                  <span className="ty-sort-arrow" aria-hidden="true">
+                    {s.arrow}
+                  </span>
+                  <span className="ty-sort-label">{s.label}</span>
                 </Link>
               );
             })}
           </div>
           {today ? (
-            <p className="ty-date" aria-label="Archive status">
-              <span className="ty-prompt" aria-hidden="true">
-                $
+            <div className="ty-date" aria-label="Archive status">
+              <span className="ty-date-line">
+                <span className="ty-prompt" aria-hidden="true">
+                  $
+                </span>
+                {today}
               </span>
-              {today}
-              {lastEntryAgo ? ` · last entry ${lastEntryAgo}` : ""}
-            </p>
+              {lastEntryAgo ? (
+                <>
+                  <span className="ty-date-line">last entry</span>
+                  <span className="ty-date-line">{lastEntryAgo}</span>
+                </>
+              ) : null}
+            </div>
           ) : null}
         </div>
 
