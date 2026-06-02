@@ -17,7 +17,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
-import type { PostSummary } from "@/lib/engine/types";
+import { archiveHref } from "@/lib/lens";
+import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 function uniqueIntentLabels(posts: PostSummary[]): string[] {
   const seen = new Set<string>();
@@ -34,9 +35,13 @@ function uniqueIntentLabels(posts: PostSummary[]): string[] {
 export function TopBar({
   posts,
   currentFilter,
+  currentQuery,
+  currentSort = "newest",
 }: {
   posts: PostSummary[];
   currentFilter?: string;
+  currentQuery?: string;
+  currentSort?: SortOrder;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const intents = uniqueIntentLabels(posts);
@@ -81,7 +86,7 @@ export function TopBar({
         <nav className="topbar-nav" aria-label="Sections">
           <Link
             className={`navlink${noFilter ? " on" : ""}`}
-            href="/"
+            href={archiveHref({ q: currentQuery, sort: currentSort })}
             aria-current={noFilter ? "page" : undefined}
           >
             Latest
@@ -92,7 +97,11 @@ export function TopBar({
               <Link
                 key={label}
                 className={`navlink${isActive ? " on" : ""}`}
-                href={`/?filter=${encodeURIComponent(label)}`}
+                href={archiveHref({
+                  q: currentQuery,
+                  filter: label,
+                  sort: currentSort,
+                })}
                 aria-current={isActive ? "page" : undefined}
               >
                 {label}

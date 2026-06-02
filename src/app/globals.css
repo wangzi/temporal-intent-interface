@@ -216,6 +216,9 @@ body.nav-open .rail {
 
 .rail .brand {
   font-size: 0.875rem;
+  align-self: flex-start;
+  padding: 0;
+  text-decoration: none;
 }
 
 .rail-section h2 {
@@ -228,8 +231,7 @@ body.nav-open .rail {
   margin-bottom: 12px;
 }
 
-.rail a,
-.rail button.navlink {
+.rail .navlink {
   display: block;
   width: 100%;
   text-align: left;
@@ -240,13 +242,126 @@ body.nav-open .rail {
   transition: color 0.15s;
 }
 
-.rail a:hover,
-.rail button.navlink:hover {
+.rail .navlink:hover {
   color: var(--ink);
 }
 
 .rail .navlink.on {
   color: var(--dot);
+}
+
+/* --- The Lens (leftside menu): search · filter · sort, inspired by the
+   Ghost Lens prototype. Mono micro-labels, red-accent active states, all
+   URL-driven. --- */
+.rail .lens {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.lens-block {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.lens-lbl {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+/* search */
+.lens-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: border-color 0.15s;
+}
+.lens-search:focus-within {
+  border-color: var(--system);
+}
+.lens-glyph {
+  flex: 0 0 auto;
+  color: var(--system-faint);
+}
+.lens-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+.lens-search input::placeholder {
+  color: var(--system-faint);
+}
+.lens-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.lens-clear {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--system-faint);
+  text-decoration: none;
+}
+.lens-clear:hover {
+  color: var(--dot);
+}
+/* filter chips */
+.lens-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+.lens-chip {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--system);
+  text-decoration: none;
+  padding: 2px 0;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.lens-chip:hover {
+  color: var(--ink);
+}
+.lens-chip.on {
+  color: var(--dot);
+  border-bottom-color: var(--dot);
+}
+/* sort segments */
+.lens-segs {
+  display: flex;
+  gap: 18px;
+}
+.lens-seg {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--system);
+  text-decoration: none;
+  padding: 2px 0;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.lens-seg:hover {
+  color: var(--ink);
+}
+.lens-seg.on {
+  color: var(--dot);
+  border-bottom-color: var(--dot);
 }
 
 .scrim {

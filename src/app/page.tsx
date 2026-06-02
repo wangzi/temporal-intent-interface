@@ -12,6 +12,7 @@
 
 import { listPosts } from "@/lib/engine/client";
 import { postYear } from "@/lib/format";
+import { searchPosts } from "@/lib/lens";
 import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
@@ -41,11 +42,12 @@ function uniqueYears(posts: PostSummary[]): string[] {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; filter?: string }>;
+  searchParams: Promise<{ sort?: string; filter?: string; q?: string }>;
 }) {
   const sp = await searchParams;
   const sort: SortOrder = sp.sort === "oldest" ? "oldest" : "newest";
   const filter = sp.filter && sp.filter !== "all" ? sp.filter : undefined;
+  const query = sp.q && sp.q.trim() ? sp.q.trim() : undefined;
 
   // Server-stable "now" for relative-ago strings within this SSR.
   const now = Date.now();
@@ -60,20 +62,41 @@ export default async function Home({
     console.error("[home] engine error:", err);
   }
 
-  const visiblePosts = filter
+  // Lens pipeline: filter (intent) → search (q). Sort is applied at fetch
+  // time by the engine/fixture layer via listPosts({ sort }).
+  const filtered = filter
     ? allPosts.filter((p) => p.intent_label === filter)
     : allPosts;
+  const visiblePosts = query ? searchPosts(filtered, query) : filtered;
   const years = uniqueYears(allPosts);
 
   return (
     <TemporalLayout
-      topBar={<TopBar posts={allPosts} currentFilter={filter} />}
-      rail={<NavigationRail posts={allPosts} currentFilter={filter} />}
+      topBar={
+        <TopBar
+          posts={allPosts}
+          currentFilter={filter}
+          currentQuery={query}
+          currentSort={sort}
+        />
+      }
+      rail={
+        <NavigationRail
+          posts={allPosts}
+          currentFilter={filter}
+          currentQuery={query}
+          currentSort={sort}
+        />
+      }
       timeIndex={<TimeIndex years={years} />}
     >
       <Spine />
       <p className="now-label">
-        {filter ? `Filtered · ${filter}` : "Now · latest"}
+        {query
+          ? `Search · “${query}”`
+          : filter
+            ? `Filtered · ${filter}`
+            : "Now · latest"}
       </p>
       <ol
         id="feed"
@@ -100,7 +123,11 @@ export default async function Home({
               color: "var(--system-faint)",
             }}
           >
-            {filter ? `No entries for ${filter}.` : "No entries."}
+            {query
+              ? `Nothing matches “${query}”. Clear the search or widen the filter.`
+              : filter
+                ? `No entries for ${filter}.`
+                : "No entries."}
           </li>
         ) : null}
       </ol>
