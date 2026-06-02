@@ -37,7 +37,7 @@ const SETTLE_MS = 350;
 // Reveal ramp: an entry at the focus line is fully revealed (1); one this
 // fraction of the viewport away from it sits at MIN_REVEAL. A generous
 // range makes the fade gradual over scroll distance.
-const REVEAL_VH = 0.55;
+const REVEAL_VH = 0.28;
 const MIN_REVEAL = 0.48;
 
 function positionDot(): void {

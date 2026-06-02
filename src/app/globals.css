@@ -321,6 +321,10 @@ body.nav-open .scrim {
   text-transform: uppercase;
   color: var(--system-faint);
   padding: 24px 0 8px var(--content-pad);
+  /* Top lead-in: mirrors #feed's bottom reach so the latest entry can
+     rise to the focus line (40vh) — without it the first entry is pinned
+     above the line and can never be focused/revealed. */
+  margin-top: 30vh;
 }
 
 /* ============================================================
