@@ -37,7 +37,7 @@ const SETTLE_MS = 350;
 // Reveal ramp: an entry at the focus line is fully revealed (1); one this
 // fraction of the viewport away from it sits at MIN_REVEAL. A generous
 // range makes the fade gradual over scroll distance.
-const REVEAL_VH = 0.28;
+const REVEAL_VH = 0.16;
 const MIN_REVEAL = 0.48;
 
 function positionDot(): void {
@@ -89,14 +89,22 @@ function setActiveClass(entries: HTMLElement[], idx: number): void {
 function revealByDistance(entries: HTMLElement[]): void {
   const line = dotLineY();
   const range = window.innerHeight * REVEAL_VH || 1;
-  for (const el of entries) {
-    const enrich = el.querySelector<HTMLElement>(".enrich");
+  // The focused (nearest) entry is always fully revealed — a constant, sharp
+  // pop independent of exact scroll position; everything else fades by
+  // distance to the floor.
+  const activeIdx = nearestEntryIndex(entries);
+  for (let i = 0; i < entries.length; i++) {
+    const el = entries[i];
+    const enrich = el?.querySelector<HTMLElement>(".enrich");
     if (!enrich) continue;
+    if (i === activeIdx) {
+      enrich.style.opacity = "1";
+      continue;
+    }
     const r = el.getBoundingClientRect();
     const center = r.top + r.height / 2;
     const t = 1 - Math.min(1, Math.abs(center - line) / range);
-    const op = MIN_REVEAL + (1 - MIN_REVEAL) * t;
-    enrich.style.opacity = op.toFixed(3);
+    enrich.style.opacity = (MIN_REVEAL + (1 - MIN_REVEAL) * t).toFixed(3);
   }
 }
 
