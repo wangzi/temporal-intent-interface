@@ -1333,7 +1333,9 @@ body.nav-open .scrim {
 .go-switch {
   position: absolute;
   left: max(0px, calc(var(--spine-x) - 66px));
-  bottom: calc(var(--footer-h) - 132px);
+  /* Sits in the empty reach-space just ABOVE the footer (bottom edge on the
+     footer's top, where the spine ends) — never over the footer text. */
+  bottom: var(--footer-h);
   width: 132px;
   height: 132px;
   z-index: 35;

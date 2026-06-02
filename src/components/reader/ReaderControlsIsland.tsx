@@ -44,6 +44,17 @@ function dotLineY(): number {
   return window.innerHeight * DOT_VH;
 }
 
+// True when the viewport is within `threshold`px of the document bottom.
+// Near the foot of the page, animating .enrich heights changes the
+// document height, which clamps scrollY, which re-fires `scroll` — a
+// feedback loop that reads as jitter. We freeze scan-density there.
+function nearBottom(threshold = 48): boolean {
+  return (
+    window.scrollY + window.innerHeight >=
+    document.documentElement.scrollHeight - threshold
+  );
+}
+
 function nearestEntryIndex(entries: HTMLElement[]): number {
   const y = dotLineY();
   let bestIdx = 0;
@@ -176,16 +187,23 @@ export function ReaderControlsIsland(): null {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        setDotBig(false);
         if (entries.length > 0) {
           const idx = nearestEntryIndex(entries);
           if (idx !== currentActive) {
             setActiveClass(entries, idx);
             currentActive = idx;
           }
-          collapseAll(entries);
         }
-        scheduleSettle();
+        if (nearBottom()) {
+          // Foot of the page: don't animate enrich heights (jitter). Keep
+          // the active entry enriched and the dot settled.
+          if (currentActive >= 0) enrichOnly(entries, currentActive);
+          setDotBig(true);
+        } else {
+          setDotBig(false);
+          if (entries.length > 0) collapseAll(entries);
+          scheduleSettle();
+        }
         ticking = false;
       });
     }

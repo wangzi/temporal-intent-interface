@@ -23,7 +23,7 @@ export function FooterColumn({
   posts: PostSummary[];
   moves?: FooterMoves;
 }) {
-  const threads = uniqueThreads(posts).slice(0, 4);
+  const threads = uniqueThreads(posts).slice(0, 3);
   const { count, startYear } = corpusStats(posts);
 
   return (
