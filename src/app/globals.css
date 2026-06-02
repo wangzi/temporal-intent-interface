@@ -520,28 +520,66 @@ body.nav-open .scrim {
     transition: transform 0.28s var(--ease);
     box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
   }
-  .topyears ol {
+  /* Grid container — same width/centering as .col, so the header hangs on
+     the exact grid the entries use (meta column | spine | content). */
+  .topyears-inner {
+    max-width: calc(
+      var(--measure) + var(--meta-width) + var(--content-pad) + 40px
+    );
+    margin: 0 auto;
+    padding: 16px 40px 16px 0;
+    position: relative;
+  }
+  /* SORT — sits in the meta column, right-aligned against the spine, the
+     same axis as each entry's date column. */
+  .ty-sort {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    width: var(--meta-width);
+    padding-right: 12px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .ty-sort-opt {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    color: var(--system-faint);
+    transition: color 0.15s;
+  }
+  .ty-sort-opt:hover {
+    color: var(--ink);
+  }
+  .ty-sort-opt.on {
+    color: var(--dot);
+  }
+  /* YEARS — aligned to the spine axis (the reader's single vertical line). */
+  .ty-years {
+    padding-left: var(--spine-x);
+  }
+  .ty-years ol {
     list-style: none;
     margin: 0;
-    padding: 14px 40px;
+    padding: 0;
     display: flex;
-    justify-content: center;
-    gap: 28px;
+    gap: 30px;
   }
-  .topyears button {
+  .ty-years button {
     font-family: var(--mono);
     font-size: 0.75rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--system-faint);
-    padding: 4px 10px;
-    border-radius: 4px;
+    padding: 4px 0;
     transition: color 0.15s;
   }
-  .topyears button:hover {
+  .ty-years button:hover {
     color: var(--ink);
   }
-  .topyears button.on {
+  .ty-years button.on {
     color: var(--dot);
   }
 

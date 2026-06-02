@@ -69,7 +69,9 @@ export default async function Home({
     <TemporalLayout
       topBar={<TopBar posts={allPosts} currentFilter={filter} />}
       rail={<NavigationRail posts={allPosts} currentFilter={filter} />}
-      timeIndex={<TimeIndex years={years} />}
+      timeIndex={
+        <TimeIndex years={years} currentSort={sort} currentFilter={filter} />
+      }
     >
       <Spine />
       <p className="now-label">
