@@ -1013,6 +1013,210 @@ body.nav-open .scrim {
 }
 
 /* ============================================================
+   Lens rail controls — search · sort · snapshot · auth. Native to
+   the existing `.rail` shell; `.rail a` / `.navlink` already style the
+   sort + topic links, so only the new control surfaces are defined here.
+   ============================================================ */
+.lens-search {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.lens-search::placeholder {
+  color: var(--system-faint);
+}
+.lens-search:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.lens-count {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+  margin-bottom: 10px;
+}
+
+.lens-snap,
+.lens-signin {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--field);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: opacity 0.15s var(--ease);
+}
+.lens-snap:hover:not(:disabled),
+.lens-signin:hover {
+  opacity: 0.85;
+}
+.lens-snap:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.lens-snap:focus-visible,
+.lens-signin:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.lens-error {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--dot);
+  margin-top: 8px;
+}
+
+.lens-snaps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lens-snaps li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.lens-snap-link {
+  line-height: 1.35;
+}
+.lens-copy {
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+  background: none;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+}
+.lens-copy:hover {
+  color: var(--ink);
+}
+
+.lens-account {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lens-email {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lens-signout {
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.lens-signout:hover {
+  color: var(--ink);
+}
+
+/* ============================================================
+   Public frozen snapshot — /s/[token]. TII visual language, centered
+   to the reading measure; no reader chrome (rail/spine/dot).
+   ============================================================ */
+.snap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 8vh var(--content-pad) 12vh;
+}
+.snap-head {
+  margin-bottom: 6vh;
+}
+.snap-home {
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+.snap-home b {
+  color: var(--dot);
+  font-weight: 500;
+}
+.snap-title {
+  font-family: var(--serif);
+  font-size: var(--t-title-read);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+  margin: 1.2rem 0 0.5rem;
+}
+.snap-meta {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+}
+.snap-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5vh;
+}
+.snap-entry {
+  border-top: 1px solid var(--rule);
+  padding-top: 2.4vh;
+}
+.snap-entry-meta {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system);
+  margin-bottom: 0.6rem;
+}
+.snap-topics {
+  color: var(--system-faint);
+}
+.snap-entry-title {
+  font-family: var(--serif);
+  font-size: var(--t-title-scan);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+  margin-bottom: 0.7rem;
+}
+.snap-entry-body {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.62;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+}
+.snap-foot {
+  margin-top: 8vh;
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+}
+.snap-foot a {
+  color: var(--system);
+}
+.snap-foot a:hover {
+  color: var(--ink);
+}
+
+/* ============================================================
    Lab — footer LAYOUT variants (/lab/footer). `.lf-*` namespace,
    scoped so nothing here touches the production footer. Reuses the
    design tokens; one red accent only; serif = author, mono = system.
