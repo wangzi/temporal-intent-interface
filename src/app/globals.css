@@ -878,7 +878,10 @@ body.nav-open .scrim {
      left-edge trigger strip (`.rail-trigger`) or the rail itself. */
   .rail {
     position: fixed;
-    width: 248px;
+    /* Responsive width: pinned ~248px on laptops, scaling with the viewport to
+       a 500px cap (~2x) on large external displays — a 27" 5K (~2560 CSS px)
+       lands at the cap so the control plane isn't a thin strip. */
+    width: clamp(248px, 20vw, 500px);
     transform: translateX(-100%);
     transition: transform 0.28s var(--ease);
     box-shadow: 4px 0 18px rgba(0, 0, 0, 0.06);
