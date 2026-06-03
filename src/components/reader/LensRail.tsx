@@ -125,6 +125,10 @@ export function LensRail({
     );
     items.forEach((el) => {
       const idx = Number(el.getAttribute("data-entry-index"));
+      // Entries appended by the Load-more island (idx beyond the rail's
+      // first-page `posts`) aren't in the search set — leave them visible
+      // rather than hiding them.
+      if (idx >= posts.length) return;
       el.style.display = visible.has(idx) ? "" : "none";
     });
     return () => {
@@ -134,7 +138,7 @@ export function LensRail({
           el.style.display = "";
         });
     };
-  }, [matches]);
+  }, [matches, posts.length]);
 
   const signIn = useCallback(() => {
     void getSupabase().auth.signInWithOAuth({
