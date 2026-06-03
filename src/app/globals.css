@@ -500,23 +500,28 @@ body.nav-open .scrim {
 }
 
 /* ============================================================
-   Terminal hero — the head of the spine. A CLI status readout that replaces
-   the old sort-toggle masthead; sits in-flow at the top of the reading column
-   and scrolls away with content. Three lines: a live client-only clock, the
-   server data string, and a scroll-hint ↓.
+   Terminal hero — the head of the spine. A CLI status readout: two text rows
+   (a live client-only clock, then the server data string) aligned to the entry
+   column, plus a SINGLE glyph on the spine that the island morphs and descends —
+   blinking | (cursor) → > (prompt) → ↓ (scroll hint) — travelling down the spine
+   as the rows type in. SSR / JS-off / reduced-motion show the rested ↓ + the
+   full data row (the clock row is the one client-only piece, height-reserved).
 
    First @keyframes in the codebase. NOTE: the global prefers-reduced-motion
-   rule kills `transition` but NOT `animation`, so the blink + bounce are
-   disabled explicitly there (search "reduce").
+   rule kills `transition` but NOT `animation`, so blink + bounce are disabled
+   explicitly there (search "reduce").
    ============================================================ */
 .hero-term {
-  /* Reserve all three rows up front: typing text in, clearing it, and the
-     clock's post-mount arrival then never reflow the page (zero CLS). The
-     container spans from the column's left edge (no left padding) so the
-     arrow row can sit on the spine; the text rows carry their own inset. */
+  /* Reserve the rows up front so typing + the clock's arrival never reflow
+     (zero CLS). The glyph is absolute (out of flow) so it never affects layout.
+     The container spans from the column's left edge so the glyph can sit on the
+     spine; the text rows carry their own entry-column inset. */
   --hero-line-h: 1.5em;
+  --hero-gap: 1.7em; /* airy space between the clock row and the data row */
   position: relative;
-  min-height: calc(var(--hero-line-h) * 3);
+  /* Only the two text rows are in-flow; the glyph is absolute and descends
+     past the hero into the lead-in to rest just above the first entry. */
+  min-height: 6rem;
   padding: 24px 0 8px 0;
   font-family: var(--mono);
   font-size: 0.75rem;
@@ -524,69 +529,52 @@ body.nav-open .scrim {
   color: var(--system);
 }
 
-/* Text rows (clock + data) align with the entry copy — the same inset the
-   entries use (.entry): --content-pad on mobile/tablet, spine-x + content-pad
-   at laptop. The arrow row opts out below to sit on the spine. */
+/* Text rows align with the entry copy — the same inset .entry uses:
+   --content-pad on mobile/tablet, spine-x + content-pad at laptop. */
 .hero-term-line {
-  /* nowrap (not `pre`): keeps each line a single, height-stable row so it
-     can't reflow mid-type. Single spaces + the prompt's &nbsp; survive
-     nowrap; overflow:hidden contains an over-long line instead of forcing
-     page-wide horizontal scroll. */
   min-height: var(--hero-line-h);
   padding-left: var(--content-pad);
-  white-space: nowrap;
-  overflow: hidden;
+  white-space: nowrap; /* single, height-stable row; can't reflow mid-type */
+  overflow: hidden; /* contain an over-long line; no page-wide h-scroll */
+}
+.hero-term-line + .hero-term-line {
+  margin-top: var(--hero-gap);
 }
 
-.hero-term-prompt {
-  color: var(--system-faint);
-}
-
-/* Live-clock slot: empty in SSR, filled by the island post-mount. min-height
-   holds the row before it fills → no shift. */
+/* Live-clock slot: empty in SSR, filled by the island post-mount. */
 .hero-term-clock {
   display: inline-block;
   min-height: 1em;
 }
-
 .hero-term-data {
   color: var(--ink-soft);
 }
 
-/* Scroll-hint row: the ↓ sits ON the spine (centred — like the dot and the old
-   toggle), not under the text. Absolutely placed within this relative row, so
-   the in-flow row still reserves its height (no CLS) while the glyph aligns to
-   the spine axis; overflow visible so the taller glyph + bounce aren't clipped. */
-.hero-term-hint {
-  position: relative;
-  padding-left: 0;
-  overflow: visible;
-}
-.hero-term-cursor {
+/* The single morphing glyph, anchored on the spine. Centred on the 1px spine
+   (+0.5px lands it dead-centre); the island drives `top` (descent), `opacity`
+   (morph cross-fade), and textContent (| → > → ↓). The CSS `top` here is the
+   SSR / JS-off rest position (just below the data row). */
+.hero-glyph {
   position: absolute;
-  top: 0;
+  /* Rest position (hero-relative, stable): on the spine, well below the text
+     rows and clear of the focus dot. Used by SSR / JS-off directly; the island
+     descends here by reverting its inline `top` at the end of the morph. */
+  top: 11rem;
   left: calc(var(--spine-x) + 0.5px);
-  /* translateX(-50%) centres on the 1px spine; it is baked into the bounce
-     keyframes too, so the vertical bounce never drops the horizontal centring. */
   transform: translateX(-50%);
-  color: var(--dot);
-  font-size: 1.5rem;
+  color: var(--ink);
+  font-size: 1.4rem;
   line-height: 1;
-  /* Pure-CSS bounce → works JS-off; killed under reduced motion. The island
-     hides it during typing via the .is-animating root class. */
-  animation: hero-bounce 1.6s var(--ease) infinite;
+  transition:
+    top 0.42s var(--ease),
+    opacity 0.16s linear;
 }
-.hero-term.is-animating .hero-term-cursor {
-  opacity: 0;
-  animation: none;
-}
-
-/* Typing caret: a blinking block at the end of whichever line is being typed.
-   The island toggles .is-typing line-by-line. */
-.hero-term-line.is-typing::after {
-  content: "▌";
-  color: var(--system);
+/* Phase-1 cursor blink and the final rested bounce — toggled by the island. */
+.hero-glyph.is-blink {
   animation: hero-blink 1s steps(1, end) infinite;
+}
+.hero-glyph.is-bounce {
+  animation: hero-bounce 1.6s var(--ease) infinite;
 }
 
 @keyframes hero-blink {
@@ -599,6 +587,7 @@ body.nav-open .scrim {
     opacity: 0;
   }
 }
+/* translateX(-50%) baked in so the vertical bounce keeps the spine centring. */
 @keyframes hero-bounce {
   0%,
   100% {
@@ -609,16 +598,12 @@ body.nav-open .scrim {
   }
 }
 
-/* Laptop: the text rows align with the article content (spine-x + content-pad,
-   matching .entry). The arrow row stays on the spine — its absolute ↓ uses
-   --spine-x directly, so it needs no per-breakpoint override. Focus geometry
-   (40vh dot, #feed 18vh lead-in) is unchanged. */
+/* Laptop: text rows align with the article content (spine-x + content-pad,
+   matching .entry). The glyph uses --spine-x directly, so it stays on the spine
+   at every breakpoint with no override. */
 @media (min-width: 1080px) {
   .hero-term-line {
     padding-left: calc(var(--spine-x) + var(--content-pad));
-  }
-  .hero-term-hint {
-    padding-left: 0;
   }
 }
 
@@ -1020,8 +1005,9 @@ body.nav-open .scrim {
   }
   /* The rule above covers `transition` only — keyframe `animation` is NOT
      affected, so the terminal hero's blink + bounce must be killed by name. */
-  .hero-term-cursor,
-  .hero-term-line.is-typing::after {
+  .hero-glyph,
+  .hero-glyph.is-blink,
+  .hero-glyph.is-bounce {
     animation: none !important;
   }
 }

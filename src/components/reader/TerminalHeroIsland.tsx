@@ -1,27 +1,33 @@
 "use client";
 
 // The single client island for the terminal hero. Returns null; mutates the
-// server-rendered DOM imperatively (same shape as ReaderControlsIsland — no
-// React state for the hero's content; the server stays source-of-truth).
+// server-rendered DOM imperatively (same shape as ReaderControlsIsland — the
+// server stays source-of-truth for the data row).
 //
-// Sequence (motion allowed): blink a caret on line 1 → type `> `+clock → 300ms
-// line-break pause → caret to line 2 → type the data string → reveal the
-// bouncing arrow. The arrow + data line already exist in SSR (JS-off contract);
-// the island hides them BEFORE first paint (useLayoutEffect, no flash) and
-// restores them at the end.
+// Choreography (motion allowed): a single glyph on the spine descends as it
+// morphs, while the two rows type in beside it —
+//   1. blinking | (cursor) at the clock row
+//   2. morph | → >, type the clock row
+//   3. descend to the data row, type it
+//   4. morph > → ↓, descend to the CSS rest position, then bounce (scroll hint)
 //
-// Reduced motion: skip all typing; just fill the live clock. The data line and
-// arrow stay in their SSR final state (the bounce is killed by the CSS
-// prefers-reduced-motion rule).
+// The morph is an opacity cross-fade + textContent swap; the descent is a CSS
+// `top` transition. Every position is HERO-RELATIVE (row offsetTop, or the CSS
+// `top` rest) — never viewport-relative — so font reflow / scroll never throw
+// the glyph off. Phase 4 reverts the inline `top` so the glyph settles to the
+// stylesheet's `.hero-glyph { top }`.
 //
-// CLS-safe: every row's height is reserved in CSS, so clearing/typing text and
-// the clock's late arrival never reflow the page.
+// JS-off / reduced-motion: the SSR markup already shows the rested ↓ + the full
+// data row; reduced motion just fills the clock and skips all animation. The
+// clock row is the only client-only piece and its height is reserved → no CLS.
 
 import { useEffect, useLayoutEffect } from "react";
 
-const TYPE_MS = 40; // per-character typing speed (spec)
-const LINE_PAUSE_MS = 300; // pause at a line break (spec)
-const START_BLINK_MS = 600; // Phase 1: caret blinks briefly before typing
+const START_BLINK_MS = 600; // Phase 1: cursor blinks before it morphs
+const TYPE_MS = 40; // per-character typing (spec)
+const LINE_PAUSE_MS = 300; // pause at a row break (spec)
+const MORPH_MS = 160; // opacity cross-fade half-cycle (matches CSS)
+const DESCEND_MS = 420; // glyph `top` transition (matches CSS)
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -47,84 +53,109 @@ function formatLocalClock(d: Date): string {
   return `${time} | ${date}`;
 }
 
+// Hero-relative `top` that centres the glyph on a row. offsetTop is font-stable,
+// so this is safe to read at any time.
+function topForRow(row: HTMLElement, glyph: HTMLElement): number {
+  return row.offsetTop + row.offsetHeight / 2 - glyph.offsetHeight / 2;
+}
+
 export function TerminalHeroIsland(): null {
-  // Before first paint: hide the final arrow + clear the data line so typing
-  // starts from empty with no flash of the SSR final state.
+  // Before first paint: jump the glyph to the clock row as a blinking |, and
+  // clear the data row — so the morph starts from the top with no flash of the
+  // SSR rested ↓.
   useLayoutEffect(() => {
     const root = document.querySelector<HTMLElement>("[data-hero-root]");
     if (!root) return;
     if (prefersReducedMotion()) return; // keep the SSR final state intact
-    root.classList.add("is-animating");
+    const glyph = root.querySelector<HTMLElement>("[data-hero-glyph]");
+    const line1 = root.querySelector<HTMLElement>('[data-hero-line="clock"]');
     const dataEl = root.querySelector<HTMLElement>(".hero-term-data");
+    if (glyph && line1) {
+      glyph.style.transition = "none"; // jump without sliding from CSS rest
+      glyph.style.top = `${topForRow(line1, glyph)}px`;
+      glyph.textContent = "|";
+      glyph.classList.add("is-blink");
+      void glyph.offsetWidth; // flush, then re-enable the transition
+      glyph.style.transition = "";
+    }
     if (dataEl) dataEl.textContent = "";
   }, []);
 
   useEffect(() => {
     const root = document.querySelector<HTMLElement>("[data-hero-root]");
     if (!root) return;
+    const glyph = root.querySelector<HTMLElement>("[data-hero-glyph]");
     const clockEl = root.querySelector<HTMLElement>("[data-hero-clock]");
     const dataEl = root.querySelector<HTMLElement>(".hero-term-data");
-    const line1 = clockEl?.closest<HTMLElement>(".hero-term-line") ?? null;
-    const line2 = dataEl?.closest<HTMLElement>(".hero-term-line") ?? null;
-    const finalData = dataEl?.dataset.heroFinal ?? "";
+    const line2 = root.querySelector<HTMLElement>('[data-hero-line="data"]');
     const clockStr = formatLocalClock(new Date());
 
     if (prefersReducedMotion()) {
-      if (clockEl) clockEl.textContent = clockStr; // fill clock, no animation
-      return; // data line + arrow already final from SSR
+      if (clockEl) clockEl.textContent = clockStr; // data row + ↓ already final
+      return;
     }
+    if (!glyph || !clockEl || !dataEl || !line2) return;
 
+    const finalData = dataEl.dataset.heroFinal ?? "";
     const timers: number[] = [];
+    const at = (ms: number, fn: () => void) =>
+      timers.push(window.setTimeout(fn, ms));
+
     let t = START_BLINK_MS;
 
-    // Phase 1: caret blinks on line 1 (CSS `.is-typing::after`).
-    line1?.classList.add("is-typing");
+    // Phase 2: end the blink, morph | → > (cross-fade).
+    at(t, () => glyph.classList.remove("is-blink"));
+    at(t, () => {
+      glyph.style.opacity = "0";
+    });
+    at(t + MORPH_MS, () => {
+      glyph.textContent = ">";
+      glyph.style.opacity = "1";
+    });
+    t += MORPH_MS * 2;
 
-    // Phase 2: type the clock after the static `> ` prompt.
+    // Type the clock row (glyph stays at the clock row).
     for (let i = 1; i <= clockStr.length; i++) {
       t += TYPE_MS;
       const n = i;
-      timers.push(
-        window.setTimeout(() => {
-          if (clockEl) clockEl.textContent = clockStr.slice(0, n);
-        }, t),
-      );
+      at(t, () => {
+        clockEl.textContent = clockStr.slice(0, n);
+      });
     }
 
-    // Phase 3: line-break pause, then move the caret to line 2.
+    // Phase 3: descend to the data row.
     t += LINE_PAUSE_MS;
-    timers.push(
-      window.setTimeout(() => {
-        line1?.classList.remove("is-typing");
-        line2?.classList.add("is-typing");
-      }, t),
-    );
+    at(t, () => {
+      glyph.style.top = `${topForRow(line2, glyph)}px`;
+    });
+    t += DESCEND_MS;
 
-    // Phase 4: type the data string.
+    // Type the data row.
     for (let i = 1; i <= finalData.length; i++) {
       t += TYPE_MS;
       const n = i;
-      timers.push(
-        window.setTimeout(() => {
-          if (dataEl) dataEl.textContent = finalData.slice(0, n);
-        }, t),
-      );
+      at(t, () => {
+        dataEl.textContent = finalData.slice(0, n);
+      });
     }
 
-    // Phase 5: stop typing; reveal the bouncing arrow (drops .is-animating).
+    // Phase 4: morph > → ↓ and descend to the CSS rest (clear the inline top).
     t += LINE_PAUSE_MS;
-    timers.push(
-      window.setTimeout(() => {
-        line2?.classList.remove("is-typing");
-        root.classList.remove("is-animating");
-      }, t),
-    );
+    at(t, () => {
+      glyph.style.opacity = "0";
+    });
+    at(t + MORPH_MS, () => {
+      glyph.textContent = "↓";
+      glyph.style.opacity = "1";
+      glyph.style.top = ""; // → stylesheet `.hero-glyph { top }`, transitions there
+    });
+    t += Math.max(MORPH_MS * 2, DESCEND_MS);
+
+    // Settle: bounce as the resting scroll hint.
+    at(t, () => glyph.classList.add("is-bounce"));
 
     return () => {
       for (const id of timers) window.clearTimeout(id);
-      line1?.classList.remove("is-typing");
-      line2?.classList.remove("is-typing");
-      root.classList.remove("is-animating");
     };
   }, []);
 
