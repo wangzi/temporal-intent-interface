@@ -22,12 +22,24 @@ function uniqueIntentLabels(posts: PostSummary[]): string[] {
   return order;
 }
 
+// Build a sort URL, preserving any active ?filter=. Newest is the default so
+// it omits the param (canonical "/"). Lifted from the removed TimeIndex.
+function sortHref(sort: "newest" | "oldest", filter?: string): string {
+  const sp = new URLSearchParams();
+  if (sort !== "newest") sp.set("sort", sort);
+  if (filter) sp.set("filter", filter);
+  const qs = sp.toString();
+  return qs ? `/?${qs}` : "/";
+}
+
 export function NavigationRail({
   posts,
   currentFilter,
+  currentSort = "newest",
 }: {
   posts: PostSummary[];
   currentFilter?: string;
+  currentSort?: "newest" | "oldest";
 }) {
   const intents = uniqueIntentLabels(posts);
   const noFilter = !currentFilter;
@@ -44,6 +56,23 @@ export function NavigationRail({
           aria-current={noFilter ? "page" : undefined}
         >
           Latest
+        </Link>
+      </div>
+      <div className="rail-section">
+        <h2>Sort</h2>
+        <Link
+          className={`navlink${currentSort === "newest" ? " on" : ""}`}
+          href={sortHref("newest", currentFilter)}
+          aria-current={currentSort === "newest" ? "page" : undefined}
+        >
+          Newest first
+        </Link>
+        <Link
+          className={`navlink${currentSort === "oldest" ? " on" : ""}`}
+          href={sortHref("oldest", currentFilter)}
+          aria-current={currentSort === "oldest" ? "page" : undefined}
+        >
+          Oldest first
         </Link>
       </div>
       <div className="rail-section">

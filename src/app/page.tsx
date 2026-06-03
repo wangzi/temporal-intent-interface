@@ -11,7 +11,7 @@
 // the visible <ol> is filtered in-component when ?filter=... is set.
 
 import { listPosts } from "@/lib/engine/client";
-import { postYear } from "@/lib/format";
+import { daysAgo, postYear } from "@/lib/format";
 import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
@@ -19,7 +19,8 @@ import { NavigationRail } from "@/components/reader/NavigationRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { Spine } from "@/components/reader/Spine";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
-import { TimeIndex } from "@/components/reader/TimeIndex";
+import { TerminalHero } from "@/components/reader/TerminalHero";
+import { TerminalHeroIsland } from "@/components/reader/TerminalHeroIsland";
 import { TitleIntentLayer } from "@/components/reader/TitleIntentLayer";
 import { TopBar } from "@/components/reader/TopBar";
 
@@ -51,13 +52,40 @@ export default async function Home({
     ? allPosts.filter((p) => p.intent_label === filter)
     : allPosts;
 
+  // Head-of-spine stats for the terminal hero, derived from the whole archive
+  // (unfiltered, and sort-independent — `sort` may be "oldest").
+  // CAVEAT: PostsListResponse has no `total` field (engine/types.ts), so this
+  // is the LOADED page only. Today the engine returns the full set unpaginated
+  // so it equals the true total; once it paginates this undercounts.
+  // TODO(engine): surface a real `total` and pass it instead of length (Q7/Q9).
+  const totalEntriesCount = allPosts.length;
+  const latestIso =
+    allPosts.length > 0
+      ? allPosts.reduce(
+          (max, p) => (p.published_at > max ? p.published_at : max),
+          allPosts[0]!.published_at,
+        )
+      : null;
+  const lastEntryDays = latestIso ? daysAgo(latestIso, now) : 0;
+
   return (
     <TemporalLayout
       topBar={<TopBar posts={allPosts} currentFilter={filter} />}
-      rail={<NavigationRail posts={allPosts} currentFilter={filter} />}
+      rail={
+        <NavigationRail
+          posts={allPosts}
+          currentFilter={filter}
+          currentSort={sort}
+        />
+      }
     >
       <Spine />
-      <TimeIndex currentSort={sort} currentFilter={filter} />
+      {allPosts.length > 0 ? (
+        <TerminalHero
+          lastEntryDays={lastEntryDays}
+          totalEntriesCount={totalEntriesCount}
+        />
+      ) : null}
       <ol
         id="feed"
         aria-label="Entries in reverse chronological order"
@@ -90,6 +118,7 @@ export default async function Home({
       {/* Footer hidden for now — FooterReview render removed. */}
       <Dot />
       <ReaderControlsIsland />
+      <TerminalHeroIsland />
     </TemporalLayout>
   );
 }
