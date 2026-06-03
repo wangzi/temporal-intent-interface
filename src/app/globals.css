@@ -523,12 +523,14 @@ body.nav-open .scrim {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     text-decoration: none;
   }
   .spine-sort-arrow {
     font-family: var(--mono);
-    font-size: 1.05rem;
+    /* 2× the prior 1.05rem — a bigger, more prominent arrow (wider head,
+       longer stem). Uniform scale keeps the glyph's stroke balanced. */
+    font-size: 2.1rem;
     line-height: 1;
     color: var(--dot);
     transition: color 0.15s, transform 0.2s var(--ease);
