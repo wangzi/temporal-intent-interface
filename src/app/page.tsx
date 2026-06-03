@@ -11,18 +11,19 @@
 // option; the visible <ol> is filtered in-component when ?filter= is set.
 
 import { listPosts } from "@/lib/engine/client";
-import { daysAgo, postYear } from "@/lib/format";
+import { daysAgo } from "@/lib/format";
 import { topicsList } from "@/lib/lens/search";
 import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
+import { EntryItem } from "@/components/reader/EntryItem";
 import { LensRail } from "@/components/reader/LensRail";
+import { LoadMore } from "@/components/reader/LoadMore";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { Spine } from "@/components/reader/Spine";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
 import { TerminalHero } from "@/components/reader/TerminalHero";
 import { TerminalHeroIsland } from "@/components/reader/TerminalHeroIsland";
-import { TitleIntentLayer } from "@/components/reader/TitleIntentLayer";
 import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
@@ -40,9 +41,11 @@ export default async function Home({
   const now = Date.now();
 
   let allPosts: PostSummary[] = [];
+  let nextCursor: string | null = null;
   try {
     const response = await listPosts({ sort });
     allPosts = response.posts;
+    nextCursor = response.next_cursor;
   } catch (err) {
     // Engine error — render an empty archive rather than blow up.
     // eslint-disable-next-line no-console
@@ -105,15 +108,7 @@ export default async function Home({
         style={{ listStyle: "none" }}
       >
         {visiblePosts.map((p, i) => (
-          <li
-            key={p.post_id}
-            className="entry"
-            data-entry-index={i}
-            data-year={postYear(p.published_at)}
-            data-label={p.intent_label}
-          >
-            <TitleIntentLayer post={p} now={now} />
-          </li>
+          <EntryItem key={p.post_id} post={p} index={i} now={now} />
         ))}
         {visiblePosts.length === 0 ? (
           <li
@@ -128,6 +123,14 @@ export default async function Home({
           </li>
         ) : null}
       </ol>
+      <LoadMore
+        key={`${sort}-${filter ?? "all"}`}
+        sort={sort}
+        filter={filter ?? null}
+        initialCursor={nextCursor}
+        initialCount={visiblePosts.length}
+        now={now}
+      />
       {/* Footer hidden for now — FooterReview render removed. */}
       <Dot />
       <ReaderControlsIsland />
