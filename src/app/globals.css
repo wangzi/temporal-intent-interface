@@ -518,7 +518,11 @@ body.nav-open .scrim {
   .spine-sort {
     position: absolute;
     top: 0;
-    left: var(--spine-x);
+    /* +0.5px: the spine is a 1px line at --spine-x, so its optical centre
+       is --spine-x + 0.5. Centring the toggle on the bare --spine-x (its
+       left edge) biases the arrow + label 0.5px left — 1 physical pixel on
+       a 2× display. Half-pixel nudge lands them dead-centre on the line. */
+    left: calc(var(--spine-x) + 0.5px);
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
