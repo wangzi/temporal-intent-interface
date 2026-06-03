@@ -500,140 +500,51 @@ body.nav-open .scrim {
 }
 
 /* ============================================================
-   Top years nav — laptop+ only. Auto-hides under a top-edge hover
-   strip (same UX as the left rail; rotated 90°).
+   Masthead — the head of the spine. No header bar: this sits in-flow at
+   the top of the reading column and scrolls away with the content.
+   Laptop+ only (the topbar carries mobile).
    ============================================================ */
-.topyears,
-.topyears-trigger {
+.masthead {
   display: none;
 }
-
 @media (min-width: 1080px) {
-  /* The timeline header. The status line (sort + date) is ALWAYS visible —
-     a persistent discovery affordance; the years are the hover-revealed
-     menu. Hangs on the entry grid: meta column | spine | content. */
-  .topyears {
+  .masthead {
     display: block;
-    position: fixed;
+    position: relative;
+  }
+  /* SORT — a single on/off toggle centred on the spine. Shows ONLY the
+     active state: ↓ Now (newest) or ↑ Past (oldest); click flips it.
+     URL-driven (?sort=), JS-off safe. */
+  .spine-sort {
+    position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
-    z-index: 48;
-    background: color-mix(in srgb, var(--field) 92%, transparent);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--rule);
-  }
-  .topyears-inner {
-    /* Same width + centring as .col → identical grid to the entries. */
-    max-width: calc(
-      var(--measure) + var(--meta-width) + var(--content-pad) + 40px
-    );
-    margin: 0 auto;
-    padding: 13px 40px 13px 0;
-    position: relative;
-  }
-  .ty-status {
-    position: relative;
-    min-height: 44px;
-  }
-  /* SORT — a two-state toggle at the head of the spine: ↓ Now (newest) /
-     ↑ Past (oldest). Arrow over label, side by side; the active state is
-     red + ink, the other recedes. URL-driven (?sort=). */
-  .ty-sort {
-    padding-left: var(--spine-x);
-    display: flex;
-    gap: 30px;
-  }
-  .ty-sort-opt {
+    left: var(--spine-x);
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
     text-decoration: none;
   }
-  .ty-sort-arrow {
+  .spine-sort-arrow {
     font-family: var(--mono);
-    font-size: 1rem;
+    font-size: 1.05rem;
     line-height: 1;
-    color: var(--system-faint);
+    color: var(--dot);
     transition: color 0.15s, transform 0.2s var(--ease);
   }
-  .ty-sort-label {
+  .spine-sort-label {
     font-family: var(--mono);
     font-size: 0.625rem;
     letter-spacing: 0.1em;
-    color: var(--system-faint);
+    color: var(--system);
     transition: color 0.15s;
   }
-  .ty-sort-opt:hover .ty-sort-arrow,
-  .ty-sort-opt:hover .ty-sort-label {
+  .spine-sort:hover .spine-sort-arrow {
+    transform: translateY(-2px);
+  }
+  .spine-sort:hover .spine-sort-label {
     color: var(--ink);
-  }
-  .ty-sort-opt.on .ty-sort-arrow {
-    color: var(--dot);
-  }
-  .ty-sort-opt.on .ty-sort-label {
-    color: var(--ink);
-  }
-  /* DATE — in the meta column, styled exactly like an entry's date column:
-     right-aligned against the spine, stacked, faint mono. The header's meta
-     block, mirroring every entry's meta block below it. */
-  .ty-date {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: var(--meta-width);
-    padding-right: 12px;
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    line-height: 1.3;
-    font-family: var(--mono);
-    font-size: 0.6875rem;
-    color: var(--system-faint);
-  }
-  .ty-prompt {
-    color: var(--branch);
-    margin-right: 2px;
-  }
-  /* YEARS — the hover-revealed menu, aligned to the spine axis. */
-  .ty-years {
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    margin-top: 0;
-    transition:
-      max-height 0.28s var(--ease),
-      opacity 0.2s var(--ease),
-      margin-top 0.28s var(--ease);
-  }
-  .topyears:hover .ty-years {
-    max-height: 56px;
-    opacity: 1;
-    margin-top: 14px;
-  }
-  .ty-years ol {
-    list-style: none;
-    margin: 0;
-    padding: 0 0 0 var(--spine-x);
-    display: flex;
-    gap: 30px;
-  }
-  .ty-years button {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--system-faint);
-    padding: 4px 0;
-    transition: color 0.15s;
-  }
-  .ty-years button:hover {
-    color: var(--ink);
-  }
-  .ty-years button.on {
-    color: var(--dot);
   }
 }
 

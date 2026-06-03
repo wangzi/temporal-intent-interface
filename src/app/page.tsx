@@ -11,7 +11,7 @@
 // the visible <ol> is filtered in-component when ?filter=... is set.
 
 import { listPosts } from "@/lib/engine/client";
-import { postYear, relativeAgo } from "@/lib/format";
+import { postYear } from "@/lib/format";
 import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
@@ -24,19 +24,6 @@ import { TitleIntentLayer } from "@/components/reader/TitleIntentLayer";
 import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
-
-function uniqueYears(posts: PostSummary[]): string[] {
-  const seen = new Set<string>();
-  const order: string[] = [];
-  for (const p of posts) {
-    const y = postYear(p.published_at);
-    if (!seen.has(y)) {
-      seen.add(y);
-      order.push(y);
-    }
-  }
-  return order;
-}
 
 export default async function Home({
   searchParams,
@@ -63,32 +50,14 @@ export default async function Home({
   const visiblePosts = filter
     ? allPosts.filter((p) => p.intent_label === filter)
     : allPosts;
-  const years = uniqueYears(allPosts);
-
-  // Bash-terminal status line: today's date (server-stable, ISO) + how long
-  // since the most recent entry (computed from the max published_at).
-  const today = new Date(now).toISOString().slice(0, 10);
-  const latest =
-    allPosts.length > 0
-      ? allPosts.reduce((a, b) => (a.published_at >= b.published_at ? a : b))
-      : null;
-  const lastEntryAgo = latest ? relativeAgo(latest.published_at, now) : "";
 
   return (
     <TemporalLayout
       topBar={<TopBar posts={allPosts} currentFilter={filter} />}
       rail={<NavigationRail posts={allPosts} currentFilter={filter} />}
-      timeIndex={
-        <TimeIndex
-          years={years}
-          currentSort={sort}
-          currentFilter={filter}
-          today={today}
-          lastEntryAgo={lastEntryAgo}
-        />
-      }
     >
       <Spine />
+      <TimeIndex currentSort={sort} currentFilter={filter} />
       <ol
         id="feed"
         aria-label="Entries in reverse chronological order"
