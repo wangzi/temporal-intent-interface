@@ -6,16 +6,17 @@
 // response against the §9 contract; on error we render an empty
 // state rather than crash.
 //
-// Filtering: the engine call is always unfiltered so that the
-// NavigationRail can list every intent_label as a filter option;
-// the visible <ol> is filtered in-component when ?filter=... is set.
+// Filtering: the engine call is always unfiltered so that the LensRail
+// can list every topic (with an intent_label fallback) as a filter
+// option; the visible <ol> is filtered in-component when ?filter= is set.
 
 import { listPosts } from "@/lib/engine/client";
 import { daysAgo, postYear } from "@/lib/format";
+import { topicsList } from "@/lib/lens/search";
 import type { PostSummary, SortOrder } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
-import { NavigationRail } from "@/components/reader/NavigationRail";
+import { LensRail } from "@/components/reader/LensRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { Spine } from "@/components/reader/Spine";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
@@ -48,9 +49,20 @@ export default async function Home({
     console.error("[home] engine error:", err);
   }
 
+  // Topic facet prefers journalkit topics; until those are populated it falls
+  // back to intent_label so the rail has a working filter today. Either value
+  // arrives as ?filter=, so the predicate matches both.
   const visiblePosts = filter
-    ? allPosts.filter((p) => p.intent_label === filter)
+    ? allPosts.filter(
+        (p) => (p.topics ?? []).includes(filter) || p.intent_label === filter,
+      )
     : allPosts;
+
+  const topicFacets = topicsList(allPosts);
+  const facetOptions =
+    topicFacets.length > 0
+      ? topicFacets
+      : Array.from(new Set(allPosts.map((p) => p.intent_label)));
 
   // Head-of-spine stats for the terminal hero, derived from the whole archive
   // (unfiltered, and sort-independent — `sort` may be "oldest").
@@ -72,9 +84,10 @@ export default async function Home({
     <TemporalLayout
       topBar={<TopBar posts={allPosts} currentFilter={filter} />}
       rail={
-        <NavigationRail
-          posts={allPosts}
-          currentFilter={filter}
+        <LensRail
+          posts={visiblePosts}
+          topics={facetOptions}
+          currentFilter={filter ?? null}
           currentSort={sort}
         />
       }
