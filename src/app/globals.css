@@ -511,22 +511,29 @@ body.nav-open .scrim {
    ============================================================ */
 .hero-term {
   /* Reserve all three rows up front: typing text in, clearing it, and the
-     clock's post-mount arrival then never reflow the page (zero CLS). */
+     clock's post-mount arrival then never reflow the page (zero CLS). The
+     container spans from the column's left edge (no left padding) so the
+     arrow row can sit on the spine; the text rows carry their own inset. */
   --hero-line-h: 1.5em;
+  position: relative;
   min-height: calc(var(--hero-line-h) * 3);
-  padding: 24px 0 8px var(--content-pad);
+  padding: 24px 0 8px 0;
   font-family: var(--mono);
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--system);
 }
 
+/* Text rows (clock + data) align with the entry copy — the same inset the
+   entries use (.entry): --content-pad on mobile/tablet, spine-x + content-pad
+   at laptop. The arrow row opts out below to sit on the spine. */
 .hero-term-line {
   /* nowrap (not `pre`): keeps each line a single, height-stable row so it
      can't reflow mid-type. Single spaces + the prompt's &nbsp; survive
      nowrap; overflow:hidden contains an over-long line instead of forcing
      page-wide horizontal scroll. */
   min-height: var(--hero-line-h);
+  padding-left: var(--content-pad);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -546,12 +553,22 @@ body.nav-open .scrim {
   color: var(--ink-soft);
 }
 
-/* Scroll-hint line: let the taller ↓ (and its bounce) overflow the row box. */
+/* Scroll-hint row: the ↓ sits ON the spine (centred — like the dot and the old
+   toggle), not under the text. Absolutely placed within this relative row, so
+   the in-flow row still reserves its height (no CLS) while the glyph aligns to
+   the spine axis; overflow visible so the taller glyph + bounce aren't clipped. */
 .hero-term-hint {
+  position: relative;
+  padding-left: 0;
   overflow: visible;
 }
 .hero-term-cursor {
-  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: calc(var(--spine-x) + 0.5px);
+  /* translateX(-50%) centres on the 1px spine; it is baked into the bounce
+     keyframes too, so the vertical bounce never drops the horizontal centring. */
+  transform: translateX(-50%);
   color: var(--dot);
   font-size: 1.5rem;
   line-height: 1;
@@ -585,20 +602,23 @@ body.nav-open .scrim {
 @keyframes hero-bounce {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
   50% {
-    transform: translateY(4px);
+    transform: translateX(-50%) translateY(4px);
   }
 }
 
-/* Laptop: align the readout's left edge with the article content (where entry
-   text starts), not the spine. Mobile/tablet use --content-pad, which already
-   clears the spine + the fixed topbar (via .reader padding-top). Focus
-   geometry (40vh dot, #feed 18vh lead-in) is unchanged. */
+/* Laptop: the text rows align with the article content (spine-x + content-pad,
+   matching .entry). The arrow row stays on the spine — its absolute ↓ uses
+   --spine-x directly, so it needs no per-breakpoint override. Focus geometry
+   (40vh dot, #feed 18vh lead-in) is unchanged. */
 @media (min-width: 1080px) {
-  .hero-term {
+  .hero-term-line {
     padding-left: calc(var(--spine-x) + var(--content-pad));
+  }
+  .hero-term-hint {
+    padding-left: 0;
   }
 }
 
