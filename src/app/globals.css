@@ -570,7 +570,10 @@ body.nav-open .scrim {
      spine + 40vh dot are positioned independently of entry rendering, and the
      active-entry / scan-density reveal run on visible (rendered) entries. */
   content-visibility: auto;
-  contain-intrinsic-size: auto 460px;
+  /* Per-axis: inline (width) = auto-remembered, 0 fallback → off-screen entries
+     fill the column rather than forcing a 460px min-width (which overflowed
+     narrow viewports); block (height) = auto-remembered, 460px placeholder. */
+  contain-intrinsic-size: auto 0 auto 460px;
 }
 
 .e-meta {
