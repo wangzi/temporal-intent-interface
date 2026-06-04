@@ -17,8 +17,53 @@
 
   --font-serif:
     "Newsreader", Georgia, "Times New Roman", serif;
+  /* SF Mono on Apple devices (named first so it wins where it's installed);
+     self-hosted iA Writer Duo S as the cross-platform backup BEFORE the
+     ui-monospace generic, so non-Apple readers get iA Writer rather than the
+     OS default mono. Menlo/monospace close it out. */
   --font-mono:
-    "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    "SF Mono", SFMono-Regular, "iA Writer Duo S", ui-monospace, Menlo, monospace;
+}
+
+/* iA Writer Duo S — self-hosted mono fallback for non-Apple platforms.
+   SIL Open Font License (github.com/iaolo/iA-Fonts). woff2 in /public/fonts.
+   `font-display: swap` mirrors the serif; `local()` short-circuits the
+   download for anyone who already has the family installed. */
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S"),
+    url("/fonts/iAWriterDuoS-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S Italic"),
+    url("/fonts/iAWriterDuoS-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S Bold"),
+    url("/fonts/iAWriterDuoS-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S Bold Italic"),
+    url("/fonts/iAWriterDuoS-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
 }
 
 :root {
