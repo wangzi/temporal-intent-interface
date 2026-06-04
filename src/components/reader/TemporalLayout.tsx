@@ -23,11 +23,21 @@ export function TemporalLayout({
   return (
     <>
       {topBar}
-      {/* Hover trigger for the auto-hide rail at laptop+. Sits as a
-          thin invisible strip on the viewport's left edge; hovering
-          slides the rail into view via the `.rail-trigger:hover ~ .rail`
-          sibling selector in globals.css. */}
-      <div className="rail-trigger" aria-hidden="true" />
+      {/* Rail toggle — a black circle (click to expand, click again to
+          collapse). CSS-only via a hidden checkbox
+          (`.rail-toggle-input:checked ~ .rail`), so it works with JS off.
+          Laptop+ only; mobile uses the TopBar hamburger. */}
+      <input
+        type="checkbox"
+        id="rail-toggle"
+        className="rail-toggle-input"
+        aria-label="Expand navigation menu"
+      />
+      <label
+        htmlFor="rail-toggle"
+        className="rail-toggle"
+        title="Toggle navigation menu"
+      />
       {rail}
       <div className="app">
         <main className="reader" id="reader-main">
