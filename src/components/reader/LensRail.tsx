@@ -207,6 +207,9 @@ export function LensRail({
             defaultValue={query}
             placeholder="Search title, body, intent…"
             aria-label="Search entries"
+            // name="q" is a very common form-field name, so browsers offer
+            // cross-site autofill history here — suppress it.
+            autoComplete="off"
           />
           {selectedTopics.length > 0 ? (
             <input
