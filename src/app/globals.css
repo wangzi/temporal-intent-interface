@@ -389,16 +389,31 @@ body.nav-open .scrim {
    so the timeline visually runs into the footer's top edge. */
 .spine {
   position: absolute;
-  /* Start BELOW the terminal-hero glyphs (✻ time / ¶ entry / ⇅ toggle) so the
-     line no longer runs through them — it begins at the entries (the bottom of
-     the hero + sort-toggle block = #feed top). 129px here = hero (~92) + sort
-     toggle (~37); laptop adds the 56px .col padding-top (see the ≥1080 rule). */
-  top: 129px;
+  /* Start well BELOW the terminal-hero glyphs (✻ time / ¶ entry / ⇅ toggle),
+     down in the lead-in space before the first entry, so the line is clearly
+     separate from the masthead. 259px here clears the (doubled-spacing) hero +
+     sort toggle and drops into the lead-in; laptop adds the 56px .col
+     padding-top (see the ≥1080 rule). The start is marked by an open circle. */
+  top: 259px;
   bottom: var(--footer-h);
   left: var(--spine-x, 28px);
   width: 1px;
   background: linear-gradient(var(--branch), var(--branch));
   opacity: 0.9;
+}
+
+/* Open-circle start cap — a hollow ring marks where the timeline begins. */
+.spine::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid var(--branch);
+  background: var(--field);
 }
 
 .spine::after {
@@ -733,12 +748,13 @@ body.nav-open .scrim {
      The container spans from the column's left edge so the glyph can sit on the
      spine; the text rows carry their own entry-column inset. */
   --hero-line-h: 1.5em;
-  --hero-gap: 1.7em; /* airy space between the clock row and the data row */
+  --hero-gap: 4.83em; /* doubled glyph/text spacing (~76px between glyphs) */
   position: relative;
   /* Only the two text rows are in-flow; the cursor glyph is absolute and
      descends to rest on the sort toggle that follows the hero. Tuned so the
-     three spine glyphs (✻ time / ¶ entry / ⇅ toggle) are evenly spaced. */
-  min-height: 5.75rem;
+     three spine glyphs (✻ time / ¶ entry / ⇅ toggle) are evenly spaced — at
+     double the original gap. */
+  min-height: 10.5rem;
   padding: 24px 0 8px 0;
   font-family: var(--mono);
   font-size: 0.75rem;
@@ -806,7 +822,7 @@ body.nav-open .scrim {
      is no dot). Tuned with the hero min-height so the three glyphs are evenly
      spaced. Used by SSR / JS-off directly; the island reverts its inline `top`
      at the end of the morph to land here. */
-  top: 6.1rem;
+  top: 10.7rem;
   left: calc(var(--spine-x) + 0.5px);
   transform: translateX(-50%);
   color: var(--ink);
@@ -890,6 +906,10 @@ body.nav-open .scrim {
      override the archive's hero-clearing top offset back to the top. */
   top: 0;
   bottom: 0;
+}
+/* No open-circle start cap on the post route (its spine starts at the top). */
+.attn-inner .spine::before {
+  content: none;
 }
 
 /* Bold circular "back" mark — a confident exit node, not a timid pill. Fixed
@@ -1132,9 +1152,9 @@ body.nav-open .scrim {
   }
   .spine {
     left: var(--spine-x);
-    /* +56px for the .col padding-top at this breakpoint, so the line still
-       begins right under the sort toggle (#feed top). */
-    top: 185px;
+    /* +56px for the .col padding-top at this breakpoint, so the start sits the
+       same distance into the lead-in as the base rule. */
+    top: 315px;
   }
   /* (Post-route spine override now lives globally as `.attn-inner
      .spine`, above — it wins by specificity at every breakpoint.) */
