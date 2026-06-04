@@ -7,9 +7,9 @@
 // Choreography (motion allowed): a single glyph on the spine descends as it
 // morphs, while the two rows type in beside it —
 //   1. blinking | (cursor) at the clock row
-//   2. morph | → >, type the clock row
+//   2. stop blinking, type the clock row (steady |)
 //   3. descend to the data row, type it
-//   4. morph > → ⇅, descend to the CSS rest position, then bob (the sort marker)
+//   4. morph | → ⇅, descend to the CSS rest position, then bob (the sort marker)
 //
 // The morph is an opacity cross-fade + textContent swap; the descent is a CSS
 // `top` transition. Every position is HERO-RELATIVE (row offsetTop, or the CSS
@@ -114,16 +114,9 @@ export function TerminalHeroIsland(): null {
 
     let t = START_BLINK_MS;
 
-    // Phase 2: end the blink, morph | → > (cross-fade).
+    // Phase 2: end the blink; the cursor stays a steady | as it types (no >).
     at(t, () => glyph.classList.remove("is-blink"));
-    at(t, () => {
-      glyph.style.opacity = "0";
-    });
-    at(t + MORPH_MS, () => {
-      glyph.textContent = ">";
-      glyph.style.opacity = "1";
-    });
-    t += MORPH_MS * 2;
+    t += MORPH_MS;
 
     // Type the clock row (glyph stays at the clock row).
     for (let i = 1; i <= clockStr.length; i++) {
@@ -152,7 +145,7 @@ export function TerminalHeroIsland(): null {
       });
     }
 
-    // Phase 4: the data row is typed — leave its › prompt, morph > → ↓ and
+    // Phase 4: the data row is typed — leave its › prompt, morph | → ⇅ and
     // descend to the CSS rest (clear the inline top).
     t += LINE_PAUSE_MS;
     at(t, () => {

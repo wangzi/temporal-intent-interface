@@ -722,7 +722,8 @@ body.nav-open .scrim {
   animation: hero-sparkle 9s linear infinite;
 }
 .hero-prompt[data-hero-prompt="data"] {
-  animation: hero-blink 1s steps(1, end) infinite;
+  /* Slow, calm cursor blink (on ~1.1s / off ~1.1s). */
+  animation: hero-blink 2.2s steps(1, end) infinite;
 }
 .hero-term-line + .hero-term-line {
   margin-top: var(--hero-gap);
