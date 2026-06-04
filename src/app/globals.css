@@ -681,9 +681,9 @@ body.nav-open .scrim {
   --hero-gap: 1.7em; /* airy space between the clock row and the data row */
   position: relative;
   /* Only the two text rows are in-flow; the cursor glyph is absolute and
-     descends to rest just below the data row — above the sort toggle that now
-     follows the hero. */
-  min-height: 7rem;
+     descends to rest on the sort toggle that follows the hero. Tuned so the
+     three spine glyphs (✻ time / ¶ entry / ⇅ toggle) are evenly spaced. */
+  min-height: 5.75rem;
   padding: 24px 0 8px 0;
   font-family: var(--mono);
   font-size: 0.75rem;
@@ -710,18 +710,19 @@ body.nav-open .scrim {
   left: calc(var(--spine-x) + 0.5px);
   top: 50%;
   transform: translate(-50%, -50%);
-  color: var(--system);
+  color: var(--ink);
   font-size: 0.95rem;
   line-height: 1;
   transition: opacity 0.2s var(--ease);
 }
 /* Fun micro-animations: the time-row sparkle slowly spins; the entry-row pilcrow
-   breathes. (The cursor ⇅ bobs via .is-bounce.) Disabled under reduced motion. */
+   blinks like a cursor. (The toggle ⇅ bobs via .is-bounce.) All three share the
+   --ink color; all are disabled under reduced motion. */
 .hero-prompt[data-hero-prompt="clock"] {
   animation: hero-sparkle 9s linear infinite;
 }
 .hero-prompt[data-hero-prompt="data"] {
-  animation: hero-pulse 3.2s var(--ease) infinite;
+  animation: hero-blink 1s steps(1, end) infinite;
 }
 .hero-term-line + .hero-term-line {
   margin-top: var(--hero-gap);
@@ -744,9 +745,10 @@ body.nav-open .scrim {
   position: absolute;
   /* Rest position (hero-relative, stable): on the spine, level with the sort
      toggle row that follows the hero — the glyph IS the toggle's marker (there
-     is no dot). Used by SSR / JS-off directly; the island descends here by
-     reverting its inline `top` at the end of the morph. */
-  top: 7.4rem;
+     is no dot). Tuned with the hero min-height so the three glyphs are evenly
+     spaced. Used by SSR / JS-off directly; the island reverts its inline `top`
+     at the end of the morph to land here. */
+  top: 6.1rem;
   left: calc(var(--spine-x) + 0.5px);
   transform: translateX(-50%);
   color: var(--ink);
@@ -784,23 +786,15 @@ body.nav-open .scrim {
     transform: translateX(-50%) translateY(4px);
   }
 }
-/* Prompt micro-animations — translate(-50%,-50%) baked in so they stay centred
-   on the spine while they spin / breathe. */
+/* Sparkle spin for the ✻ prompt — translate(-50%,-50%) baked in so it stays
+   centred on the spine while it rotates. (The ¶ prompt reuses hero-blink; the
+   ⇅ cursor reuses hero-bounce.) */
 @keyframes hero-sparkle {
   from {
     transform: translate(-50%, -50%) rotate(0deg);
   }
   to {
     transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-@keyframes hero-pulse {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.18);
   }
 }
 
