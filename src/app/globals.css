@@ -388,6 +388,10 @@ body.nav-open .scrim {
 .reader {
   grid-column: 2;
   position: relative;
+  /* Allow the grid track to shrink below its content's min-content width so the
+     hero's `white-space: nowrap` clock/data rows (overflow:hidden) can't force a
+     horizontal scroll on very narrow / JS-off viewports (e.g. 320px). */
+  min-width: 0;
   /* Clear the fixed TopBar, which now includes the safe-area top inset. */
   padding-top: calc(52px + env(safe-area-inset-top, 0px));
 }
