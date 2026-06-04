@@ -874,8 +874,8 @@ body.nav-open .scrim {
   .topbar {
     display: none;
   }
-  /* Auto-hide rail: off-screen by default; slides in on hover of the
-     left-edge trigger strip (`.rail-trigger`) or the rail itself. */
+  /* Off-screen by default; revealed by the black circle toggle (a hidden
+     checkbox — CSS-only, works JS-off). No hover. */
   .rail {
     position: fixed;
     /* Responsive width: pinned ~248px on laptops, scaling with the viewport to
@@ -886,9 +886,37 @@ body.nav-open .scrim {
     transition: transform 0.28s var(--ease);
     box-shadow: 4px 0 18px rgba(0, 0, 0, 0.06);
   }
-  .rail-trigger:hover ~ .rail,
-  .rail:hover {
+  .rail-toggle-input:checked ~ .rail {
     transform: translateX(0);
+  }
+  /* The toggle: a black circle on the left edge. It slides to the rail's right
+     edge when open, so it always reads as the collapse affordance. */
+  .rail-toggle {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    z-index: 60; /* above the rail (50) so it stays clickable when open */
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    transition:
+      left 0.28s var(--ease),
+      background 0.15s var(--ease);
+  }
+  .rail-toggle:hover {
+    background: var(--dot);
+  }
+  .rail-toggle-input:focus-visible + .rail-toggle {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .rail-toggle-input:checked ~ .rail-toggle {
+    left: calc(clamp(248px, 20vw, 500px) + 16px);
   }
   .scrim {
     display: none;
@@ -953,37 +981,18 @@ body.nav-open .scrim {
   }
 }
 
-/* Auto-hide rail trigger strip — only present at laptop+, where the
-   rail is hover-revealed (CSS-only). Sits over content as an invisible
-   16px wide hover zone on the viewport's left edge. */
-.rail-trigger {
+/* Rail toggle base — the black circle is hidden below laptop (mobile uses the
+   TopBar hamburger); its visible styles + the reveal live in the 1080px block
+   above. The checkbox is visually hidden but stays keyboard-focusable. */
+.rail-toggle {
   display: none;
 }
-@media (min-width: 1080px) {
-  .rail-trigger {
-    display: block;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 16px;
-    z-index: 49;
-    /* Visual hint: a faint hairline that thickens slightly on hover so
-       the affordance is discoverable without dominating. */
-    background: linear-gradient(
-      to right,
-      color-mix(in srgb, var(--rule) 80%, transparent),
-      transparent
-    );
-    transition: background 0.2s var(--ease);
-  }
-  .rail-trigger:hover {
-    background: linear-gradient(
-      to right,
-      color-mix(in srgb, var(--system-faint) 30%, transparent),
-      transparent
-    );
-  }
+.rail-toggle-input {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* Wide desktop: measure holds; extra width → margin only. (Years
