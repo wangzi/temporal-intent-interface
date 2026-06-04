@@ -410,8 +410,7 @@ body.nav-open .scrim {
 @media (min-width: 1080px) {
   .spine-sort,
   .feed-status,
-  .feed-empty,
-  .route-header {
+  .feed-empty {
     padding-left: calc(var(--spine-x) + var(--content-pad));
   }
 }
@@ -527,6 +526,13 @@ body.nav-open .scrim {
 .route-header {
   padding: 2vh 0 2vh var(--content-pad);
   max-width: calc(var(--measure) + var(--content-pad));
+}
+/* Laptop inset — declared AFTER the base so the shorthand above doesn't win.
+   Aligns the header to the entry column (right of the spine), not the gutter. */
+@media (min-width: 1080px) {
+  .route-header {
+    padding-left: calc(var(--spine-x) + var(--content-pad));
+  }
 }
 .route-title {
   font-family: var(--serif);
@@ -1064,6 +1070,11 @@ body.nav-open .scrim {
     );
     /* Bottom padding 0 — footer is flush; reach lives on #feed. */
     padding: 56px 40px 0 0;
+    /* Nudge the whole reader (spine + content) right by 50px. Relative offset,
+       so the fixed dot (repositioned to the spine by the island) follows it and
+       the dot's own containing block is unaffected. Laptop+ only — there's room
+       in the centered margins; mobile fills the width. */
+    left: 50px;
   }
   .spine {
     left: var(--spine-x);
