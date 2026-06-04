@@ -196,10 +196,12 @@ a {
   z-index: 50;
   width: var(--rail-reveal-w);
   background: var(--field);
-  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.08);
+  /* Softened edge: no hard 1px border — a wide, low shadow + rounded right
+     corners let the drawer float over the content. */
+  box-shadow: 8px 0 40px rgba(0, 0, 0, 0.1);
+  border-radius: 0 20px 20px 0;
   overflow-y: auto;
-  border-right: 1px solid var(--rule);
-  padding: 26px 22px;
+  padding: 34px 28px;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -245,10 +247,8 @@ body.nav-open .rail {
    rail's own width (a container), so a wide drawer gets the airy reference look
    while a narrow one stacks. */
 @container rail (min-width: 420px) {
-  .rail {
-    gap: 40px;
-    padding: 30px 30px;
-  }
+  /* NOTE: a container can't style itself, so the rail's own gap/padding live in
+     the viewport media query below — only descendants are styled here. */
   .rail-section {
     display: grid;
     grid-template-columns: 132px minmax(0, 1fr);
@@ -258,6 +258,16 @@ body.nav-open .rail {
   .rail-section h2 {
     margin-bottom: 0;
     padding-top: 4px; /* drop the label onto the first control row */
+  }
+}
+
+/* Roomier padding + section spacing once the rail is wide (laptop+, where
+   --rail-reveal-w grows). Keyed to the viewport since the rail can't style
+   itself from its own container query. */
+@media (min-width: 1080px) {
+  .rail {
+    padding: 48px 44px;
+    gap: 44px;
   }
 }
 
