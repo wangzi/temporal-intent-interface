@@ -32,19 +32,13 @@ import { LensRail } from "@/components/reader/LensRail";
 import { LoadMore } from "@/components/reader/LoadMore";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { Spine } from "@/components/reader/Spine";
+import { SpineSort } from "@/components/reader/SpineSort";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
 import { TerminalHero } from "@/components/reader/TerminalHero";
 import { TerminalHeroIsland } from "@/components/reader/TerminalHeroIsland";
 import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
-
-const emptyRowStyle = {
-  padding: "5.5vh 0 5.5vh var(--content-pad)",
-  fontFamily: "var(--mono)",
-  fontSize: "0.8125rem",
-  color: "var(--system-faint)",
-};
 
 function parseTopics(raw?: string): string[] {
   if (!raw) return [];
@@ -94,10 +88,16 @@ export default async function Home({
       console.error("[home] search error:", err);
     }
 
-    const criteria = [
-      query ? `“${query}”` : null,
-      selectedTopics.length ? selectedTopics.join(", ") : null,
-    ]
+    // Keep the status line terse: name the topics when there are a few, but
+    // collapse to a count past 3 so it never becomes a wall of caps. The active
+    // topics are also shown (highlighted) in the rail's Topics list.
+    const topicCriteria =
+      selectedTopics.length === 0
+        ? null
+        : selectedTopics.length <= 3
+          ? selectedTopics.join(", ")
+          : `${selectedTopics.length} topics`;
+    const criteria = [query ? `“${query}”` : null, topicCriteria]
       .filter(Boolean)
       .join(" · ");
     const heading =
@@ -119,17 +119,13 @@ export default async function Home({
         }
       >
         <Spine />
+        <SpineSort
+          currentSort={sort}
+          query={query}
+          selectedTopics={selectedTopics}
+        />
         <ol id="feed" aria-label="Search results" style={{ listStyle: "none" }}>
-          <li
-            style={{
-              padding: "3vh 0 1vh var(--content-pad)",
-              fontFamily: "var(--mono)",
-              fontSize: "0.75rem",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "var(--system-faint)",
-            }}
-          >
+          <li className="feed-status">
             {heading}
             {criteria ? ` · ${criteria}` : ""}
           </li>
@@ -143,7 +139,7 @@ export default async function Home({
             />
           ))}
           {results.length === 0 ? (
-            <li style={emptyRowStyle}>
+            <li className="feed-empty">
               No entries match {criteria || "your search"}.
             </li>
           ) : null}
@@ -203,6 +199,11 @@ export default async function Home({
       }
     >
       <Spine />
+      <SpineSort
+        currentSort={sort}
+        query={query}
+        selectedTopics={selectedTopics}
+      />
       {allPosts.length > 0 ? (
         <TerminalHero
           lastEntryDays={lastEntryDays}
@@ -218,7 +219,7 @@ export default async function Home({
           <EntryItem key={p.post_id} post={p} index={i} now={now} />
         ))}
         {visiblePosts.length === 0 ? (
-          <li style={emptyRowStyle}>
+          <li className="feed-empty">
             {filter ? `No entries for ${filter}.` : "No entries."}
           </li>
         ) : null}

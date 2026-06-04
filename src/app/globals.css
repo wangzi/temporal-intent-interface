@@ -317,6 +317,69 @@ body.nav-open .scrim {
   background: var(--branch);
 }
 
+/* Spine sort — the now→past / past→now toggle, anchored on the spine as a small
+   node at the head of the timeline (relocated here from the Lens rail). The
+   margin-left tracks --spine-x at every breakpoint, so the node always lands on
+   the spine line; the labels sit just to its right. */
+.spine-sort {
+  position: relative;
+  margin-left: var(--spine-x);
+  padding: 10px 0 10px 18px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.spine-sort::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--branch);
+  transform: translate(-50%, -50%);
+}
+.spine-sort-opt {
+  color: var(--system-faint);
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.spine-sort-opt:hover {
+  color: var(--ink);
+}
+.spine-sort-opt.on {
+  color: var(--dot);
+}
+
+/* Feed status (search "N results …") + empty rows — align to the entry column
+   (right of the spine at laptop) so they don't float in the meta gutter and
+   cross the spine line. */
+.feed-status {
+  padding: 3vh 0 1vh var(--content-pad);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+.feed-empty {
+  padding: 5.5vh 0 5.5vh var(--content-pad);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--system-faint);
+}
+@media (min-width: 1080px) {
+  .feed-status,
+  .feed-empty {
+    padding-left: calc(var(--spine-x) + var(--content-pad));
+  }
+}
+
 .now-label {
   font-family: var(--mono);
   font-size: 0.6875rem;
@@ -991,39 +1054,28 @@ body.nav-open .scrim {
   font-size: var(--t-label);
   color: var(--ink);
   background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 8px 10px;
+  /* A simple line, not a box. */
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 6px 2px;
 }
 .lens-search::placeholder {
   color: var(--system-faint);
 }
 .lens-search:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 1px;
-  border-color: transparent;
+  outline: none;
+  /* Visible focus without a box: the underline darkens to ink. */
+  border-bottom-color: var(--ink);
 }
 
-/* Search form: the input, a submit button (needed JS-off), and a clear link. */
+/* Search form: a single underline input that submits on Enter (works JS-off —
+   one text field implies submission) + a clear link. No submit button: the
+   line IS the control. */
 .lens-search-form {
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-.lens-search-go {
-  align-self: flex-start;
-  font-family: var(--mono);
-  font-size: var(--t-label);
-  color: var(--field);
-  background: var(--ink);
-  border: 1px solid var(--ink);
-  border-radius: 6px;
-  padding: 6px 14px;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.lens-search-go:hover {
-  opacity: 0.85;
 }
 .rail a.lens-search-clear {
   padding-top: 8px;

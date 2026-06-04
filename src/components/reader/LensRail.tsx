@@ -9,7 +9,9 @@
 //     search submit never drops them.
 //   • Topics — real facets from journalkit /api/v1/topics, with post counts.
 //     Multi-select with OR semantics: each chip toggles itself in `?topics=a,b`.
-//   • Sort   — `?sort=`, preserving q + topics.
+//   • Sort   — moved out of the rail onto the spine (see SpineSort). The rail
+//     still carries the current `?sort=` through search + topic links so a
+//     query/topic change never resets the chosen order.
 //   • Snapshot (JS-only, gated behind `mounted` so it's absent for JS-off):
 //     Google sign-in + "Snap this view" freeze the currently-rendered entries —
 //     the search results in order, or the feed — into a shareable /s/[token].
@@ -222,9 +224,8 @@ export function LensRail({
           {currentSort === "oldest" ? (
             <input type="hidden" name="sort" value="oldest" readOnly />
           ) : null}
-          <button type="submit" className="lens-search-go">
-            Search
-          </button>
+          {/* No submit button — a single search field submits on Enter (works
+              JS-off too). The input is a simple line, not a box. */}
         </form>
         {query ? (
           <Link
@@ -234,24 +235,6 @@ export function LensRail({
             Clear search
           </Link>
         ) : null}
-      </div>
-
-      <div className="rail-section">
-        <h2>Sort</h2>
-        <Link
-          className={`navlink${currentSort === "newest" ? " on" : ""}`}
-          href={railHref({ q: query, topics: selectedTopics, sort: "newest" })}
-          aria-current={currentSort === "newest" ? "page" : undefined}
-        >
-          Now → Past
-        </Link>
-        <Link
-          className={`navlink${currentSort === "oldest" ? " on" : ""}`}
-          href={railHref({ q: query, topics: selectedTopics, sort: "oldest" })}
-          aria-current={currentSort === "oldest" ? "page" : undefined}
-        >
-          Past → Now
-        </Link>
       </div>
 
       <div className="rail-section">
