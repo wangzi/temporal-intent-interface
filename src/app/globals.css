@@ -531,6 +531,15 @@ body.nav-open .scrim {
   position: relative;
   padding: 5.5vh 0 5.5vh var(--content-pad);
   border: 0;
+  /* Skip layout/paint of off-screen entries — the archive SSRs the full
+     page (~100 entries on live), so this cuts initial Style & Layout sharply
+     on long lists without removing any DOM (JS-off-safe). `auto` lets the
+     browser remember each entry's real height after first render, so the
+     ~460px placeholder never causes layout shift (CLS stays ~0). The fixed
+     spine + 40vh dot are positioned independently of entry rendering, and the
+     active-entry / scan-density reveal run on visible (rendered) entries. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 460px;
 }
 
 .e-meta {
