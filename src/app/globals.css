@@ -49,6 +49,8 @@
   --gutter: 0px;
   --content-pad: 64px;
   --rail-w: 0px;
+  /* Rail drawer width when the circle toggle reveals it. */
+  --rail-reveal-w: min(82vw, 300px);
   --index-w: 0px;
   --spine-x: 28px;
   --dot-vh: 40;
@@ -174,12 +176,8 @@ a {
 }
 
 .menu-btn {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  margin-right: -10px;
-  color: var(--system);
+  /* Hidden — the black-circle rail toggle is the universal toggle now. */
+  display: none;
 }
 
 .menu-btn svg {
@@ -196,8 +194,10 @@ a {
   bottom: 0;
   left: 0;
   z-index: 50;
-  width: min(82vw, 300px);
+  width: var(--rail-reveal-w);
   background: var(--field);
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.08);
+  overflow-y: auto;
   border-right: 1px solid var(--rule);
   padding: 26px 22px;
   display: flex;
@@ -783,41 +783,8 @@ body.nav-open .scrim {
     display: none;
   }
 
-  /* Bottom-sheet rail (replaces slide-from-left on mobile). Anchored
-     to the bottom edge; full-width; slides up via translateY. The
-     scrim above darkens the rest of the viewport (z-index 45 sits
-     below the rail at 50). */
-  .rail {
-    top: auto;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: auto;
-    max-height: 72vh;
-    border-right: none;
-    border-top: 1px solid var(--rule);
-    border-radius: 14px 14px 0 0;
-    padding: 18px 22px 32px;
-    transform: translateY(102%);
-    transition: transform 0.3s var(--ease);
-    overflow-y: auto;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.12);
-    gap: 22px;
-  }
-  body.nav-open .rail {
-    transform: translateY(0);
-  }
-
-  /* Drag-handle affordance at the top of the sheet. */
-  .rail::before {
-    content: "";
-    display: block;
-    width: 40px;
-    height: 4px;
-    background: var(--rule);
-    border-radius: 999px;
-    margin: 0 auto 6px;
-  }
+  /* The rail is a left drawer at all sizes now (toggled by the black circle);
+     the mobile bottom-sheet was removed. Just tighter list spacing below. */
 
   /* Tighter list spacing inside the sheet. */
   .rail-section h2 {
@@ -863,8 +830,10 @@ body.nav-open .scrim {
    type steps up. */
 @media (min-width: 1080px) {
   :root {
-    /* No layout-reserved rail — it's auto-hide, floats over content. */
+    /* No layout-reserved rail — it floats over content. */
     --rail-w: 0px;
+    /* Wider drawer on laptops; scales to a 500px cap on large displays. */
+    --rail-reveal-w: clamp(248px, 20vw, 500px);
     /* Spine sits to the RIGHT of the meta column (was at col-left=0). */
     --spine-x: 128px;
     --content-pad: 64px;
@@ -874,50 +843,9 @@ body.nav-open .scrim {
   .topbar {
     display: none;
   }
-  /* Off-screen by default; revealed by the black circle toggle (a hidden
-     checkbox — CSS-only, works JS-off). No hover. */
-  .rail {
-    position: fixed;
-    /* Responsive width: pinned ~248px on laptops, scaling with the viewport to
-       a 500px cap (~2x) on large external displays — a 27" 5K (~2560 CSS px)
-       lands at the cap so the control plane isn't a thin strip. */
-    width: clamp(248px, 20vw, 500px);
-    transform: translateX(-100%);
-    transition: transform 0.28s var(--ease);
-    box-shadow: 4px 0 18px rgba(0, 0, 0, 0.06);
-  }
-  .rail-toggle-input:checked ~ .rail {
-    transform: translateX(0);
-  }
-  /* The toggle: a black circle on the left edge. It slides to the rail's right
-     edge when open, so it always reads as the collapse affordance. */
-  .rail-toggle {
-    display: block;
-    position: fixed;
-    top: 50%;
-    left: 16px;
-    transform: translateY(-50%);
-    z-index: 60; /* above the rail (50) so it stays clickable when open */
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--ink);
-    cursor: pointer;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
-    transition:
-      left 0.28s var(--ease),
-      background 0.15s var(--ease);
-  }
-  .rail-toggle:hover {
-    background: var(--dot);
-  }
-  .rail-toggle-input:focus-visible + .rail-toggle {
-    outline: 2px solid var(--focus);
-    outline-offset: 3px;
-  }
-  .rail-toggle-input:checked ~ .rail-toggle {
-    left: calc(clamp(248px, 20vw, 500px) + 16px);
-  }
+  /* The rail (left drawer) + the black-circle toggle are styled at base level
+     now, so they work at every width — see the .rail-toggle block. The laptop
+     drawer width comes from --rail-reveal-w (widened via :root above). */
   .scrim {
     display: none;
   }
@@ -981,18 +909,46 @@ body.nav-open .scrim {
   }
 }
 
-/* Rail toggle base — the black circle is hidden below laptop (mobile uses the
-   TopBar hamburger); its visible styles + the reveal live in the 1080px block
-   above. The checkbox is visually hidden but stays keyboard-focusable. */
-.rail-toggle {
-  display: none;
-}
+/* Rail toggle — a black circle at EVERY screen size that opens/collapses the
+   rail. CSS-only via the hidden checkbox (`:checked ~ .rail`), so it works with
+   JS off and is keyboard-focusable. The circle sits at the left edge and slides
+   to the rail's right edge when open, so it's always a clear toggle. */
 .rail-toggle-input {
   position: fixed;
   width: 1px;
   height: 1px;
   opacity: 0;
   pointer-events: none;
+}
+.rail-toggle-input:checked ~ .rail {
+  transform: translateX(0);
+}
+.rail-toggle {
+  display: block;
+  position: fixed;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  z-index: 60; /* above the rail (50) so it stays clickable when open */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  transition:
+    left 0.28s var(--ease),
+    background 0.15s var(--ease);
+}
+.rail-toggle:hover {
+  background: var(--dot);
+}
+.rail-toggle-input:focus-visible + .rail-toggle {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.rail-toggle-input:checked ~ .rail-toggle {
+  left: calc(var(--rail-reveal-w) + 16px);
 }
 
 /* Wide desktop: measure holds; extra width → margin only. (Years
