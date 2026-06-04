@@ -205,6 +205,11 @@ a {
   gap: 30px;
   transform: translateX(-102%);
   transition: transform 0.26s var(--ease);
+  /* The rail is a query container so its sections can switch from stacked
+     (label above control) to two-column (label beside control) based on the
+     rail's own width, not the viewport's — see `@container rail` below. */
+  container-type: inline-size;
+  container-name: rail;
 }
 
 body.nav-open .rail {
@@ -217,12 +222,43 @@ body.nav-open .rail {
 
 .rail-section h2 {
   font-family: var(--mono);
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--system-faint);
+  font-size: var(--t-label);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--system);
   margin-bottom: 12px;
+}
+
+/* Stacked by default (narrow rail): label on top, control below. */
+.rail-section {
+  display: block;
+}
+.rail-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0; /* let names ellipsis instead of stretching the grid cell */
+}
+
+/* Two-column label → control layout once the rail is wide enough. Driven by the
+   rail's own width (a container), so a wide drawer gets the airy reference look
+   while a narrow one stacks. */
+@container rail (min-width: 420px) {
+  .rail {
+    gap: 40px;
+    padding: 30px 30px;
+  }
+  .rail-section {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    column-gap: 28px;
+    align-items: start;
+  }
+  .rail-section h2 {
+    margin-bottom: 0;
+    padding-top: 4px; /* drop the label onto the first control row */
+  }
 }
 
 .rail a,
@@ -895,8 +931,9 @@ body.nav-open .scrim {
   :root {
     /* No layout-reserved rail — it floats over content. */
     --rail-w: 0px;
-    /* Wider drawer on laptops; scales to a 500px cap on large displays. */
-    --rail-reveal-w: clamp(248px, 20vw, 500px);
+    /* Wide enough for the two-column label → control layout; scales to a 700px
+       cap on large displays (e.g. a 5K). */
+    --rail-reveal-w: clamp(400px, 40vw, 700px);
     /* Spine sits to the RIGHT of the meta column (was at col-left=0). */
     --spine-x: 128px;
     --content-pad: 64px;
@@ -1044,9 +1081,9 @@ body.nav-open .scrim {
 }
 
 /* ============================================================
-   Lens rail controls — search · sort · snapshot · auth. Native to
-   the existing `.rail` shell; `.rail a` / `.navlink` already style the
-   sort + topic links, so only the new control surfaces are defined here.
+   Lens rail controls — snap-to-share · search · topics. The two-column
+   label → control layout lives in the `.rail-section` grid above; these
+   style the individual control surfaces. (Sort moved to the spine.)
    ============================================================ */
 .lens-search {
   width: 100%;
@@ -1086,27 +1123,57 @@ body.nav-open .scrim {
   color: var(--ink);
 }
 
-/* Topic facet chips — name + post count, multi-select (OR). Reuse `.navlink`
-   for base type + the `.on` selected color; this only adds the count layout. */
-.rail a.topic-chip {
+/* Topic rows — radio-style: a circle that fills when selected, then the name and
+   a right-aligned count. Multi-select (OR), so several circles can be filled at
+   once. */
+.rail a.topic-opt {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 7px 0;
+  color: var(--system);
 }
-.topic-chip .topic-name {
+.rail a.topic-opt:hover {
+  color: var(--ink);
+}
+.topic-radio {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--branch);
+  box-sizing: border-box;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.rail a.topic-opt:hover .topic-radio {
+  border-color: var(--system);
+}
+.rail a.topic-opt.on .topic-radio {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.topic-opt .topic-name {
+  flex: 1 1 auto;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.topic-chip .topic-count {
+.topic-opt .topic-count {
   flex: none;
-  font-size: 0.6875rem;
+  font-size: var(--t-label);
   color: var(--system-faint);
   font-variant-numeric: tabular-nums;
 }
-.rail a.topic-chip.on .topic-count {
-  color: var(--dot);
+.rail a.topic-opt.on .topic-name {
+  color: var(--ink);
+  font-weight: 500;
+}
+.rail a.topic-opt.on .topic-count {
+  color: var(--ink);
 }
 .rail-empty {
   font-family: var(--mono);
@@ -1119,34 +1186,37 @@ body.nav-open .scrim {
    Lens snapshot controls — sign-in / Snap / the single most-recent share
    link (replaces on each Snap, ✕ to clear; no history list).
    ============================================================ */
-.lens-snap,
-.lens-signin {
-  display: block;
-  width: 100%;
-  text-align: center;
+/* Snap to share — a plain corner-bracket icon + the in-view count, not a filled
+   box. Signed out it triggers Google sign-in; signed in it snaps the view. */
+.lens-snap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--mono);
   font-size: var(--t-label);
-  color: var(--field);
-  background: var(--ink);
-  border: 1px solid var(--ink);
-  border-radius: 6px;
-  padding: 9px 12px;
+  color: var(--ink);
+  padding: 2px 0;
   cursor: pointer;
-  transition: opacity 0.15s var(--ease);
 }
-.lens-snap:hover:not(:disabled),
-.lens-signin:hover:not(:disabled) {
-  opacity: 0.85;
+.lens-snap:hover:not(:disabled) {
+  color: var(--dot);
 }
-.lens-snap:disabled,
-.lens-signin:disabled {
-  opacity: 0.4;
+.lens-snap:disabled {
+  color: var(--system-faint);
   cursor: default;
 }
-.lens-snap:focus-visible,
-.lens-signin:focus-visible {
+.lens-snap:focus-visible {
   outline: 2px solid var(--focus);
-  outline-offset: 2px;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.snap-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.lens-snap-count {
+  font-variant-numeric: tabular-nums;
 }
 .lens-snaplink {
   margin-top: 10px;
