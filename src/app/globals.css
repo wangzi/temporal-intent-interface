@@ -101,7 +101,7 @@
   --dot-vh: 40;
   /* Footer hidden for now → no reserved footer space, so the spine
      terminates at the page bottom. Restore to 300px to bring it back. */
-  --footer-h: 0px;
+  --footer-h: 72px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
@@ -535,14 +535,36 @@ body.nav-open .scrim {
 .site-footer {
   position: relative;
   min-height: var(--footer-h);
-  /* No top hairline — the spine itself is the divider. The link sits
-     directly under the spine's terminus: left edge aligned to the
-     spine (--spine-x), a small gap below the spine's end-cap dot. */
-  padding: 14px var(--content-pad) 28px var(--spine-x);
+  /* No top hairline — the spine itself is the divider; it terminates at this
+     footer's top edge. Left edge aligns to the spine (--spine-x). */
+  padding: 20px var(--content-pad) 30px var(--spine-x);
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px 28px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--system-faint);
 }
-
+.site-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+.site-footer-brand {
+  color: var(--ink);
+}
+.site-footer-brand span {
+  color: var(--dot);
+}
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
 .site-footer-link {
   font-size: 0.6875rem;
   letter-spacing: 0.14em;
@@ -550,7 +572,6 @@ body.nav-open .scrim {
   color: var(--system-faint);
   transition: color 0.15s;
 }
-
 .site-footer-link:hover {
   color: var(--ink);
 }

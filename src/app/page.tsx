@@ -35,6 +35,7 @@ import type {
 
 import { Dot } from "@/components/reader/Dot";
 import { EntryItem } from "@/components/reader/EntryItem";
+import { Footer } from "@/components/reader/Footer";
 import { FocusRouteHeader } from "@/components/reader/FocusRouteHeader";
 import { LensRail } from "@/components/reader/LensRail";
 import { LoadMore } from "@/components/reader/LoadMore";
@@ -167,6 +168,7 @@ export default async function Home({
             </li>
           ) : null}
         </ol>
+        <Footer />
         <Dot />
         <ReaderControlsIsland />
       </TemporalLayout>
@@ -217,6 +219,7 @@ export default async function Home({
             <li className="feed-empty">No entries match “{query}”.</li>
           ) : null}
         </ol>
+        <Footer />
         <Dot />
         <ReaderControlsIsland />
       </TemporalLayout>
@@ -301,7 +304,7 @@ export default async function Home({
         initialCount={visiblePosts.length}
         now={now}
       />
-      {/* Footer hidden for now — FooterReview render removed. */}
+      <Footer entryCount={totalEntriesCount} updatedISO={latestIso} />
       <Dot />
       <ReaderControlsIsland />
       <TerminalHeroIsland />
