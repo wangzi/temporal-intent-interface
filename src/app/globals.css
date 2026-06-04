@@ -1033,7 +1033,7 @@ body.nav-open .scrim {
 .rail-toggle {
   display: block;
   position: fixed;
-  top: 28px;
+  top: 52px;
   left: 20px;
   z-index: 60; /* above the rail (50) so it stays clickable when open */
   width: 40px;
@@ -1047,7 +1047,9 @@ body.nav-open .scrim {
     background 0.15s var(--ease);
 }
 .rail-toggle:hover {
-  background: var(--dot);
+  /* Invert to white on hover (was the red dot). The drop shadow keeps the
+     white disc legible against the off-white field. */
+  background: #ffffff;
 }
 .rail-toggle-input:focus-visible + .rail-toggle {
   outline: 2px solid var(--focus);
