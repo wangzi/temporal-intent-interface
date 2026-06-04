@@ -101,7 +101,7 @@
   --dot-vh: 40;
   /* Footer hidden for now → no reserved footer space, so the spine
      terminates at the page bottom. Restore to 300px to bring it back. */
-  --footer-h: 0px;
+  --footer-h: 72px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
@@ -170,6 +170,33 @@ a {
   border-radius: 2px;
 }
 
+/* Skip-to-content — first focusable element; off-screen until focused. */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px
+    calc(16px + env(safe-area-inset-left, 0px));
+  background: var(--ink);
+  color: var(--field);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  border-radius: 0 0 6px 0;
+  transform: translateY(-130%);
+  transition: transform 0.16s var(--ease);
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* The skip target receives focus programmatically; no ring on the whole main. */
+#reader-main:focus {
+  outline: none;
+}
+
 .mono {
   font-family: var(--mono);
 }
@@ -201,8 +228,11 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 52px;
-  padding: 0 18px;
+  /* Safe-area: the bar background extends under the notch; its content is
+     padded clear of it (top + landscape left/right insets). */
+  height: calc(52px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) max(18px, env(safe-area-inset-right, 0px))
+    0 max(18px, env(safe-area-inset-left, 0px));
   background: color-mix(in srgb, var(--field) 86%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--rule);
@@ -358,7 +388,12 @@ body.nav-open .scrim {
 .reader {
   grid-column: 2;
   position: relative;
-  padding-top: 52px;
+  /* Allow the grid track to shrink below its content's min-content width so the
+     hero's `white-space: nowrap` clock/data rows (overflow:hidden) can't force a
+     horizontal scroll on very narrow / JS-off viewports (e.g. 320px). */
+  min-width: 0;
+  /* Clear the fixed TopBar, which now includes the safe-area top inset. */
+  padding-top: calc(52px + env(safe-area-inset-top, 0px));
 }
 
 .col {
@@ -504,14 +539,36 @@ body.nav-open .scrim {
 .site-footer {
   position: relative;
   min-height: var(--footer-h);
-  /* No top hairline — the spine itself is the divider. The link sits
-     directly under the spine's terminus: left edge aligned to the
-     spine (--spine-x), a small gap below the spine's end-cap dot. */
-  padding: 14px var(--content-pad) 28px var(--spine-x);
+  /* No top hairline — the spine itself is the divider; it terminates at this
+     footer's top edge. Left edge aligns to the spine (--spine-x). */
+  padding: 20px var(--content-pad) 30px var(--spine-x);
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px 28px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--system-faint);
 }
-
+.site-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+}
+.site-footer-brand {
+  color: var(--ink);
+}
+.site-footer-brand span {
+  color: var(--dot);
+}
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
 .site-footer-link {
   font-size: 0.6875rem;
   letter-spacing: 0.14em;
@@ -519,7 +576,6 @@ body.nav-open .scrim {
   color: var(--system-faint);
   transition: color 0.15s;
 }
-
 .site-footer-link:hover {
   color: var(--ink);
 }
@@ -531,6 +587,18 @@ body.nav-open .scrim {
   position: relative;
   padding: 5.5vh 0 5.5vh var(--content-pad);
   border: 0;
+  /* Skip layout/paint of off-screen entries — the archive SSRs the full
+     page (~100 entries on live), so this cuts initial Style & Layout sharply
+     on long lists without removing any DOM (JS-off-safe). `auto` lets the
+     browser remember each entry's real height after first render, so the
+     ~460px placeholder never causes layout shift (CLS stays ~0). The fixed
+     spine + 40vh dot are positioned independently of entry rendering, and the
+     active-entry / scan-density reveal run on visible (rendered) entries. */
+  content-visibility: auto;
+  /* Per-axis: inline (width) = auto-remembered, 0 fallback → off-screen entries
+     fill the column rather than forcing a 460px min-width (which overflowed
+     narrow viewports); block (height) = auto-remembered, 460px placeholder. */
+  contain-intrinsic-size: auto 0 auto 460px;
 }
 
 .e-meta {
@@ -939,6 +1007,13 @@ body.nav-open .scrim {
   text-decoration: none;
   color: var(--ink);
 }
+/* Touch-target: extend the tap area to ≥44×44 around the 34px ring. */
+.attn-back::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+}
 .attn-back-mark {
   width: 34px;
   height: 34px;
@@ -992,11 +1067,31 @@ body.nav-open .scrim {
   outline-offset: 3px;
 }
 /* Narrow viewports: the spine hugs the text, so the button can't ride it —
-   the island leaves its CSS `left` alone below 768px; pin it near the top-left
-   so it stays a clear, reachable back control (still fixed on scroll). */
+   the island leaves its CSS `left` alone below 768px. Pin it in the left gutter
+   (content starts at --content-pad: 64px) BELOW the rail-toggle dot
+   (top:72px + 40px tall) so the two no longer overlap; still fixed on scroll. */
 @media (max-width: 767px) {
   .attn-back {
-    top: 76px;
+    /* +safe-area-inset-top so it tracks the rail-toggle (which also shifts
+       down under the notch) and the two stay clear of each other. */
+    top: calc(150px + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* RANK-10 PROPOSAL (uncommitted): compact the doubled hero masthead on phones
+   so the first entry isn't pushed ~42% down. Halve the inter-glyph spacing and
+   shrink the reserved height; the ⇅ button + spine `top` are retuned so the
+   glyph stays centred in the button ring. */
+@media (max-width: 767px) {
+  .hero-term {
+    --hero-gap: 2.2em;
+    min-height: 6.5rem;
+  }
+  .hero-glyph {
+    top: 7rem;
+  }
+  .spine {
+    top: 121px;
   }
 }
 
@@ -1242,8 +1337,9 @@ body.nav-open .scrim {
   align-items: center;
   justify-content: center;
   position: fixed;
-  top: 72px;
-  left: 20px;
+  /* Safe-area: clear the notch (top) and landscape inset (left). */
+  top: calc(72px + env(safe-area-inset-top, 0px));
+  left: calc(20px + env(safe-area-inset-left, 0px));
   z-index: 60; /* above the rail (50) so it stays clickable when open */
   width: 40px;
   height: 40px;
@@ -1259,6 +1355,13 @@ body.nav-open .scrim {
   transition:
     left 0.28s var(--ease),
     background 0.15s var(--ease);
+}
+/* Touch-target: extend the tap area to ≥44×44 without growing the 40px dot. */
+.rail-toggle::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
 }
 /* Collapsed dot, hover: invert to white + reveal the count (37). */
 .rail-toggle:hover {
@@ -1345,6 +1448,8 @@ body.nav-open .scrim {
   border-bottom: 1px solid var(--rule);
   border-radius: 0;
   padding: 6px 2px;
+  /* Touch-target: ≥44px tall tap area for the search field (glyph size kept). */
+  min-height: 44px;
 }
 .lens-search::placeholder {
   color: var(--system-faint);

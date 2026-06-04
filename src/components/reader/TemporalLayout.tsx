@@ -22,6 +22,10 @@ export function TemporalLayout({
 }) {
   return (
     <>
+      {/* Skip link — first focusable element; SSR, visible only on focus. */}
+      <a href="#reader-main" className="skip-link">
+        Skip to content
+      </a>
       {topBar}
       {/* Rail toggle — a black circle (click to expand, click again to
           collapse). CSS-only via a hidden checkbox
@@ -44,7 +48,7 @@ export function TemporalLayout({
           `.rail-scrim`). A click outside the rail collapses it. */}
       <label htmlFor="rail-toggle" className="rail-scrim" aria-hidden="true" />
       <div className="app">
-        <main className="reader" id="reader-main">
+        <main className="reader" id="reader-main" tabIndex={-1}>
           <div className="col" id="col">
             {children}
           </div>

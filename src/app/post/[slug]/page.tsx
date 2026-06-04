@@ -7,6 +7,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { Footer } from "@/components/reader/Footer";
 import { LensRail } from "@/components/reader/LensRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { SelectionLayer } from "@/components/reader/SelectionLayer";
@@ -39,6 +40,7 @@ export async function generateMetadata({
     return {
       title: post.title,
       description,
+      alternates: { canonical: `/post/${slug}` },
       openGraph: {
         title: post.title,
         description,
@@ -89,6 +91,7 @@ export default async function PostPage({
         }
       >
         <AttentionView post={post} />
+        <Footer />
         {/* No focus dot on a single post — the back button is the spine's node
             (positioned onto the spine by ReaderControlsIsland). */}
         <ReaderControlsIsland />

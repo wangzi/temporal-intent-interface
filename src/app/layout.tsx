@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Newsreader } from "next/font/google";
 
 import "./globals.css";
@@ -28,10 +28,21 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://z.stillinlove.co",
   ),
+  // Default canonical → home; the filtered archive modes (?focus/?q/?sort)
+  // consolidate here. The post route overrides this with its own canonical.
+  alternates: { canonical: "/" },
   openGraph: {
     siteName: "z.",
     type: "website",
   },
+};
+
+// viewport-fit=cover lets the page extend under the notch so fixed controls
+// can be padded clear of it with env(safe-area-inset-*) (see globals.css).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

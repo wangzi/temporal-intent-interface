@@ -1,19 +1,48 @@
-// Footer placeholder zone (~300px tall). Reserved space for future
-// footer content; today it carries the single required bridge to the
-// studio at studio.stillinlove.co — the author chrome lives there,
-// not here (PRD §10).
+// SSR site footer — pure markup, no JavaScript. The reader spine terminates at
+// this footer's top edge (height reserved via --footer-h in globals.css).
 //
-// Height is driven by --footer-h in globals.css; the reader spine
-// terminates exactly at this footer's top edge.
-//
-// Server component. Renders as part of the SSR'd HTML.
+// Server component. Renders as part of the SSR'd HTML (visible JS-off).
 
-export function Footer() {
+import Link from "next/link";
+
+import { formatAbsoluteDate } from "@/lib/format";
+
+export function Footer({
+  entryCount,
+  updatedISO,
+}: {
+  /** Total entries (archive only). Omitted on a single post. */
+  entryCount?: number;
+  /** Latest entry date, ISO (archive only). */
+  updatedISO?: string | null;
+}) {
+  // Server-rendered once; no client hydration → safe, deterministic per render.
+  const year = new Date().getUTCFullYear();
   return (
-    <footer className="site-footer" aria-label="Site footer">
-      <a href="https://studio.stillinlove.co" className="site-footer-link mono">
-        Studio / Sign in →
-      </a>
+    <footer className="site-footer mono" aria-label="Site footer">
+      <div className="site-footer-meta">
+        <Link href="/" className="site-footer-brand" aria-label="z. — home">
+          z<span aria-hidden="true">.</span>
+        </Link>
+        <span>© {year}</span>
+        {typeof entryCount === "number" ? (
+          <span>
+            {entryCount} {entryCount === 1 ? "entry" : "entries"}
+          </span>
+        ) : null}
+        {updatedISO ? <span>updated {formatAbsoluteDate(updatedISO)}</span> : null}
+      </div>
+      <nav className="site-footer-links" aria-label="Site links">
+        <a href="https://stillinlove.co" className="site-footer-link">
+          About
+        </a>
+        <a href="/feed.xml" className="site-footer-link">
+          RSS
+        </a>
+        <a href="https://studio.stillinlove.co" className="site-footer-link">
+          Studio →
+        </a>
+      </nav>
     </footer>
   );
 }
