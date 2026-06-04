@@ -14,12 +14,19 @@ import { fixtureGet } from "./fixtures";
 import {
   PostsListResponseSchema,
   PostDetailResponseSchema,
+  SearchResponseSchema,
+  TopicsResponseSchema,
 } from "./schemas";
 import type {
   ListPostsParams,
   PostDetailResponse,
   PostsListResponse,
   PostSummary,
+  SearchParams,
+  SearchResponse,
+  SearchResult,
+  TopicFacet,
+  TopicsResponse,
 } from "./types";
 
 export class EngineError extends Error {
