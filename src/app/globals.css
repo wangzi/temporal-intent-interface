@@ -1040,6 +1040,97 @@ body.nav-open .scrim {
 }
 
 /* ============================================================
+   Lens snapshot controls — sign-in / Snap / the single most-recent share
+   link (replaces on each Snap, ✕ to clear; no history list).
+   ============================================================ */
+.lens-snap,
+.lens-signin {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--field);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: opacity 0.15s var(--ease);
+}
+.lens-snap:hover:not(:disabled),
+.lens-signin:hover:not(:disabled) {
+  opacity: 0.85;
+}
+.lens-snap:disabled,
+.lens-signin:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.lens-snap:focus-visible,
+.lens-signin:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.lens-snaplink {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+.lens-snaplink a {
+  padding: 0;
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  line-height: 1.35;
+  color: var(--ink);
+  word-break: break-word;
+}
+.lens-snaplink-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.lens-copy,
+.lens-dismiss {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system);
+  background: none;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+}
+.lens-copy:hover,
+.lens-dismiss:hover {
+  color: var(--ink);
+}
+.lens-error {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--dot);
+  margin-top: 8px;
+}
+.lens-signout {
+  align-self: flex-start;
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.lens-signout:hover {
+  color: var(--ink);
+}
+
+/* ============================================================
    Public frozen snapshot — /s/[token]. TII visual language, centered
    to the reading measure; no reader chrome (rail/spine/dot).
    ============================================================ */

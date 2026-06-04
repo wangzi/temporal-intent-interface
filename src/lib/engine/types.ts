@@ -65,3 +65,42 @@ export type ListPostsParams = {
   /** Intent-label filter, e.g. "Humanity & Technology". */
   filter?: string;
 };
+
+/** Match metadata journalkit attaches to each search result (engine §search). */
+export type SearchHit = {
+  /** Relevance score; higher = better. Result order already reflects it. */
+  score: number;
+  /** Which fields matched, e.g. ["title", "body"] or ["topics"]. */
+  fields: string[];
+  /** A short excerpt around the match, ready to render. */
+  snippet: string;
+};
+
+/** One entry from GET /api/v1/search — a PostSummary plus its match metadata. */
+export type SearchResult = PostSummary & {
+  search: SearchHit;
+};
+
+/** Returned by GET /api/v1/search?q=&topics=. Results are in relevance order. */
+export type SearchResponse = {
+  results: SearchResult[];
+};
+
+/** One topic facet with the count of posts carrying it. */
+export type TopicFacet = {
+  topic: string;
+  count: number;
+};
+
+/** Returned by GET /api/v1/topics. Sorted by count desc, then label asc. */
+export type TopicsResponse = {
+  topics: TopicFacet[];
+};
+
+export type SearchParams = {
+  /** Free-text query. Body-aware on the engine. Omit for a topic-only filter. */
+  q?: string;
+  /** OR-semantics topic filter. */
+  topics?: string[];
+  limit?: number;
+};

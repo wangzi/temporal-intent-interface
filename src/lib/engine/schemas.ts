@@ -53,3 +53,26 @@ export const PostsListResponseSchema = z.object({
 export const PostDetailResponseSchema = z.object({
   post: PostDetailSchema,
 });
+
+export const SearchHitSchema = z.object({
+  score: z.number(),
+  fields: z.array(z.string()),
+  snippet: z.string(),
+});
+
+export const SearchResultSchema = PostSummarySchema.extend({
+  search: SearchHitSchema,
+});
+
+export const SearchResponseSchema = z.object({
+  results: z.array(SearchResultSchema),
+});
+
+export const TopicFacetSchema = z.object({
+  topic: z.string(),
+  count: z.number(),
+});
+
+export const TopicsResponseSchema = z.object({
+  topics: z.array(TopicFacetSchema),
+});
