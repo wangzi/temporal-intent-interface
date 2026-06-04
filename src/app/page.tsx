@@ -1,19 +1,30 @@
-// Archive index — public reverse-chronological feed of published
-// posts. SSR per PRD §17.4: renders fully without JavaScript.
+// Archive index — public reverse-chronological feed of published posts, plus
+// Lens search + topic-filter modes.
 //
-// ISR with revalidate=60 so anonymous readers always get a fresh
-// snapshot at most a minute stale. The engine client validates the
-// response against the §9 contract; on error we render an empty
-// state rather than crash.
+// SSR per PRD §17.4: renders fully without JavaScript. ISR revalidate=60 so
+// anonymous readers get an at-most-minute-stale snapshot. Every engine call is
+// validated against the §9 contract; on error we render an empty state rather
+// than crash.
 //
-// Filtering: the engine call is always unfiltered so that the LensRail
-// can list every topic (with an intent_label fallback) as a filter
-// option; the visible <ol> is filtered in-component when ?filter= is set.
+// Modes (driven by the URL):
+//   • Default feed        — no ?q and no ?topics. Reverse-chron list + Load-more.
+//     An optional ?filter= still narrows by intent label (TopBar's mobile nav).
+//   • Search / topic view — ?q= and/or ?topics= present. Results come from
+//     journalkit /api/v1/search (body-aware text + OR topic filter), rendered
+//     with the engine's snippets. No Load-more (search returns a capped set).
+//
+// The LensRail (search box + real topic facets + sort + Snap) renders in every
+// mode; its facets come from journalkit /api/v1/topics and Snap freezes the
+// currently-rendered set (the search results in result order, or the feed).
 
-import { listPosts } from "@/lib/engine/client";
+import { listPosts, listTopics, searchPosts } from "@/lib/engine/client";
 import { daysAgo } from "@/lib/format";
-import { topicsList } from "@/lib/lens/search";
-import type { PostSummary, SortOrder } from "@/lib/engine/types";
+import type {
+  PostSummary,
+  SearchResult,
+  SortOrder,
+  TopicFacet,
+} from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
 import { EntryItem } from "@/components/reader/EntryItem";
@@ -28,17 +39,123 @@ import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
 
+const emptyRowStyle = {
+  padding: "5.5vh 0 5.5vh var(--content-pad)",
+  fontFamily: "var(--mono)",
+  fontSize: "0.8125rem",
+  color: "var(--system-faint)",
+};
+
+function parseTopics(raw?: string): string[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string; filter?: string }>;
+  searchParams: Promise<{
+    sort?: string;
+    topics?: string;
+    q?: string;
+    filter?: string;
+  }>;
 }) {
   const sp = await searchParams;
   const sort: SortOrder = sp.sort === "oldest" ? "oldest" : "newest";
-  const filter = sp.filter && sp.filter !== "all" ? sp.filter : undefined;
+  const query = (sp.q ?? "").trim();
+  const selectedTopics = parseTopics(sp.topics);
+  const searchMode = query.length > 0 || selectedTopics.length > 0;
 
   // Server-stable "now" for relative-ago strings within this SSR.
   const now = Date.now();
+
+  // Topic facets for the rail (every mode) — real journalkit /api/v1/topics.
+  let facets: TopicFacet[] = [];
+  try {
+    facets = (await listTopics()).topics;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("[home] topics error:", err);
+  }
+
+  // ── Search / topic-filter mode ────────────────────────────────────────────
+  if (searchMode) {
+    let results: SearchResult[] = [];
+    try {
+      results = (
+        await searchPosts({ q: query || undefined, topics: selectedTopics })
+      ).results;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[home] search error:", err);
+    }
+
+    const criteria = [
+      query ? `“${query}”` : null,
+      selectedTopics.length ? selectedTopics.join(", ") : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const heading =
+      results.length === 0
+        ? "No results"
+        : `${results.length} result${results.length === 1 ? "" : "s"}`;
+
+    return (
+      <TemporalLayout
+        topBar={<TopBar posts={results} />}
+        rail={
+          <LensRail
+            posts={results}
+            facets={facets}
+            selectedTopics={selectedTopics}
+            query={query}
+            currentSort={sort}
+          />
+        }
+      >
+        <Spine />
+        <ol id="feed" aria-label="Search results" style={{ listStyle: "none" }}>
+          <li
+            style={{
+              padding: "3vh 0 1vh var(--content-pad)",
+              fontFamily: "var(--mono)",
+              fontSize: "0.75rem",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: "var(--system-faint)",
+            }}
+          >
+            {heading}
+            {criteria ? ` · ${criteria}` : ""}
+          </li>
+          {results.map((r, i) => (
+            <EntryItem
+              key={r.post_id}
+              post={r}
+              index={i}
+              now={now}
+              snippet={r.search.snippet}
+            />
+          ))}
+          {results.length === 0 ? (
+            <li style={emptyRowStyle}>
+              No entries match {criteria || "your search"}.
+            </li>
+          ) : null}
+        </ol>
+        <Dot />
+        <ReaderControlsIsland />
+      </TemporalLayout>
+    );
+  }
+
+  // ── Default feed ──────────────────────────────────────────────────────────
+  const filter = sp.filter && sp.filter !== "all" ? sp.filter : undefined;
 
   let allPosts: PostSummary[] = [];
   let nextCursor: string | null = null;
@@ -52,27 +169,16 @@ export default async function Home({
     console.error("[home] engine error:", err);
   }
 
-  // Topic facet prefers journalkit topics; until those are populated it falls
-  // back to intent_label so the rail has a working filter today. Either value
-  // arrives as ?filter=, so the predicate matches both.
+  // ?filter= (intent label) is the legacy in-component narrow that TopBar's
+  // mobile nav still emits; the desktop rail now uses ?topics= instead. Kept so
+  // the existing feed behavior is preserved when no ?q / ?topics is present.
   const visiblePosts = filter
     ? allPosts.filter(
         (p) => (p.topics ?? []).includes(filter) || p.intent_label === filter,
       )
     : allPosts;
 
-  const topicFacets = topicsList(allPosts);
-  const facetOptions =
-    topicFacets.length > 0
-      ? topicFacets
-      : Array.from(new Set(allPosts.map((p) => p.intent_label)));
-
-  // Head-of-spine stats for the terminal hero, derived from the whole archive
-  // (unfiltered, and sort-independent — `sort` may be "oldest").
-  // CAVEAT: PostsListResponse has no `total` field (engine/types.ts), so this
-  // is the LOADED page only. Today the engine returns the full set unpaginated
-  // so it equals the true total; once it paginates this undercounts.
-  // TODO(engine): surface a real `total` and pass it instead of length (Q7/Q9).
+  // Head-of-spine stats for the terminal hero, derived from the whole archive.
   const totalEntriesCount = allPosts.length;
   const latestIso =
     allPosts.length > 0
@@ -89,8 +195,9 @@ export default async function Home({
       rail={
         <LensRail
           posts={visiblePosts}
-          topics={facetOptions}
-          currentFilter={filter ?? null}
+          facets={facets}
+          selectedTopics={selectedTopics}
+          query={query}
           currentSort={sort}
         />
       }
@@ -111,14 +218,7 @@ export default async function Home({
           <EntryItem key={p.post_id} post={p} index={i} now={now} />
         ))}
         {visiblePosts.length === 0 ? (
-          <li
-            style={{
-              padding: "5.5vh 0 5.5vh var(--content-pad)",
-              fontFamily: "var(--mono)",
-              fontSize: "0.8125rem",
-              color: "var(--system-faint)",
-            }}
-          >
+          <li style={emptyRowStyle}>
             {filter ? `No entries for ${filter}.` : "No entries."}
           </li>
         ) : null}

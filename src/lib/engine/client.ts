@@ -103,6 +103,47 @@ export async function getPost(slug: string): Promise<PostDetailResponse> {
   return PostDetailResponseSchema.parse(raw);
 }
 
+/**
+ * GET /api/v1/search?q=&topics=&limit= — body-aware text search + OR-semantics
+ * topic filter. Results arrive in relevance order, each with a ready-to-render
+ * snippet. Empty q AND empty topics short-circuits to no results (matching the
+ * engine). Fixture mode approximates over the summary fields (no body_md offline).
+ */
+export async function searchPosts(
+  params: SearchParams = {},
+): Promise<SearchResponse> {
+  const q = (params.q ?? "").trim();
+  const topics = (params.topics ?? []).map((t) => t.trim()).filter(Boolean);
+  if (!q && topics.length === 0) return { results: [] };
+
+  if (env.JOURNALKIT_FIXTURE_MODE) {
+    const raw = await fixtureGet("posts");
+    if (!raw) throw new EngineError("fixture posts.json missing", 500);
+    const { posts } = PostsListResponseSchema.parse(raw);
+    return { results: fixtureSearch(posts, q, topics, params.limit ?? 50) };
+  }
+
+  const sp = new URLSearchParams();
+  if (q) sp.set("q", q);
+  if (topics.length) sp.set("topics", topics.join(","));
+  if (params.limit) sp.set("limit", String(params.limit));
+  const raw = await fetchJSON(`/search?${sp.toString()}`);
+  return SearchResponseSchema.parse(raw);
+}
+
+/** GET /api/v1/topics — facets (topic + post count) over published posts. */
+export async function listTopics(): Promise<TopicsResponse> {
+  if (env.JOURNALKIT_FIXTURE_MODE) {
+    const raw = await fixtureGet("posts");
+    if (!raw) throw new EngineError("fixture posts.json missing", 500);
+    const { posts } = PostsListResponseSchema.parse(raw);
+    return { topics: fixtureFacets(posts) };
+  }
+
+  const raw = await fetchJSON("/topics");
+  return TopicsResponseSchema.parse(raw);
+}
+
 // In-process sort + filter for the fixture path. The real engine is
 // expected to do this server-side, so this code is only exercised in
 // fixture mode (JOURNALKIT_FIXTURE_MODE=true).
@@ -135,4 +176,61 @@ function applyListParams(
   });
 
   return { posts: [...pinned, ...rest], next_cursor: null };
+}
+
+// Fixture-only topic facets — mirrors the engine's count-once-per-post shape so
+// the rail renders offline. Real facets come from GET /api/v1/topics.
+function fixtureFacets(posts: PostSummary[]): TopicFacet[] {
+  const byKey = new Map<string, { topic: string; count: number }>();
+  for (const p of posts) {
+    const seen = new Set<string>();
+    for (const t of p.topics ?? []) {
+      const key = t.toLowerCase();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      const cur = byKey.get(key);
+      if (cur) cur.count += 1;
+      else byKey.set(key, { topic: t, count: 1 });
+    }
+  }
+  return [...byKey.values()].sort(
+    (a, b) => b.count - a.count || a.topic.localeCompare(b.topic),
+  );
+}
+
+// Fixture-only search — offline approximation over the summary fields (fixtures
+// carry no body_md). Real, body-aware search runs on the engine.
+function fixtureSearch(
+  posts: PostSummary[],
+  q: string,
+  topics: string[],
+  limit: number,
+): SearchResult[] {
+  const ql = q.toLowerCase();
+  const wanted = topics.map((t) => t.toLowerCase());
+  const out: SearchResult[] = [];
+  for (const p of posts) {
+    const ptopics = (p.topics ?? []).map((t) => t.toLowerCase());
+    if (wanted.length && !wanted.some((t) => ptopics.includes(t))) continue;
+    const hay = [
+      p.title,
+      p.intent_label,
+      p.intent_statement,
+      p.central_question,
+      p.core_insight_visible ? p.core_insight : "",
+      ...(p.topics ?? []),
+    ]
+      .join(" ")
+      .toLowerCase();
+    if (ql && !hay.includes(ql)) continue;
+    out.push({
+      ...p,
+      search: {
+        score: 1,
+        fields: ["fixture"],
+        snippet: (p.intent_statement || p.core_insight || p.title).slice(0, 200),
+      },
+    });
+  }
+  return out.slice(0, limit);
 }
