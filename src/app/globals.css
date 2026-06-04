@@ -389,7 +389,11 @@ body.nav-open .scrim {
    so the timeline visually runs into the footer's top edge. */
 .spine {
   position: absolute;
-  top: 0;
+  /* Start BELOW the terminal-hero glyphs (✻ time / ¶ entry / ⇅ toggle) so the
+     line no longer runs through them — it begins at the entries (the bottom of
+     the hero + sort-toggle block = #feed top). 129px here = hero (~92) + sort
+     toggle (~37); laptop adds the 56px .col padding-top (see the ≥1080 rule). */
+  top: 129px;
   bottom: var(--footer-h);
   left: var(--spine-x, 28px);
   width: 1px;
@@ -882,6 +886,9 @@ body.nav-open .scrim {
    so this wins at every breakpoint without a media query. */
 .attn-inner .spine {
   left: 0;
+  /* The post route has no hero, so its spine runs the full article height —
+     override the archive's hero-clearing top offset back to the top. */
+  top: 0;
   bottom: 0;
 }
 
@@ -1125,6 +1132,9 @@ body.nav-open .scrim {
   }
   .spine {
     left: var(--spine-x);
+    /* +56px for the .col padding-top at this breakpoint, so the line still
+       begins right under the sort toggle (#feed top). */
+    top: 185px;
   }
   /* (Post-route spine override now lives globally as `.attn-inner
      .spine`, above — it wins by specificity at every breakpoint.) */
