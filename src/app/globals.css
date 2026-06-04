@@ -1039,6 +1039,65 @@ body.nav-open .scrim {
   border-color: transparent;
 }
 
+/* Search form: the input, a submit button (needed JS-off), and a clear link. */
+.lens-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lens-search-go {
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: var(--t-label);
+  color: var(--field);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.lens-search-go:hover {
+  opacity: 0.85;
+}
+.rail a.lens-search-clear {
+  padding-top: 8px;
+  font-size: 0.75rem;
+  color: var(--system-faint);
+}
+.rail a.lens-search-clear:hover {
+  color: var(--ink);
+}
+
+/* Topic facet chips — name + post count, multi-select (OR). Reuse `.navlink`
+   for base type + the `.on` selected color; this only adds the count layout. */
+.rail a.topic-chip {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.topic-chip .topic-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topic-chip .topic-count {
+  flex: none;
+  font-size: 0.6875rem;
+  color: var(--system-faint);
+  font-variant-numeric: tabular-nums;
+}
+.rail a.topic-chip.on .topic-count {
+  color: var(--dot);
+}
+.rail-empty {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--system-faint);
+  padding: 4px 0;
+}
+
 /* ============================================================
    Lens snapshot controls — sign-in / Snap / the single most-recent share
    link (replaces on each Snap, ✕ to clear; no history list).

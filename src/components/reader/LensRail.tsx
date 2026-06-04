@@ -2,27 +2,30 @@
 
 // LensRail — the reader's left control plane.
 //
-// SSR-preserving (JS-off hard rule): Sort + Topics are URL-driven <Link>s
-// (?sort=, ?filter=); Search is a client-only, non-destructive hide over the
-// SSR-rendered #feed entries. Those work without JS.
-//
-// Snapshot (JS-only, gated behind `mounted` so it's absent for JS-off): Google
-// sign-in + "Snap this view" freeze the currently-visible entries (server
-// sort/topic, minus client-hidden-by-search), in order, into a shareable
-// /s/[token]. We show ONLY the link you just created (copy + ✕); each Snap
-// replaces the previous one and there is NO history list — so the rail never
-// gets busy. Supabase is lazy-loaded (getSupabase dynamic-imports it), so the
-// auth client stays out of the reader's bundle until you sign in.
+// URL-driven search + topics (work with JS off), plus a JS-only Snapshot:
+//   • Search — a GET form posting `?q=`. journalkit does the body-aware match
+//     server-side (lib/engine/client → /api/v1/search); page.tsx renders the
+//     results. Hidden inputs carry the current topic + sort selection so a
+//     search submit never drops them.
+//   • Topics — real facets from journalkit /api/v1/topics, with post counts.
+//     Multi-select with OR semantics: each chip toggles itself in `?topics=a,b`.
+//   • Sort   — `?sort=`, preserving q + topics.
+//   • Snapshot (JS-only, gated behind `mounted` so it's absent for JS-off):
+//     Google sign-in + "Snap this view" freeze the currently-rendered entries —
+//     the search results in order, or the feed — into a shareable /s/[token].
+//     We show ONLY the link you just created (copy + ✕); each Snap replaces the
+//     previous one and there is NO history list. Supabase is lazy-loaded
+//     (getSupabase dynamic-imports it) so the auth client stays out of the
+//     reader's bundle until you sign in.
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { Session } from "@supabase/supabase-js";
 
 import { createSnapshot, SnapshotError, type SnapshotMeta } from "@/lib/lens/api";
 import { getSupabase } from "@/lib/lens/supabase";
-import { matchPost } from "@/lib/lens/search";
-import type { PostSummary, SortOrder } from "@/lib/engine/types";
+import type { PostSummary, SortOrder, TopicFacet } from "@/lib/engine/types";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "");
 
@@ -32,60 +35,54 @@ function originBase(): string {
   return "";
 }
 
-function facetHref(filter: string | null, sort: SortOrder): string {
+type RailState = { q: string; topics: string[]; sort: SortOrder };
+
+// Build a "/" URL from the full rail state — the same `?q` / `?topics` / `?sort`
+// contract page.tsx reads. Empty values are omitted so the canonical feed is "/".
+function railHref({ q, topics, sort }: RailState): string {
   const params = new URLSearchParams();
-  if (filter) params.set("filter", filter);
+  if (q) params.set("q", q);
+  if (topics.length) params.set("topics", topics.join(","));
   if (sort === "oldest") params.set("sort", "oldest");
   const qs = params.toString();
   return qs ? `/?${qs}` : "/";
 }
 
+// Add or remove a topic (case-insensitive) — OR-semantics multi-select.
+function toggleTopic(selected: string[], topic: string): string[] {
+  const key = topic.toLowerCase();
+  return selected.some((t) => t.toLowerCase() === key)
+    ? selected.filter((t) => t.toLowerCase() !== key)
+    : [...selected, topic];
+}
+
 export function LensRail({
   posts,
-  topics,
-  currentFilter,
+  facets,
+  selectedTopics,
+  query,
   currentSort,
 }: {
+  /** The currently-rendered set, in order — what Snap freezes (the search
+   *  results in search mode, the feed otherwise). */
   posts: PostSummary[];
-  topics: string[];
-  currentFilter: string | null;
+  /** Real topic facets from journalkit /api/v1/topics (topic + post count). */
+  facets: TopicFacet[];
+  /** Currently selected topics (from `?topics=`), OR-combined. */
+  selectedTopics: string[];
+  /** Current free-text query (from `?q=`). */
+  query: string;
   currentSort: SortOrder;
 }) {
   const [mounted, setMounted] = useState(false);
-  const [query, setQuery] = useState("");
   const [session, setSession] = useState<Session | null>(null);
   const [snapLink, setSnapLink] = useState<SnapshotMeta | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Search matches over the server-ordered set. Index = render order in #feed.
-  const matches = useMemo(
-    () =>
-      posts
-        .map((post, index) => ({ post, index }))
-        .filter(({ post }) => matchPost(post, query)),
-    [posts, query],
-  );
-
-  // Non-destructive search hide over the SSR entries (restored on unmount).
-  useEffect(() => {
-    const visible = new Set(matches.map((m) => m.index));
-    document
-      .querySelectorAll<HTMLElement>("#feed [data-entry-index]")
-      .forEach((el) => {
-        const idx = Number(el.getAttribute("data-entry-index"));
-        if (idx >= posts.length) return;
-        el.style.display = visible.has(idx) ? "" : "none";
-      });
-    return () => {
-      document
-        .querySelectorAll<HTMLElement>("#feed [data-entry-index]")
-        .forEach((el) => {
-          el.style.display = "";
-        });
-    };
-  }, [matches, posts.length]);
+  const selectedSet = new Set(selectedTopics.map((t) => t.toLowerCase()));
+  const noTopics = selectedTopics.length === 0;
 
   // Snapshot UI is client-only (auth needs JS) → mount-gate it so JS-off shows
   // just search/sort/topics. Also: if we're returning from the Google OAuth
@@ -148,7 +145,7 @@ export function LensRail({
   }, []);
 
   const onSnap = useCallback(async () => {
-    if (matches.length === 0) return;
+    if (posts.length === 0) return;
     setBusy(true);
     setError(null);
     try {
@@ -160,11 +157,13 @@ export function LensRail({
         setError("Please sign in again");
         return;
       }
+      // Freeze the rendered set in order — search results in result order, or
+      // the current feed.
       const snap = await createSnapshot(
         token,
-        matches.map((m) => m.post.post_id),
+        posts.map((p) => p.post_id),
         {
-          topics: currentFilter ? [currentFilter] : [],
+          topics: selectedTopics,
           sort: currentSort,
           query: query.trim(),
         },
@@ -180,7 +179,7 @@ export function LensRail({
     } finally {
       setBusy(false);
     }
-  }, [matches, currentFilter, currentSort, query]);
+  }, [posts, selectedTopics, currentSort, query]);
 
   const onCopy = useCallback(async (token: string) => {
     try {
@@ -200,28 +199,52 @@ export function LensRail({
 
       <div className="rail-section">
         <h2>Search</h2>
-        <input
-          className="lens-search"
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter entries…"
-          aria-label="Search entries"
-        />
+        <form className="lens-search-form" method="get" action="/" role="search">
+          <input
+            className="lens-search"
+            type="search"
+            name="q"
+            defaultValue={query}
+            placeholder="Search title, body, intent…"
+            aria-label="Search entries"
+          />
+          {selectedTopics.length > 0 ? (
+            <input
+              type="hidden"
+              name="topics"
+              value={selectedTopics.join(",")}
+              readOnly
+            />
+          ) : null}
+          {currentSort === "oldest" ? (
+            <input type="hidden" name="sort" value="oldest" readOnly />
+          ) : null}
+          <button type="submit" className="lens-search-go">
+            Search
+          </button>
+        </form>
+        {query ? (
+          <Link
+            className="lens-search-clear"
+            href={railHref({ q: "", topics: selectedTopics, sort: currentSort })}
+          >
+            Clear search
+          </Link>
+        ) : null}
       </div>
 
       <div className="rail-section">
         <h2>Sort</h2>
         <Link
           className={`navlink${currentSort === "newest" ? " on" : ""}`}
-          href={facetHref(currentFilter, "newest")}
+          href={railHref({ q: query, topics: selectedTopics, sort: "newest" })}
           aria-current={currentSort === "newest" ? "page" : undefined}
         >
           Now → Past
         </Link>
         <Link
           className={`navlink${currentSort === "oldest" ? " on" : ""}`}
-          href={facetHref(currentFilter, "oldest")}
+          href={railHref({ q: query, topics: selectedTopics, sort: "oldest" })}
           aria-current={currentSort === "oldest" ? "page" : undefined}
         >
           Past → Now
@@ -231,22 +254,34 @@ export function LensRail({
       <div className="rail-section">
         <h2>Topics</h2>
         <Link
-          className={`navlink${!currentFilter ? " on" : ""}`}
-          href={facetHref(null, currentSort)}
-          aria-current={!currentFilter ? "page" : undefined}
+          className={`navlink${noTopics ? " on" : ""}`}
+          href={railHref({ q: query, topics: [], sort: currentSort })}
+          aria-current={noTopics ? "page" : undefined}
         >
           All topics
         </Link>
-        {topics.map((topic) => (
-          <Link
-            key={topic}
-            className={`navlink${currentFilter === topic ? " on" : ""}`}
-            href={facetHref(topic, currentSort)}
-            aria-current={currentFilter === topic ? "page" : undefined}
-          >
-            {topic}
-          </Link>
-        ))}
+        {facets.length === 0 ? (
+          <p className="rail-empty">No topics yet.</p>
+        ) : (
+          facets.map((f) => {
+            const on = selectedSet.has(f.topic.toLowerCase());
+            return (
+              <Link
+                key={f.topic}
+                className={`navlink topic-chip${on ? " on" : ""}`}
+                href={railHref({
+                  q: query,
+                  topics: toggleTopic(selectedTopics, f.topic),
+                  sort: currentSort,
+                })}
+                aria-current={on ? "true" : undefined}
+              >
+                <span className="topic-name">{f.topic}</span>
+                <span className="topic-count">{f.count}</span>
+              </Link>
+            );
+          })
+        )}
       </div>
 
       {mounted ? (
@@ -258,9 +293,9 @@ export function LensRail({
                 type="button"
                 className="lens-snap"
                 onClick={() => void onSnap()}
-                disabled={busy || matches.length === 0}
+                disabled={busy || posts.length === 0}
               >
-                {busy ? "Snapping…" : `Snap this view (${matches.length})`}
+                {busy ? "Snapping…" : `Snap this view (${posts.length})`}
               </button>
               {snapLink ? (
                 <div className="lens-snaplink">

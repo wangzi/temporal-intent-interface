@@ -16,6 +16,7 @@ export function EntryItem({
   post,
   index,
   now,
+  snippet,
 }: {
   post: PostSummary;
   /** Sequential position in the feed; drives `data-entry-index` (focus + the
@@ -23,6 +24,9 @@ export function EntryItem({
   index: number;
   /** Server-stable "now" (ms) for the relative-ago string. */
   now: number;
+  /** Search-result excerpt from the engine. Rendered below the title in search
+   *  mode; omitted in the default feed. */
+  snippet?: string;
 }) {
   return (
     <li
@@ -32,6 +36,7 @@ export function EntryItem({
       data-label={post.intent_label}
     >
       <TitleIntentLayer post={post} now={now} />
+      {snippet ? <p className="e-snippet">{snippet}</p> : null}
     </li>
   );
 }
