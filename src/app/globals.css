@@ -322,9 +322,10 @@ body.nav-open .scrim {
    40vh. Sits between the last entry and the footer; the spine runs
    through it and stops at the footer top. */
 #feed {
-  /* Top lead-in (was on the now-label, now removed) so the latest entry can
-     reach the focus line; bottom reach so the oldest entry can too. */
-  padding-top: 18vh;
+  /* Top lead-in so the first entry can reach the focus line (trimmed ~50px so
+     it sits closer to the sort toggle); bottom reach so the oldest entry can
+     scroll up to the dot too. */
+  padding-top: calc(18vh - 50px);
   padding-bottom: 40vh;
 }
 
@@ -1032,9 +1033,8 @@ body.nav-open .scrim {
 .rail-toggle {
   display: block;
   position: fixed;
-  top: 50%;
-  left: 16px;
-  transform: translateY(-50%);
+  top: 28px;
+  left: 20px;
   z-index: 60; /* above the rail (50) so it stays clickable when open */
   width: 40px;
   height: 40px;
@@ -1055,6 +1055,21 @@ body.nav-open .scrim {
 }
 .rail-toggle-input:checked ~ .rail-toggle {
   left: calc(var(--rail-reveal-w) + 16px);
+}
+
+/* Click-outside-to-collapse: a full-viewport label bound to the same checkbox,
+   shown only while the rail is open. It sits under the rail (50) + circle (60)
+   but over the content, so a click anywhere outside the rail unchecks the box
+   and the drawer slides away. CSS-only, so it works with JS off. */
+.rail-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  cursor: pointer;
+}
+.rail-toggle-input:checked ~ .rail-scrim {
+  display: block;
 }
 
 /* Wide desktop: measure holds; extra width → margin only. (Years

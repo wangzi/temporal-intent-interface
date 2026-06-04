@@ -39,6 +39,10 @@ export function TemporalLayout({
         title="Toggle navigation menu"
       />
       {rail}
+      {/* Click-outside-to-collapse: a full-screen label bound to the same
+          checkbox, visible only while the rail is open (see globals.css
+          `.rail-scrim`). A click outside the rail collapses it. */}
+      <label htmlFor="rail-toggle" className="rail-scrim" aria-hidden="true" />
       <div className="app">
         <main className="reader" id="reader-main">
           <div className="col" id="col">
