@@ -76,3 +76,55 @@ export const TopicFacetSchema = z.object({
 export const TopicsResponseSchema = z.object({
   topics: z.array(TopicFacetSchema),
 });
+
+// ── Focus API guards ────────────────────────────────────────────────────────
+// Critical fields (ids, label, count) are required; descriptive ones default so
+// a minor journalkit drift degrades gracefully rather than blanking the rail.
+// Unknown keys (representative_entry_ids, entry_no, title_hint, `ok`, …) are
+// ignored by z.object — in particular we never read entry_no.
+
+export const FocusCategorySchema = z.object({
+  category_id: z.string(),
+  label: z.string(),
+  order: z.number().optional().default(0),
+  route_ids: z.array(z.string()).optional().default([]),
+});
+
+export const FocusRouteSchema = z.object({
+  route_id: z.string(),
+  label: z.string(),
+  category_id: z.string(),
+  order: z.number().optional().default(0),
+  description: z.string().optional().default(""),
+  aliases: z.array(z.string()).optional().default([]),
+  tags: z.array(z.string()).optional().default([]),
+  entry_count: z.number().optional().default(0),
+});
+
+export const FocusResponseSchema = z.object({
+  categories: z.array(FocusCategorySchema),
+  routes: z.array(FocusRouteSchema),
+});
+
+export const FocusRouteMetaSchema = z.object({
+  route_id: z.string(),
+  label: z.string(),
+  category_id: z.string().optional().default(""),
+  description: z.string().optional().default(""),
+  aliases: z.array(z.string()).optional().default([]),
+  tags: z.array(z.string()).optional().default([]),
+  entry_count: z.number().optional().default(0),
+});
+
+export const FocusMappingSchema = z.object({
+  entry_id: z.string(),
+  day: z.string().optional().default(""),
+  reason: z.string().optional().default(""),
+  slug: z.string().optional().default(""),
+});
+
+export const FocusRouteResponseSchema = z.object({
+  route: FocusRouteMetaSchema,
+  mappings: z.array(FocusMappingSchema),
+  entries: z.array(PostSummarySchema),
+});

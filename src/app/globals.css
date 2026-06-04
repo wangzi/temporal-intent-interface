@@ -410,7 +410,8 @@ body.nav-open .scrim {
 @media (min-width: 1080px) {
   .spine-sort,
   .feed-status,
-  .feed-empty {
+  .feed-empty,
+  .route-header {
     padding-left: calc(var(--spine-x) + var(--content-pad));
   }
 }
@@ -519,6 +520,68 @@ body.nav-open .scrim {
   line-height: 1.5;
   margin-top: 8px;
   max-width: var(--measure);
+}
+
+/* Focus route header (reader body) — the active route's metadata above its
+   entries. Aligned to the entry column (laptop inset added in the breakpoint). */
+.route-header {
+  padding: 2vh 0 2vh var(--content-pad);
+  max-width: calc(var(--measure) + var(--content-pad));
+}
+.route-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: var(--t-title-scan);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.route-desc {
+  font-family: var(--mono);
+  font-size: var(--t-insight);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-top: 0.85rem;
+  max-width: var(--measure);
+}
+.route-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--system-faint);
+  margin-top: 1.1rem;
+}
+.route-tags {
+  color: var(--system);
+}
+
+/* Per-entry mapping reason — "why this entry belongs here". Visually distinct
+   from the serif search snippet: a red-accented, labeled mono block. Both can
+   render at once in search-within-route. */
+.e-reason {
+  margin-top: 14px;
+  max-width: var(--measure);
+  padding-left: 13px;
+  border-left: 2px solid var(--dot);
+}
+.e-reason-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dot);
+  margin-bottom: 5px;
+}
+.e-reason-text {
+  font-family: var(--mono);
+  font-size: var(--t-insight);
+  line-height: 1.55;
+  color: var(--ink-soft);
 }
 
 /* Scan-density: a by-distance opacity reveal.
@@ -1258,6 +1321,20 @@ body.nav-open .scrim {
   font-size: 0.75rem;
   color: var(--system-faint);
   padding: 4px 0;
+}
+
+/* Focus rail — routes (reuse .topic-opt rows) grouped under a category header. */
+.focus-group + .focus-group {
+  margin-top: 18px;
+}
+.focus-cat {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 6px 0 4px;
 }
 
 /* ============================================================

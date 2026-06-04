@@ -1,25 +1,20 @@
 "use client";
 
 // LensRail — the reader's left control plane. A two-column label → control
-// panel (widens to ~700px on large displays; labels stack above their control
-// on narrow screens via a container query).
+// panel (widens to ~700px on large displays; labels stack on narrow via a
+// container query).
 //
-//   • Snap to share — JS-only, mount-gated (absent for JS-off). One control: a
-//     corner-bracket icon + the count of entries in view. Signed out it starts
-//     Google sign-in; signed in it freezes the rendered set (search results in
-//     order, or the feed) into a shareable /s/[token]. We show ONLY the link you
-//     just made (copy + ✕); each Snap replaces the previous — no history.
-//     Supabase is lazy-loaded (getSupabase) so auth stays out of the bundle
-//     until you sign in.
-//   • Search — a GET form posting `?q=` (an underline line that submits on
-//     Enter, works JS-off). journalkit does the body-aware match server-side;
-//     page.tsx renders results. Hidden inputs carry topics + sort so a submit
-//     never drops them.
-//   • Topics — real facets from journalkit /api/v1/topics: radio-style rows
-//     (○ / ●) with counts. Multi-select OR — each toggles itself in
-//     `?topics=a,b`; several can be active at once.
-//   • Sort lives on the spine now (see SpineSort); the rail only threads the
-//     current `?sort=` through its search + topic links.
+//   • Snap to share — JS-only, mount-gated. A corner-bracket icon + the count of
+//     entries in view; signed out it starts Google sign-in, signed in it freezes
+//     the rendered set (search results / focused route / feed, in order) into a
+//     shareable /s/[token]. When a Focus route is active the descriptor also
+//     carries { focus, route_label }. Supabase is lazy-loaded.
+//   • Search — a GET form posting `?q=` (underline line, submits on Enter,
+//     works JS-off). Hidden inputs carry the active focus route + sort so a
+//     submit searches *within* the route and keeps the order.
+//   • Focus — journalkit's navigation surface: selectable Routes grouped by
+//     Category (GET /api/v1/focus). Single active route via `?focus=routeId`.
+//   • Sort lives on the spine (see SpineSort).
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -28,7 +23,13 @@ import type { Session } from "@supabase/supabase-js";
 
 import { createSnapshot, SnapshotError, type SnapshotMeta } from "@/lib/lens/api";
 import { getSupabase } from "@/lib/lens/supabase";
-import type { PostSummary, SortOrder, TopicFacet } from "@/lib/engine/types";
+import type {
+  FocusCategory,
+  FocusResponse,
+  FocusRoute,
+  PostSummary,
+  SortOrder,
+} from "@/lib/engine/types";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "");
 
@@ -59,42 +60,59 @@ function SnapIcon() {
   );
 }
 
-type RailState = { q: string; topics: string[]; sort: SortOrder };
-
-// Build a "/" URL from the full rail state — the same `?q` / `?topics` / `?sort`
-// contract page.tsx reads. Empty values are omitted so the canonical feed is "/".
-function railHref({ q, topics, sort }: RailState): string {
+// Build a "/" URL preserving q + sort, setting the focus route (empty = clear).
+function focusHref({
+  q,
+  focus,
+  sort,
+}: {
+  q: string;
+  focus: string;
+  sort: SortOrder;
+}): string {
   const params = new URLSearchParams();
   if (q) params.set("q", q);
-  if (topics.length) params.set("topics", topics.join(","));
+  if (focus) params.set("focus", focus);
   if (sort === "oldest") params.set("sort", "oldest");
   const qs = params.toString();
   return qs ? `/?${qs}` : "/";
 }
 
-// Add or remove a topic (case-insensitive) — OR-semantics multi-select.
-function toggleTopic(selected: string[], topic: string): string[] {
-  const key = topic.toLowerCase();
-  return selected.some((t) => t.toLowerCase() === key)
-    ? selected.filter((t) => t.toLowerCase() !== key)
-    : [...selected, topic];
+// Categories in declared order.
+function orderedCategories(focus: FocusResponse): FocusCategory[] {
+  return [...focus.categories].sort((a, b) => a.order - b.order);
+}
+
+// A category's routes, in its declared route_ids order; falls back to a
+// category_id match if route_ids is empty.
+function routesForCategory(
+  cat: FocusCategory,
+  routes: FocusRoute[],
+): FocusRoute[] {
+  const byId = new Map(routes.map((r) => [r.route_id, r]));
+  const ordered = cat.route_ids
+    .map((id) => byId.get(id))
+    .filter((r): r is FocusRoute => Boolean(r));
+  if (ordered.length) return ordered;
+  return routes
+    .filter((r) => r.category_id === cat.category_id)
+    .sort((a, b) => a.order - b.order);
 }
 
 export function LensRail({
   posts,
-  facets,
-  selectedTopics,
+  focus,
+  activeRoute,
   query,
   currentSort,
 }: {
-  /** The currently-rendered set, in order — what Snap freezes (the search
-   *  results in search mode, the feed otherwise). Also the "All topics" /
-   *  Snap count. */
+  /** The currently-rendered set, in order — what Snap freezes (route entries,
+   *  search results, or the feed). Also the Snap count. */
   posts: PostSummary[];
-  /** Real topic facets from journalkit /api/v1/topics (topic + post count). */
-  facets: TopicFacet[];
-  /** Currently selected topics (from `?topics=`), OR-combined. */
-  selectedTopics: string[];
+  /** GET /api/v1/focus — the focus index (categories + routes). */
+  focus: FocusResponse;
+  /** Active route id from `?focus=`, or null. Single-select. */
+  activeRoute: string | null;
   /** Current free-text query (from `?q=`). */
   query: string;
   currentSort: SortOrder;
@@ -106,14 +124,13 @@ export function LensRail({
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const selectedSet = new Set(selectedTopics.map((t) => t.toLowerCase()));
-  const noTopics = selectedTopics.length === 0;
   const count = posts.length;
+  const activeRouteLabel = activeRoute
+    ? (focus.routes.find((r) => r.route_id === activeRoute)?.label ?? null)
+    : null;
 
   // Snapshot UI is client-only (auth needs JS) → mount-gate it so JS-off shows
-  // just search + topics. Also: if we're returning from the Google OAuth
-  // redirect (tokens in the URL hash), eagerly load Supabase to finish sign-in;
-  // otherwise stay lazy.
+  // just search + focus. Resume an in-flight OAuth redirect from the URL hash.
   useEffect(() => {
     setMounted(true);
     if (
@@ -183,15 +200,18 @@ export function LensRail({
         setError("Please sign in again");
         return;
       }
-      // Freeze the rendered set in order — search results in result order, or
-      // the current feed.
+      // Freeze the rendered set in order — focused route entries, search
+      // results, or the feed. Carry the focus route in the descriptor.
       const snap = await createSnapshot(
         token,
         posts.map((p) => p.post_id),
         {
-          topics: selectedTopics,
+          topics: [],
           sort: currentSort,
           query: query.trim(),
+          ...(activeRoute
+            ? { focus: activeRoute, route_label: activeRouteLabel ?? activeRoute }
+            : {}),
         },
       );
       setSnapLink(snap); // replaces any previous link — no history pile-up
@@ -205,7 +225,7 @@ export function LensRail({
     } finally {
       setBusy(false);
     }
-  }, [posts, selectedTopics, currentSort, query]);
+  }, [posts, currentSort, query, activeRoute, activeRouteLabel]);
 
   const onCopy = useCallback(async (token: string) => {
     try {
@@ -216,6 +236,8 @@ export function LensRail({
       /* clipboard unavailable — the link is still openable */
     }
   }, []);
+
+  const categories = orderedCategories(focus);
 
   return (
     <nav className="rail" id="reader-rail" aria-label="Reader navigation">
@@ -239,28 +261,24 @@ export function LensRail({
               defaultValue={query}
               placeholder="Search title, body, intent…"
               aria-label="Search entries"
-              // name="q" is a very common form-field name, so browsers offer
-              // cross-site autofill history here — suppress it.
               autoComplete="off"
             />
-            {selectedTopics.length > 0 ? (
-              <input
-                type="hidden"
-                name="topics"
-                value={selectedTopics.join(",")}
-                readOnly
-              />
+            {activeRoute ? (
+              <input type="hidden" name="focus" value={activeRoute} readOnly />
             ) : null}
             {currentSort === "oldest" ? (
               <input type="hidden" name="sort" value="oldest" readOnly />
             ) : null}
-            {/* No submit button — a single search field submits on Enter (works
-                JS-off too). The input is a simple line, not a box. */}
+            {/* No submit button — a single search field submits on Enter. */}
           </form>
           {query ? (
             <Link
               className="lens-search-clear"
-              href={railHref({ q: "", topics: selectedTopics, sort: currentSort })}
+              href={focusHref({
+                q: "",
+                focus: activeRoute ?? "",
+                sort: currentSort,
+              })}
             >
               Clear search
             </Link>
@@ -268,8 +286,7 @@ export function LensRail({
         </div>
       </div>
 
-      {/* Snap to share — JS-only (mount-gated). One affordance: icon + count.
-          Signed out → starts Google sign-in; signed in → snaps. */}
+      {/* Snap to share — JS-only (mount-gated). Icon + count. */}
       {mounted ? (
         <div className="rail-section">
           <h2>Snap to share</h2>
@@ -340,37 +357,45 @@ export function LensRail({
       ) : null}
 
       <div className="rail-section">
-        <h2>Topics</h2>
-        <div className="rail-control rail-topics">
+        <h2>Focus</h2>
+        <div className="rail-control rail-focus">
           <Link
-            className={`topic-opt${noTopics ? " on" : ""}`}
-            href={railHref({ q: query, topics: [], sort: currentSort })}
-            aria-current={noTopics ? "true" : undefined}
+            className={`topic-opt${!activeRoute ? " on" : ""}`}
+            href={focusHref({ q: query, focus: "", sort: currentSort })}
+            aria-current={!activeRoute ? "true" : undefined}
           >
             <span className="topic-radio" aria-hidden="true" />
-            <span className="topic-name">All topics</span>
-            <span className="topic-count">{count}</span>
+            <span className="topic-name">All</span>
           </Link>
-          {facets.length === 0 ? (
-            <p className="rail-empty">No topics yet.</p>
+          {categories.length === 0 ? (
+            <p className="rail-empty">No routes yet.</p>
           ) : (
-            facets.map((f) => {
-              const on = selectedSet.has(f.topic.toLowerCase());
+            categories.map((cat) => {
+              const routes = routesForCategory(cat, focus.routes);
+              if (routes.length === 0) return null;
               return (
-                <Link
-                  key={f.topic}
-                  className={`topic-opt${on ? " on" : ""}`}
-                  href={railHref({
-                    q: query,
-                    topics: toggleTopic(selectedTopics, f.topic),
-                    sort: currentSort,
+                <div key={cat.category_id} className="focus-group">
+                  <h3 className="focus-cat">{cat.label}</h3>
+                  {routes.map((route) => {
+                    const on = route.route_id === activeRoute;
+                    return (
+                      <Link
+                        key={route.route_id}
+                        className={`topic-opt${on ? " on" : ""}`}
+                        href={focusHref({
+                          q: query,
+                          focus: route.route_id,
+                          sort: currentSort,
+                        })}
+                        aria-current={on ? "true" : undefined}
+                      >
+                        <span className="topic-radio" aria-hidden="true" />
+                        <span className="topic-name">{route.label}</span>
+                        <span className="topic-count">{route.entry_count}</span>
+                      </Link>
+                    );
                   })}
-                  aria-current={on ? "true" : undefined}
-                >
-                  <span className="topic-radio" aria-hidden="true" />
-                  <span className="topic-name">{f.topic}</span>
-                  <span className="topic-count">{f.count}</span>
-                </Link>
+                </div>
               );
             })
           )}

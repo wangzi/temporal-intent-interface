@@ -17,6 +17,7 @@ export function EntryItem({
   index,
   now,
   snippet,
+  reason,
 }: {
   post: PostSummary;
   /** Sequential position in the feed; drives `data-entry-index` (focus + the
@@ -24,9 +25,12 @@ export function EntryItem({
   index: number;
   /** Server-stable "now" (ms) for the relative-ago string. */
   now: number;
-  /** Search-result excerpt from the engine. Rendered below the title in search
-   *  mode; omitted in the default feed. */
+  /** Search-result excerpt from the engine (match evidence). Rendered below the
+   *  title in search mode; omitted in the default feed. */
   snippet?: string;
+  /** Focus route mapping reason — "why this entry belongs to this route."
+   *  Visually distinct from the search snippet; both can show at once. */
+  reason?: string;
 }) {
   return (
     <li
@@ -37,6 +41,12 @@ export function EntryItem({
     >
       <TitleIntentLayer post={post} now={now} />
       {snippet ? <p className="e-snippet">{snippet}</p> : null}
+      {reason ? (
+        <div className="e-reason">
+          <span className="e-reason-label">Why this entry belongs here</span>
+          <p className="e-reason-text">{reason}</p>
+        </div>
+      ) : null}
     </li>
   );
 }

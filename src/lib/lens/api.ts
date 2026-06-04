@@ -23,6 +23,10 @@ export type SnapshotDescriptor = {
   topics: string[];
   sort: "newest" | "oldest";
   query: string;
+  /** Active Focus route id when snapping a focused route view (additive — the
+   *  journalkit snapshot descriptor is JSONB and accepts these). */
+  focus?: string;
+  route_label?: string;
 };
 
 export type SnapshotMeta = {
