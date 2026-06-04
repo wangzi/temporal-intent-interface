@@ -1,5 +1,5 @@
 // Layer-1 enriched-state content for an entry: Intent statement +
-// Key insight. Pure server markup.
+// Signal (the entry's core insight). Pure server markup.
 //
 // PROGRESSIVE-ENHANCEMENT NOTE (PRD §17.4 + plan §5):
 // The .enrich element ships fully visible (opacity 1) so JS-off readers
@@ -22,7 +22,7 @@ export function ScanDensity({
       </p>
       {post.core_insight_visible ? (
         <>
-          <span className="k">Key insight</span>
+          <span className="k">Signal</span>
           <p className="insight" data-text-origin="canonical">
             {post.core_insight}
           </p>

@@ -44,7 +44,7 @@ const FIELDS: {
 }[] = [
   { pick: (p) => p.central_question, weight: 3, label: "shares a question" },
   { pick: (p) => p.intent_statement, weight: 2, label: "intent" },
-  { pick: (p) => p.core_insight, weight: 2, label: "key insight" },
+  { pick: (p) => p.core_insight, weight: 2, label: "signal" },
   { pick: (p) => p.title, weight: 1.5, label: "title" },
   { pick: (p) => p.topics.join(" "), weight: 1, label: "topic" },
 ];
