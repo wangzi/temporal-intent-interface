@@ -199,17 +199,19 @@ export default async function Home({
       }
     >
       <Spine />
-      <SpineSort
-        currentSort={sort}
-        query={query}
-        selectedTopics={selectedTopics}
-      />
+      {/* Spine head order: time + last-entry (the hero) first, then the sort
+          toggle below the hero's resting glyph. */}
       {allPosts.length > 0 ? (
         <TerminalHero
           lastEntryDays={lastEntryDays}
           totalEntriesCount={totalEntriesCount}
         />
       ) : null}
+      <SpineSort
+        currentSort={sort}
+        query={query}
+        selectedTopics={selectedTopics}
+      />
       <ol
         id="feed"
         aria-label="Entries in reverse chronological order"

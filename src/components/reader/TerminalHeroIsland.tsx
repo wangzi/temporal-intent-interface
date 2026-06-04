@@ -79,6 +79,11 @@ export function TerminalHeroIsland(): null {
       glyph.style.transition = "";
     }
     if (dataEl) dataEl.textContent = "";
+    // Hide the › prompts until the cursor types each row (they fade in below).
+    // Reduced-motion returned above, so the SSR-visible prompts stay.
+    root
+      .querySelectorAll<HTMLElement>("[data-hero-prompt]")
+      .forEach((p) => (p.style.opacity = "0"));
   }, []);
 
   useEffect(() => {
@@ -88,6 +93,12 @@ export function TerminalHeroIsland(): null {
     const clockEl = root.querySelector<HTMLElement>("[data-hero-clock]");
     const dataEl = root.querySelector<HTMLElement>(".hero-term-data");
     const line2 = root.querySelector<HTMLElement>('[data-hero-line="data"]');
+    const clockPrompt = root.querySelector<HTMLElement>(
+      '[data-hero-prompt="clock"]',
+    );
+    const dataPrompt = root.querySelector<HTMLElement>(
+      '[data-hero-prompt="data"]',
+    );
     const clockStr = formatLocalClock(new Date());
 
     if (prefersReducedMotion()) {
@@ -123,9 +134,11 @@ export function TerminalHeroIsland(): null {
       });
     }
 
-    // Phase 3: descend to the data row.
+    // Phase 3: the clock row is typed — leave its › prompt on the spine, then
+    // descend to the data row.
     t += LINE_PAUSE_MS;
     at(t, () => {
+      if (clockPrompt) clockPrompt.style.opacity = "1";
       glyph.style.top = `${topForRow(line2, glyph)}px`;
     });
     t += DESCEND_MS;
@@ -139,9 +152,11 @@ export function TerminalHeroIsland(): null {
       });
     }
 
-    // Phase 4: morph > → ↓ and descend to the CSS rest (clear the inline top).
+    // Phase 4: the data row is typed — leave its › prompt, morph > → ↓ and
+    // descend to the CSS rest (clear the inline top).
     t += LINE_PAUSE_MS;
     at(t, () => {
+      if (dataPrompt) dataPrompt.style.opacity = "1";
       glyph.style.opacity = "0";
     });
     at(t + MORPH_MS, () => {
