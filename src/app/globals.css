@@ -1031,7 +1031,9 @@ body.nav-open .scrim {
   transform: translateX(0);
 }
 .rail-toggle {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   top: 52px;
   left: 20px;
@@ -1042,21 +1044,35 @@ body.nav-open .scrim {
   background: var(--ink);
   cursor: pointer;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  /* The hover number (::after). Black on the white states; never seen on the
+     plain black dot since the number only appears on hover/expanded. */
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  color: var(--ink);
   transition:
     left 0.28s var(--ease),
     background 0.15s var(--ease);
 }
+/* Collapsed dot, hover: invert to white + reveal the count (37). */
 .rail-toggle:hover {
-  /* Invert to white on hover (was the red dot). The drop shadow keeps the
-     white disc legible against the off-white field. */
   background: #ffffff;
+}
+.rail-toggle:hover::after {
+  content: "37";
 }
 .rail-toggle-input:focus-visible + .rail-toggle {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
+/* Rail expanded: the dot is white, and slides to the rail's right edge. */
 .rail-toggle-input:checked ~ .rail-toggle {
   left: calc(var(--rail-reveal-w) + 16px);
+  background: #ffffff;
+}
+/* Expanded dot, hover: reveal its count (78). Outranks the collapsed :hover
+   rule (more classes), so 78 wins while the rail is open. */
+.rail-toggle-input:checked ~ .rail-toggle:hover::after {
+  content: "78";
 }
 
 /* Click-outside-to-collapse: a full-viewport label bound to the same checkbox,
