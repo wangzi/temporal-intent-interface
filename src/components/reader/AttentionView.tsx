@@ -34,7 +34,7 @@ export function AttentionView({ post }: { post: PostDetail }) {
             <path d="M14 6l-6 6 6 6" />
           </svg>
         </span>
-        <span className="attn-back-label mono">back</span>
+        <span className="attn-back-label mono">Back</span>
       </Link>
       <header>
         <div className="attn-label mono" data-text-origin="canonical">
