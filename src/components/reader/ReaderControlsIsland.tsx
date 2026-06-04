@@ -38,7 +38,7 @@ const SETTLE_MS = 350;
 // fraction of the viewport away from it sits at MIN_REVEAL. A generous
 // range makes the fade gradual over scroll distance.
 const REVEAL_VH = 0.16;
-const MIN_REVEAL = 0.48;
+const MIN_REVEAL = 0.1;
 
 function positionDot(): void {
   const spine = document.querySelector<HTMLElement>(".spine");
