@@ -7,7 +7,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { Dot } from "@/components/reader/Dot";
 import { LensRail } from "@/components/reader/LensRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { SelectionLayer } from "@/components/reader/SelectionLayer";
@@ -90,8 +89,8 @@ export default async function PostPage({
         }
       >
         <AttentionView post={post} />
-        {/* Footer hidden for now — FooterReview render removed. */}
-        <Dot />
+        {/* No focus dot on a single post — the back button is the spine's node
+            (positioned onto the spine by ReaderControlsIsland). */}
         <ReaderControlsIsland />
         <SelectionLayer
           post={{

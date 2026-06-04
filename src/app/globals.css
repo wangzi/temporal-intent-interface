@@ -922,69 +922,81 @@ body.nav-open .scrim {
   content: none;
 }
 
-/* Bold circular "back" mark — a confident exit node, not a timid pill. Fixed
-   to the left edge so it (and the rail-toggle dot above it) stay reachable
-   while scrolling — no scrolling back to the top to navigate. Centred on the
-   same x as the rail-toggle dot (40px), stacked just below it. z below the
-   rail (50) + toggle (60) so the open rail cleanly covers it. */
+/* Back button — a ring + chevron NODE that rides the spine, in the same
+   circular language as the ⇅ sort button. Fixed at the focus line; the island
+   anchors its X to the spine (laptop+) so it travels up/down the spine as you
+   scroll. The field fill caps the line behind it → it reads as a node ON the
+   spine. CSS fallback `left` keeps it reachable JS-off / on mobile. The `‹`
+   reads as "back"; the word is revealed in the margin on hover/focus only. */
 .attn-back {
   position: fixed;
-  top: 124px;
-  left: 40px;
-  transform: translateX(-50%);
+  top: calc(var(--dot-vh, 40) * 1vh);
+  left: 40px; /* JS-off / mobile fallback; the island overrides to the spine X */
+  transform: translate(-50%, -50%);
   z-index: 45;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
+  display: grid;
+  place-items: center;
   text-decoration: none;
   color: var(--ink);
 }
 .attn-back-mark {
-  width: 46px;
-  height: 46px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  border: 1.5px solid var(--ink);
+  border: 1px solid var(--branch);
   background: var(--field);
-  transition:
-    background 0.2s var(--ease),
-    color 0.2s var(--ease),
-    transform 0.2s var(--ease);
-}
-.attn-back-label {
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   color: var(--ink);
+  transition:
+    background 0.18s var(--ease),
+    color 0.18s var(--ease),
+    border-color 0.18s var(--ease);
 }
-.attn-back:hover .attn-back-mark {
+/* "Back" word — hidden until hover/focus, then fades into the left margin
+   (away from the body text) beside the ring. Absolute so it never shifts the
+   ring off the spine. */
+.attn-back-label {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--system);
+  opacity: 0;
+  transform: translate(4px, -50%);
+  transition:
+    opacity 0.18s var(--ease),
+    transform 0.18s var(--ease);
+  pointer-events: none;
+}
+.attn-back:hover .attn-back-mark,
+.attn-back:focus-visible .attn-back-mark {
   background: var(--ink);
   color: var(--field);
-  transform: translateX(-4px);
+  border-color: var(--ink);
+}
+.attn-back:hover .attn-back-label,
+.attn-back:focus-visible .attn-back-label {
+  opacity: 1;
+  transform: translate(0, -50%);
 }
 .attn-back:focus-visible {
   outline: none;
 }
 .attn-back:focus-visible .attn-back-mark {
   outline: 2px solid var(--focus);
-  outline-offset: 4px;
+  outline-offset: 3px;
 }
-/* Narrow viewports: no room left of the spine — fall back to inline, above
-   the title, still bold. */
-@media (max-width: 700px) {
+/* Narrow viewports: the spine hugs the text, so the button can't ride it —
+   the island leaves its CSS `left` alone below 768px; pin it near the top-left
+   so it stays a clear, reachable back control (still fixed on scroll). */
+@media (max-width: 767px) {
   .attn-back {
-    position: static;
-    transform: none;
-    flex-direction: row;
-    gap: 10px;
-    margin: 0 0 30px 0;
-  }
-  .attn-back-mark {
-    width: 38px;
-    height: 38px;
+    top: 76px;
   }
 }
 

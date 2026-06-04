@@ -42,10 +42,18 @@ const MIN_REVEAL = 0.1;
 
 function positionDot(): void {
   const spine = document.querySelector<HTMLElement>(".spine");
+  if (!spine) return;
+  const x = spine.getBoundingClientRect().left;
   const dot = document.getElementById("dot");
-  if (!spine || !dot) return;
-  const rect = spine.getBoundingClientRect();
-  dot.style.left = `${rect.left}px`;
+  if (dot) dot.style.left = `${x}px`;
+  // The post route's back button rides the spine at the same X anchor — but
+  // only on laptop+, where there's margin for it. On narrow widths the spine
+  // hugs the text, so it falls back to its CSS top-left position.
+  const back = document.querySelector<HTMLElement>(".attn-back");
+  if (back) {
+    if (window.innerWidth >= 768) back.style.left = `${x}px`;
+    else back.style.removeProperty("left");
+  }
 }
 
 function dotLineY(): number {
