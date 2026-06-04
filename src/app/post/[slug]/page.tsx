@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Dot } from "@/components/reader/Dot";
+import { LensRail } from "@/components/reader/LensRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { SelectionLayer } from "@/components/reader/SelectionLayer";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
@@ -15,7 +16,9 @@ import { AttentionView } from "@/components/reader/AttentionView";
 import {
   EngineNotFoundError,
   getPost,
+  listFocus,
 } from "@/lib/engine/client";
+import type { FocusResponse } from "@/lib/engine/types";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -63,8 +66,29 @@ export default async function PostPage({
   try {
     const { post } = await getPost(slug);
 
+    // The Lens rail (Focus routes + Search + Snap) renders here too, so the
+    // trigger dot opens the same navigation surface from within Attention mode.
+    // A focus failure degrades to an empty index — the rail still opens.
+    let focus: FocusResponse = { categories: [], routes: [] };
+    try {
+      focus = await listFocus();
+    } catch (focusErr) {
+      // eslint-disable-next-line no-console
+      console.error("[post] focus error:", focusErr);
+    }
+
     return (
-      <TemporalLayout>
+      <TemporalLayout
+        rail={
+          <LensRail
+            posts={[post]}
+            focus={focus}
+            activeRoute={null}
+            query=""
+            currentSort="newest"
+          />
+        }
+      >
         <AttentionView post={post} />
         {/* Footer hidden for now — FooterReview render removed. */}
         <Dot />
