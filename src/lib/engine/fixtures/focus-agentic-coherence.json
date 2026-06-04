@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "route": {
+    "route_id": "agentic-coherence",
+    "label": "Agentic Coherence",
+    "category_id": "ai",
+    "description": "The transition from ephemeral, prompt-based chat sessions to persistent background daemons that hold long-horizon human intent.",
+    "aliases": ["coherence", "ghost", "intent"],
+    "tags": ["#coherence", "#ghost", "#intent"],
+    "entry_count": 2
+  },
+  "mappings": [
+    {
+      "entry_id": "p-001",
+      "day": "90",
+      "title_hint": "",
+      "reason": "Defining coherence as the computational persistence of intent.",
+      "slug": "why-technology-still-needs-humanity",
+      "entry_no": null
+    },
+    {
+      "entry_id": "p-002",
+      "day": "72",
+      "title_hint": "",
+      "reason": "Reading as the act that re-grounds long-horizon intent.",
+      "slug": "reading-as-an-active-operation",
+      "entry_no": null
+    }
+  ],
+  "entries": [
+    {
+      "post_id": "p-001",
+      "slug": "why-technology-still-needs-humanity",
+      "title": "Why Technology Still Needs Humanity",
+      "published_at": "2026-05-25T00:00:00Z",
+      "reading_time": 2,
+      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "intent_label": "Humanity & Technology",
+      "intent_statement": "Explore whether technology can amplify human judgment without replacing agency.",
+      "central_question": "Can a tool extend human judgment without quietly replacing it?",
+      "core_insight": "Technology becomes meaningful when joined to context, judgment, and care.",
+      "core_insight_visible": true,
+      "topics": ["tools", "judgment", "agency"],
+      "pinned_until": null
+    },
+    {
+      "post_id": "p-002",
+      "slug": "reading-as-an-active-operation",
+      "title": "Reading as an Active Operation",
+      "published_at": "2026-05-14T00:00:00Z",
+      "reading_time": 3,
+      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "intent_label": "AI-Native Reading",
+      "intent_statement": "Argue that reading should become an operation the reader performs, not content the reader receives.",
+      "central_question": "What changes if a page can be thought with, not just read?",
+      "core_insight": "The unit of reading shifts from the page to the passage you choose to act on.",
+      "core_insight_visible": true,
+      "topics": ["reading", "attention", "ai-native"],
+      "pinned_until": null
+    }
+  ]
+}

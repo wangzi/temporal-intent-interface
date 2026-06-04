@@ -102,5 +102,71 @@ export type SearchParams = {
   q?: string;
   /** OR-semantics topic filter. */
   topics?: string[];
+  /** Focus route ids to restrict the search to (GET /api/v1/search?focus=). */
+  focus?: string[];
   limit?: number;
+  sort?: SortOrder;
+};
+
+// ── Focus API — journalkit's navigation surface ─────────────────────────────
+// Focus groups the journal into selectable Routes, grouped by Category
+// (AI / Healthspan / Startup / Macro). NOT "topics", "TOC", or "index" in the UI.
+
+/** A category grouping a set of routes (GET /api/v1/focus). */
+export type FocusCategory = {
+  category_id: string;
+  label: string;
+  order: number;
+  /** Ordered route ids belonging to this category. */
+  route_ids: string[];
+};
+
+/** A selectable route (a curated path through the journal). */
+export type FocusRoute = {
+  route_id: string;
+  label: string;
+  category_id: string;
+  order: number;
+  description: string;
+  aliases: string[];
+  tags: string[];
+  /** Number of entries mapped to this route. */
+  entry_count: number;
+};
+
+/** GET /api/v1/focus — the focus index: categories + their routes. */
+export type FocusResponse = {
+  categories: FocusCategory[];
+  routes: FocusRoute[];
+};
+
+/** Route metadata returned alongside a route's entries (the body header). */
+export type FocusRouteMeta = {
+  route_id: string;
+  label: string;
+  category_id: string;
+  description: string;
+  aliases: string[];
+  tags: string[];
+  entry_count: number;
+};
+
+/** One curated entry→route mapping. `reason` = why this entry belongs here. */
+export type FocusMapping = {
+  /** journalkit post_id of the mapped entry. */
+  entry_id: string;
+  /** Day marker, e.g. "90" (for "Day 90 — …"). May be empty. */
+  day: string;
+  /** The mapping reason — do NOT drop this in the UI. */
+  reason: string;
+  slug: string;
+};
+
+/** GET /api/v1/focus/:routeId/entries — route header + mapped entries. */
+export type FocusRouteResponse = {
+  route: FocusRouteMeta;
+  /** Curated mappings (in order); carries the per-entry reason. */
+  mappings: FocusMapping[];
+  /** The mapped entries as PostSummaries (deduped, in curated order). */
+  entries: PostSummary[];
 };

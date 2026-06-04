@@ -12,12 +12,16 @@ import "server-only";
 import { env } from "@/lib/env";
 import { fixtureGet } from "./fixtures";
 import {
+  FocusResponseSchema,
+  FocusRouteResponseSchema,
   PostsListResponseSchema,
   PostDetailResponseSchema,
   SearchResponseSchema,
   TopicsResponseSchema,
 } from "./schemas";
 import type {
+  FocusResponse,
+  FocusRouteResponse,
   ListPostsParams,
   PostDetailResponse,
   PostsListResponse,
@@ -114,21 +118,59 @@ export async function searchPosts(
 ): Promise<SearchResponse> {
   const q = (params.q ?? "").trim();
   const topics = (params.topics ?? []).map((t) => t.trim()).filter(Boolean);
-  if (!q && topics.length === 0) return { results: [] };
+  const focus = (params.focus ?? []).map((f) => f.trim()).filter(Boolean);
+  if (!q && topics.length === 0 && focus.length === 0) return { results: [] };
 
   if (env.JOURNALKIT_FIXTURE_MODE) {
     const raw = await fixtureGet("posts");
     if (!raw) throw new EngineError("fixture posts.json missing", 500);
     const { posts } = PostsListResponseSchema.parse(raw);
+    // Offline approximation can't resolve focus mappings; search over summaries.
     return { results: fixtureSearch(posts, q, topics, params.limit ?? 50) };
   }
 
   const sp = new URLSearchParams();
   if (q) sp.set("q", q);
   if (topics.length) sp.set("topics", topics.join(","));
+  if (focus.length) sp.set("focus", focus.join(","));
   if (params.limit) sp.set("limit", String(params.limit));
   const raw = await fetchJSON(`/search?${sp.toString()}`);
   return SearchResponseSchema.parse(raw);
+}
+
+/** GET /api/v1/focus — the Focus index: categories and their routes. */
+export async function listFocus(): Promise<FocusResponse> {
+  if (env.JOURNALKIT_FIXTURE_MODE) {
+    const raw = await fixtureGet("focus");
+    // No fixture offline → empty index (rail renders its empty state). Real
+    // Focus data comes from the keyed engine in prod.
+    if (!raw) return { categories: [], routes: [] };
+    return FocusResponseSchema.parse(raw);
+  }
+  const raw = await fetchJSON("/focus");
+  return FocusResponseSchema.parse(raw);
+}
+
+/**
+ * GET /api/v1/focus/{routeId}/entries — a route's header metadata, its curated
+ * mappings (each with the `reason` an entry belongs here), and the mapped
+ * entries as PostSummaries (in curated order). Throws EngineNotFoundError on an
+ * unknown route.
+ */
+export async function getFocusRoute(
+  routeId: string,
+): Promise<FocusRouteResponse> {
+  if (env.JOURNALKIT_FIXTURE_MODE) {
+    const raw = await fixtureGet(`focus-${routeId}`);
+    if (!raw) {
+      throw new EngineNotFoundError(`fixture focus-${routeId}.json missing`);
+    }
+    return FocusRouteResponseSchema.parse(raw);
+  }
+  const raw = await fetchJSON(
+    `/focus/${encodeURIComponent(routeId)}/entries`,
+  );
+  return FocusRouteResponseSchema.parse(raw);
 }
 
 /** GET /api/v1/topics — facets (topic + post count) over published posts. */

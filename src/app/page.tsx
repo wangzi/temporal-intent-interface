@@ -1,33 +1,41 @@
-// Archive index — public reverse-chronological feed of published posts, plus
-// Lens search + topic-filter modes.
+// Archive index — public reverse-chronological feed, plus Focus (journalkit's
+// navigation surface) and free-text Search.
 //
-// SSR per PRD §17.4: renders fully without JavaScript. ISR revalidate=60 so
-// anonymous readers get an at-most-minute-stale snapshot. Every engine call is
-// validated against the §9 contract; on error we render an empty state rather
-// than crash.
+// SSR per PRD §17.4: renders fully without JavaScript. ISR revalidate=60. Every
+// engine call is validated against the §9 contract; on error we render an empty
+// state rather than crash.
 //
 // Modes (driven by the URL):
-//   • Default feed        — no ?q and no ?topics. Reverse-chron list + Load-more.
-//     An optional ?filter= still narrows by intent label (TopBar's mobile nav).
-//   • Search / topic view — ?q= and/or ?topics= present. Results come from
-//     journalkit /api/v1/search (body-aware text + OR topic filter), rendered
-//     with the engine's snippets. No Load-more (search returns a capped set).
+//   • Default feed   — no ?focus and no ?q. Reverse-chron list + Load-more.
+//     An optional ?filter= still narrows by intent label (TopBar mobile nav).
+//   • Focus route    — ?focus=<routeId>. Fetches the route's mapped entries
+//     (GET /api/v1/focus/:routeId/entries), renders a route header + each
+//     entry's mapping reason ("why this entry belongs here"). With ?q= too, it
+//     searches *within* the route (GET /api/v1/search?q=&focus=) and shows both
+//     the match snippet and the route reason.
+//   • Search         — ?q= (no focus). Body-aware text search results.
 //
-// The LensRail (search box + real topic facets + sort + Snap) renders in every
-// mode; its facets come from journalkit /api/v1/topics and Snap freezes the
-// currently-rendered set (the search results in result order, or the feed).
+// The LensRail (search + Snap + Focus routes) renders in every mode; its focus
+// index comes from GET /api/v1/focus.
 
-import { listPosts, listTopics, searchPosts } from "@/lib/engine/client";
+import {
+  getFocusRoute,
+  listFocus,
+  listPosts,
+  searchPosts,
+} from "@/lib/engine/client";
 import { daysAgo } from "@/lib/format";
 import type {
+  FocusResponse,
+  FocusRouteResponse,
   PostSummary,
   SearchResult,
   SortOrder,
-  TopicFacet,
 } from "@/lib/engine/types";
 
 import { Dot } from "@/components/reader/Dot";
 import { EntryItem } from "@/components/reader/EntryItem";
+import { FocusRouteHeader } from "@/components/reader/FocusRouteHeader";
 import { LensRail } from "@/components/reader/LensRail";
 import { LoadMore } from "@/components/reader/LoadMore";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
@@ -40,12 +48,10 @@ import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
 
-function parseTopics(raw?: string): string[] {
-  if (!raw) return [];
-  return raw
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
+const EMPTY_FOCUS: FocusResponse = { categories: [], routes: [] };
+
+function resultCount(n: number): string {
+  return `${n} result${n === 1 ? "" : "s"}`;
 }
 
 export default async function Home({
@@ -53,7 +59,7 @@ export default async function Home({
 }: {
   searchParams: Promise<{
     sort?: string;
-    topics?: string;
+    focus?: string;
     q?: string;
     filter?: string;
   }>;
@@ -61,58 +67,63 @@ export default async function Home({
   const sp = await searchParams;
   const sort: SortOrder = sp.sort === "oldest" ? "oldest" : "newest";
   const query = (sp.q ?? "").trim();
-  const selectedTopics = parseTopics(sp.topics);
-  const searchMode = query.length > 0 || selectedTopics.length > 0;
+  const activeRoute = (sp.focus ?? "").trim() || null;
 
   // Server-stable "now" for relative-ago strings within this SSR.
   const now = Date.now();
 
-  // Topic facets for the rail (every mode) — real journalkit /api/v1/topics.
-  let facets: TopicFacet[] = [];
+  // Focus index for the rail (every mode) — real journalkit /api/v1/focus.
+  let focus: FocusResponse = EMPTY_FOCUS;
   try {
-    facets = (await listTopics()).topics;
+    focus = await listFocus();
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("[home] topics error:", err);
+    console.error("[home] focus error:", err);
   }
 
-  // ── Search / topic-filter mode ────────────────────────────────────────────
-  if (searchMode) {
-    let results: SearchResult[] = [];
+  // ── Focus route mode ───────────────────────────────────────────────────────
+  if (activeRoute) {
+    let routeData: FocusRouteResponse | null = null;
     try {
-      results = (
-        await searchPosts({ q: query || undefined, topics: selectedTopics })
-      ).results;
+      routeData = await getFocusRoute(activeRoute);
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error("[home] search error:", err);
+      console.error("[home] focus route error:", err);
     }
 
-    // Keep the status line terse: name the topics when there are a few, but
-    // collapse to a count past 3 so it never becomes a wall of caps. The active
-    // topics are also shown (highlighted) in the rail's Topics list.
-    const topicCriteria =
-      selectedTopics.length === 0
-        ? null
-        : selectedTopics.length <= 3
-          ? selectedTopics.join(", ")
-          : `${selectedTopics.length} topics`;
-    const criteria = [query ? `“${query}”` : null, topicCriteria]
-      .filter(Boolean)
-      .join(" · ");
-    const heading =
-      results.length === 0
-        ? "No results"
-        : `${results.length} result${results.length === 1 ? "" : "s"}`;
+    // entry_id → "Day {day} — {reason}" (first mapping per entry).
+    const reasonById = new Map<string, string>();
+    for (const m of routeData?.mappings ?? []) {
+      if (reasonById.has(m.entry_id)) continue;
+      const r = m.reason.trim();
+      if (!r) continue;
+      reasonById.set(m.entry_id, m.day ? `Day ${m.day} — ${r}` : r);
+    }
+
+    // Entries: the route's mapped entries, OR search-within-route results.
+    let entries: PostSummary[] = routeData?.entries ?? [];
+    const snippetById = new Map<string, string>();
+    if (query) {
+      let results: SearchResult[] = [];
+      try {
+        results = (await searchPosts({ q: query, focus: [activeRoute] }))
+          .results;
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error("[home] focus search error:", err);
+      }
+      entries = results;
+      for (const r of results) snippetById.set(r.post_id, r.search.snippet);
+    }
 
     return (
       <TemporalLayout
-        topBar={<TopBar posts={results} />}
+        topBar={<TopBar posts={entries} />}
         rail={
           <LensRail
-            posts={results}
-            facets={facets}
-            selectedTopics={selectedTopics}
+            posts={entries}
+            focus={focus}
+            activeRoute={activeRoute}
             query={query}
             currentSort={sort}
           />
@@ -122,12 +133,76 @@ export default async function Home({
         <SpineSort
           currentSort={sort}
           query={query}
-          selectedTopics={selectedTopics}
+          selectedTopics={[]}
+          activeRoute={activeRoute}
         />
+        {routeData ? <FocusRouteHeader route={routeData.route} /> : null}
+        <ol
+          id="feed"
+          aria-label={
+            routeData ? `${routeData.route.label} — entries` : "Focus route"
+          }
+          style={{ listStyle: "none" }}
+        >
+          {query ? (
+            <li className="feed-status">
+              {resultCount(entries.length)} · “{query}”
+            </li>
+          ) : null}
+          {entries.map((p, i) => (
+            <EntryItem
+              key={p.post_id}
+              post={p}
+              index={i}
+              now={now}
+              snippet={snippetById.get(p.post_id)}
+              reason={reasonById.get(p.post_id)}
+            />
+          ))}
+          {entries.length === 0 ? (
+            <li className="feed-empty">
+              {query
+                ? `No entries in this route match “${query}”.`
+                : "No entries mapped to this route yet."}
+            </li>
+          ) : null}
+        </ol>
+        <Dot />
+        <ReaderControlsIsland />
+      </TemporalLayout>
+    );
+  }
+
+  // ── Search mode (free-text, no focus) ──────────────────────────────────────
+  if (query) {
+    let results: SearchResult[] = [];
+    try {
+      results = (await searchPosts({ q: query })).results;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[home] search error:", err);
+    }
+    const heading =
+      results.length === 0 ? "No results" : resultCount(results.length);
+
+    return (
+      <TemporalLayout
+        topBar={<TopBar posts={results} />}
+        rail={
+          <LensRail
+            posts={results}
+            focus={focus}
+            activeRoute={null}
+            query={query}
+            currentSort={sort}
+          />
+        }
+      >
+        <Spine />
+        <SpineSort currentSort={sort} query={query} selectedTopics={[]} />
         <ol id="feed" aria-label="Search results" style={{ listStyle: "none" }}>
           <li className="feed-status">
-            {heading}
-            {criteria ? ` · ${criteria}` : ""}
+            {heading} · “{query}”
           </li>
           {results.map((r, i) => (
             <EntryItem
@@ -139,9 +214,7 @@ export default async function Home({
             />
           ))}
           {results.length === 0 ? (
-            <li className="feed-empty">
-              No entries match {criteria || "your search"}.
-            </li>
+            <li className="feed-empty">No entries match “{query}”.</li>
           ) : null}
         </ol>
         <Dot />
@@ -150,7 +223,7 @@ export default async function Home({
     );
   }
 
-  // ── Default feed ──────────────────────────────────────────────────────────
+  // ── Default feed ───────────────────────────────────────────────────────────
   const filter = sp.filter && sp.filter !== "all" ? sp.filter : undefined;
 
   let allPosts: PostSummary[] = [];
@@ -160,14 +233,12 @@ export default async function Home({
     allPosts = response.posts;
     nextCursor = response.next_cursor;
   } catch (err) {
-    // Engine error — render an empty archive rather than blow up.
     // eslint-disable-next-line no-console
     console.error("[home] engine error:", err);
   }
 
   // ?filter= (intent label) is the legacy in-component narrow that TopBar's
-  // mobile nav still emits; the desktop rail now uses ?topics= instead. Kept so
-  // the existing feed behavior is preserved when no ?q / ?topics is present.
+  // mobile nav still emits. Kept so the existing feed behavior is preserved.
   const visiblePosts = filter
     ? allPosts.filter(
         (p) => (p.topics ?? []).includes(filter) || p.intent_label === filter,
@@ -191,8 +262,8 @@ export default async function Home({
       rail={
         <LensRail
           posts={visiblePosts}
-          facets={facets}
-          selectedTopics={selectedTopics}
+          focus={focus}
+          activeRoute={null}
           query={query}
           currentSort={sort}
         />
@@ -207,11 +278,7 @@ export default async function Home({
           totalEntriesCount={totalEntriesCount}
         />
       ) : null}
-      <SpineSort
-        currentSort={sort}
-        query={query}
-        selectedTopics={selectedTopics}
-      />
+      <SpineSort currentSort={sort} query={query} selectedTopics={[]} />
       <ol
         id="feed"
         aria-label="Entries in reverse chronological order"

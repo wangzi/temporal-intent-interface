@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "categories": [
+    {
+      "category_id": "ai",
+      "label": "AI",
+      "order": 1,
+      "route_ids": ["agentic-coherence", "ai-native-reading"]
+    },
+    {
+      "category_id": "interfaces",
+      "label": "Interfaces",
+      "order": 2,
+      "route_ids": ["temporal-interfaces"]
+    }
+  ],
+  "routes": [
+    {
+      "route_id": "agentic-coherence",
+      "label": "Agentic Coherence",
+      "category_id": "ai",
+      "order": 1,
+      "description": "The transition from ephemeral, prompt-based chat sessions to persistent background daemons that hold long-horizon human intent.",
+      "aliases": ["coherence", "ghost", "intent"],
+      "tags": ["#coherence", "#ghost", "#intent"],
+      "entry_count": 2,
+      "representative_entry_ids": ["p-001", "p-002"]
+    },
+    {
+      "route_id": "ai-native-reading",
+      "label": "AI-Native Reading",
+      "category_id": "ai",
+      "order": 2,
+      "description": "Reading reframed as an operation the reader performs, not content the reader receives.",
+      "aliases": ["reading", "attention"],
+      "tags": ["#reading", "#attention"],
+      "entry_count": 1,
+      "representative_entry_ids": ["p-002"]
+    },
+    {
+      "route_id": "temporal-interfaces",
+      "label": "Temporal Interfaces",
+      "category_id": "interfaces",
+      "order": 1,
+      "description": "Time as the honest axis for navigating a journal.",
+      "aliases": ["time", "timeline"],
+      "tags": ["#time", "#timeline"],
+      "entry_count": 1,
+      "representative_entry_ids": ["p-003"]
+    }
+  ]
+}
