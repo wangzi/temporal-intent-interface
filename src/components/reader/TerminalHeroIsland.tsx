@@ -145,11 +145,12 @@ export function TerminalHeroIsland(): null {
       });
     }
 
-    // Phase 4: the data row is typed — leave its › prompt, morph | → ⇅ and
-    // descend to the CSS rest (clear the inline top).
+    // Phase 4: the data row is typed — fade the cursor out, morph it to ⇅, and
+    // descend to the CSS rest (clear the inline top). The ¶ prompt is held back
+    // until the cursor has descended off the row (settle step), so the cursor is
+    // never shown behind it.
     t += LINE_PAUSE_MS;
     at(t, () => {
-      if (dataPrompt) dataPrompt.style.opacity = "1";
       glyph.style.opacity = "0";
     });
     at(t + MORPH_MS, () => {
@@ -159,8 +160,15 @@ export function TerminalHeroIsland(): null {
     });
     t += Math.max(MORPH_MS * 2, DESCEND_MS);
 
-    // Settle: bounce as the resting scroll hint.
-    at(t, () => glyph.classList.add("is-bounce"));
+    // Settle: the cursor bounces at the toggle; the ¶ now appears + starts its
+    // (slow) blink, with the cursor already gone from the row.
+    at(t, () => {
+      glyph.classList.add("is-bounce");
+      if (dataPrompt) {
+        dataPrompt.style.opacity = "1";
+        dataPrompt.classList.add("is-blink");
+      }
+    });
 
     return () => {
       for (const id of timers) window.clearTimeout(id);

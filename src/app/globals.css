@@ -721,8 +721,10 @@ body.nav-open .scrim {
 .hero-prompt[data-hero-prompt="clock"] {
   animation: hero-sparkle 9s linear infinite;
 }
-.hero-prompt[data-hero-prompt="data"] {
-  /* Slow, calm cursor blink (on ~1.1s / off ~1.1s). */
+/* The ¶ blinks only after the island reveals it (.is-blink) — once the cursor
+   has typed and descended off the row, so the cursor is never behind it. Slow,
+   calm blink (on ~1.1s / off ~1.1s). */
+.hero-prompt[data-hero-prompt="data"].is-blink {
   animation: hero-blink 2.2s steps(1, end) infinite;
 }
 .hero-term-line + .hero-term-line {
