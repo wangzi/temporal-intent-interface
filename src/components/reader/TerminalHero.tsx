@@ -54,7 +54,7 @@ export function TerminalHero({
           SSR for JS-off. data-hero-final is the island's retype source. */}
       <div className="hero-term-line" data-hero-line="data">
         <span className="hero-prompt" data-hero-prompt="data" aria-hidden="true">
-          ¶
+          |
         </span>
         <span className="hero-term-data" data-hero-final={dataLine}>
           {dataLine}
