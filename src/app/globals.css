@@ -170,6 +170,33 @@ a {
   border-radius: 2px;
 }
 
+/* Skip-to-content — first focusable element; off-screen until focused. */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px
+    calc(16px + env(safe-area-inset-left, 0px));
+  background: var(--ink);
+  color: var(--field);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  border-radius: 0 0 6px 0;
+  transform: translateY(-130%);
+  transition: transform 0.16s var(--ease);
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* The skip target receives focus programmatically; no ring on the whole main. */
+#reader-main:focus {
+  outline: none;
+}
+
 .mono {
   font-family: var(--mono);
 }
