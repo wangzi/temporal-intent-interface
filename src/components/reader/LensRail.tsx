@@ -223,6 +223,51 @@ export function LensRail({
         z<b>.</b>
       </span>
 
+      <div className="rail-section">
+        <h2>Search</h2>
+        <div className="rail-control">
+          <form
+            className="lens-search-form"
+            method="get"
+            action="/"
+            role="search"
+          >
+            <input
+              className="lens-search"
+              type="search"
+              name="q"
+              defaultValue={query}
+              placeholder="Search title, body, intent…"
+              aria-label="Search entries"
+              // name="q" is a very common form-field name, so browsers offer
+              // cross-site autofill history here — suppress it.
+              autoComplete="off"
+            />
+            {selectedTopics.length > 0 ? (
+              <input
+                type="hidden"
+                name="topics"
+                value={selectedTopics.join(",")}
+                readOnly
+              />
+            ) : null}
+            {currentSort === "oldest" ? (
+              <input type="hidden" name="sort" value="oldest" readOnly />
+            ) : null}
+            {/* No submit button — a single search field submits on Enter (works
+                JS-off too). The input is a simple line, not a box. */}
+          </form>
+          {query ? (
+            <Link
+              className="lens-search-clear"
+              href={railHref({ q: "", topics: selectedTopics, sort: currentSort })}
+            >
+              Clear search
+            </Link>
+          ) : null}
+        </div>
+      </div>
+
       {/* Snap to share — JS-only (mount-gated). One affordance: icon + count.
           Signed out → starts Google sign-in; signed in → snaps. */}
       {mounted ? (
@@ -293,51 +338,6 @@ export function LensRail({
           </div>
         </div>
       ) : null}
-
-      <div className="rail-section">
-        <h2>Search</h2>
-        <div className="rail-control">
-          <form
-            className="lens-search-form"
-            method="get"
-            action="/"
-            role="search"
-          >
-            <input
-              className="lens-search"
-              type="search"
-              name="q"
-              defaultValue={query}
-              placeholder="Search title, body, intent…"
-              aria-label="Search entries"
-              // name="q" is a very common form-field name, so browsers offer
-              // cross-site autofill history here — suppress it.
-              autoComplete="off"
-            />
-            {selectedTopics.length > 0 ? (
-              <input
-                type="hidden"
-                name="topics"
-                value={selectedTopics.join(",")}
-                readOnly
-              />
-            ) : null}
-            {currentSort === "oldest" ? (
-              <input type="hidden" name="sort" value="oldest" readOnly />
-            ) : null}
-            {/* No submit button — a single search field submits on Enter (works
-                JS-off too). The input is a simple line, not a box. */}
-          </form>
-          {query ? (
-            <Link
-              className="lens-search-clear"
-              href={railHref({ q: "", topics: selectedTopics, sort: currentSort })}
-            >
-              Clear search
-            </Link>
-          ) : null}
-        </div>
-      </div>
 
       <div className="rail-section">
         <h2>Topics</h2>
