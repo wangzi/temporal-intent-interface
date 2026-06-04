@@ -1,24 +1,25 @@
 "use client";
 
-// LensRail — the reader's left control plane.
+// LensRail — the reader's left control plane. A two-column label → control
+// panel (widens to ~700px on large displays; labels stack above their control
+// on narrow screens via a container query).
 //
-// URL-driven search + topics (work with JS off), plus a JS-only Snapshot:
-//   • Search — a GET form posting `?q=`. journalkit does the body-aware match
-//     server-side (lib/engine/client → /api/v1/search); page.tsx renders the
-//     results. Hidden inputs carry the current topic + sort selection so a
-//     search submit never drops them.
-//   • Topics — real facets from journalkit /api/v1/topics, with post counts.
-//     Multi-select with OR semantics: each chip toggles itself in `?topics=a,b`.
-//   • Sort   — moved out of the rail onto the spine (see SpineSort). The rail
-//     still carries the current `?sort=` through search + topic links so a
-//     query/topic change never resets the chosen order.
-//   • Snapshot (JS-only, gated behind `mounted` so it's absent for JS-off):
-//     Google sign-in + "Snap this view" freeze the currently-rendered entries —
-//     the search results in order, or the feed — into a shareable /s/[token].
-//     We show ONLY the link you just created (copy + ✕); each Snap replaces the
-//     previous one and there is NO history list. Supabase is lazy-loaded
-//     (getSupabase dynamic-imports it) so the auth client stays out of the
-//     reader's bundle until you sign in.
+//   • Snap to share — JS-only, mount-gated (absent for JS-off). One control: a
+//     corner-bracket icon + the count of entries in view. Signed out it starts
+//     Google sign-in; signed in it freezes the rendered set (search results in
+//     order, or the feed) into a shareable /s/[token]. We show ONLY the link you
+//     just made (copy + ✕); each Snap replaces the previous — no history.
+//     Supabase is lazy-loaded (getSupabase) so auth stays out of the bundle
+//     until you sign in.
+//   • Search — a GET form posting `?q=` (an underline line that submits on
+//     Enter, works JS-off). journalkit does the body-aware match server-side;
+//     page.tsx renders results. Hidden inputs carry topics + sort so a submit
+//     never drops them.
+//   • Topics — real facets from journalkit /api/v1/topics: radio-style rows
+//     (○ / ●) with counts. Multi-select OR — each toggles itself in
+//     `?topics=a,b`; several can be active at once.
+//   • Sort lives on the spine now (see SpineSort); the rail only threads the
+//     current `?sort=` through its search + topic links.
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -35,6 +36,27 @@ function originBase(): string {
   if (SITE) return SITE;
   if (typeof window !== "undefined") return window.location.origin;
   return "";
+}
+
+// Corner-bracket "snap / capture" mark for the Snap-to-share control.
+function SnapIcon() {
+  return (
+    <svg
+      className="snap-icon"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M1 6V3a2 2 0 0 1 2-2h3M12 1h3a2 2 0 0 1 2 2v3M17 12v3a2 2 0 0 1-2 2h-3M6 17H3a2 2 0 0 1-2-2v-3"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 type RailState = { q: string; topics: string[]; sort: SortOrder };
@@ -66,7 +88,8 @@ export function LensRail({
   currentSort,
 }: {
   /** The currently-rendered set, in order — what Snap freezes (the search
-   *  results in search mode, the feed otherwise). */
+   *  results in search mode, the feed otherwise). Also the "All topics" /
+   *  Snap count. */
   posts: PostSummary[];
   /** Real topic facets from journalkit /api/v1/topics (topic + post count). */
   facets: TopicFacet[];
@@ -85,9 +108,10 @@ export function LensRail({
 
   const selectedSet = new Set(selectedTopics.map((t) => t.toLowerCase()));
   const noTopics = selectedTopics.length === 0;
+  const count = posts.length;
 
   // Snapshot UI is client-only (auth needs JS) → mount-gate it so JS-off shows
-  // just search/sort/topics. Also: if we're returning from the Google OAuth
+  // just search + topics. Also: if we're returning from the Google OAuth
   // redirect (tokens in the URL hash), eagerly load Supabase to finish sign-in;
   // otherwise stay lazy.
   useEffect(() => {
@@ -199,123 +223,65 @@ export function LensRail({
         z<b>.</b>
       </span>
 
-      <div className="rail-section">
-        <h2>Search</h2>
-        <form className="lens-search-form" method="get" action="/" role="search">
-          <input
-            className="lens-search"
-            type="search"
-            name="q"
-            defaultValue={query}
-            placeholder="Search title, body, intent…"
-            aria-label="Search entries"
-            // name="q" is a very common form-field name, so browsers offer
-            // cross-site autofill history here — suppress it.
-            autoComplete="off"
-          />
-          {selectedTopics.length > 0 ? (
-            <input
-              type="hidden"
-              name="topics"
-              value={selectedTopics.join(",")}
-              readOnly
-            />
-          ) : null}
-          {currentSort === "oldest" ? (
-            <input type="hidden" name="sort" value="oldest" readOnly />
-          ) : null}
-          {/* No submit button — a single search field submits on Enter (works
-              JS-off too). The input is a simple line, not a box. */}
-        </form>
-        {query ? (
-          <Link
-            className="lens-search-clear"
-            href={railHref({ q: "", topics: selectedTopics, sort: currentSort })}
-          >
-            Clear search
-          </Link>
-        ) : null}
-      </div>
-
-      <div className="rail-section">
-        <h2>Topics</h2>
-        <Link
-          className={`navlink${noTopics ? " on" : ""}`}
-          href={railHref({ q: query, topics: [], sort: currentSort })}
-          aria-current={noTopics ? "page" : undefined}
-        >
-          All topics
-        </Link>
-        {facets.length === 0 ? (
-          <p className="rail-empty">No topics yet.</p>
-        ) : (
-          facets.map((f) => {
-            const on = selectedSet.has(f.topic.toLowerCase());
-            return (
-              <Link
-                key={f.topic}
-                className={`navlink topic-chip${on ? " on" : ""}`}
-                href={railHref({
-                  q: query,
-                  topics: toggleTopic(selectedTopics, f.topic),
-                  sort: currentSort,
-                })}
-                aria-current={on ? "true" : undefined}
-              >
-                <span className="topic-name">{f.topic}</span>
-                <span className="topic-count">{f.count}</span>
-              </Link>
-            );
-          })
-        )}
-      </div>
-
+      {/* Snap to share — JS-only (mount-gated). One affordance: icon + count.
+          Signed out → starts Google sign-in; signed in → snaps. */}
       {mounted ? (
         <div className="rail-section">
-          <h2>Snapshot</h2>
-          {session ? (
-            <>
-              <button
-                type="button"
-                className="lens-snap"
-                onClick={() => void onSnap()}
-                disabled={busy || posts.length === 0}
-              >
-                {busy ? "Snapping…" : `Snap this view (${posts.length})`}
-              </button>
-              {snapLink ? (
-                <div className="lens-snaplink">
-                  <a
-                    href={`/s/${snapLink.token}`}
-                    target="_blank"
-                    rel="noreferrer"
+          <h2>Snap to share</h2>
+          <div className="rail-control">
+            <button
+              type="button"
+              className="lens-snap"
+              onClick={() => void (session ? onSnap() : signIn())}
+              disabled={busy || (!!session && count === 0)}
+              aria-label={
+                session
+                  ? `Snap ${count} ${count === 1 ? "entry" : "entries"} to a shareable link`
+                  : "Sign in with Google to snap and share"
+              }
+              title={
+                session
+                  ? "Snap this view to a shareable link"
+                  : "Sign in with Google to snap"
+              }
+            >
+              <SnapIcon />
+              <span className="lens-snap-count">{busy ? "…" : count}</span>
+            </button>
+            {snapLink ? (
+              <div className="lens-snaplink">
+                <a
+                  href={`/s/${snapLink.token}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {snapLink.title}
+                </a>
+                <div className="lens-snaplink-actions">
+                  <button
+                    type="button"
+                    className="lens-copy"
+                    onClick={() => void onCopy(snapLink.token)}
                   >
-                    {snapLink.title}
-                  </a>
-                  <div className="lens-snaplink-actions">
-                    <button
-                      type="button"
-                      className="lens-copy"
-                      onClick={() => void onCopy(snapLink.token)}
-                    >
-                      {copied ? "Copied" : "Copy link"}
-                    </button>
-                    <button
-                      type="button"
-                      className="lens-dismiss"
-                      aria-label="Dismiss link"
-                      onClick={() => setSnapLink(null)}
-                    >
-                      ✕
-                    </button>
-                  </div>
+                    {copied ? "Copied" : "Copy link"}
+                  </button>
+                  <button
+                    type="button"
+                    className="lens-dismiss"
+                    aria-label="Dismiss link"
+                    onClick={() => setSnapLink(null)}
+                  >
+                    ✕
+                  </button>
                 </div>
-              ) : null}
-              {error ? (
-                <p className="lens-error" role="alert">
-                  {error}
-                </p>
-              ) : null}
+              </div>
+            ) : null}
+            {error ? (
+              <p className="lens-error" role="alert">
+                {error}
+              </p>
+            ) : null}
+            {session ? (
               <button
                 type="button"
                 className="lens-signout"
@@ -323,26 +289,93 @@ export function LensRail({
               >
                 Sign out
               </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="lens-signin"
-                onClick={() => void signIn()}
-                disabled={busy}
-              >
-                {busy ? "…" : "Sign in with Google to Snap"}
-              </button>
-              {error ? (
-                <p className="lens-error" role="alert">
-                  {error}
-                </p>
-              ) : null}
-            </>
-          )}
+            ) : null}
+          </div>
         </div>
       ) : null}
+
+      <div className="rail-section">
+        <h2>Search</h2>
+        <div className="rail-control">
+          <form
+            className="lens-search-form"
+            method="get"
+            action="/"
+            role="search"
+          >
+            <input
+              className="lens-search"
+              type="search"
+              name="q"
+              defaultValue={query}
+              placeholder="Search title, body, intent…"
+              aria-label="Search entries"
+              // name="q" is a very common form-field name, so browsers offer
+              // cross-site autofill history here — suppress it.
+              autoComplete="off"
+            />
+            {selectedTopics.length > 0 ? (
+              <input
+                type="hidden"
+                name="topics"
+                value={selectedTopics.join(",")}
+                readOnly
+              />
+            ) : null}
+            {currentSort === "oldest" ? (
+              <input type="hidden" name="sort" value="oldest" readOnly />
+            ) : null}
+            {/* No submit button — a single search field submits on Enter (works
+                JS-off too). The input is a simple line, not a box. */}
+          </form>
+          {query ? (
+            <Link
+              className="lens-search-clear"
+              href={railHref({ q: "", topics: selectedTopics, sort: currentSort })}
+            >
+              Clear search
+            </Link>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="rail-section">
+        <h2>Topics</h2>
+        <div className="rail-control rail-topics">
+          <Link
+            className={`topic-opt${noTopics ? " on" : ""}`}
+            href={railHref({ q: query, topics: [], sort: currentSort })}
+            aria-current={noTopics ? "true" : undefined}
+          >
+            <span className="topic-radio" aria-hidden="true" />
+            <span className="topic-name">All topics</span>
+            <span className="topic-count">{count}</span>
+          </Link>
+          {facets.length === 0 ? (
+            <p className="rail-empty">No topics yet.</p>
+          ) : (
+            facets.map((f) => {
+              const on = selectedSet.has(f.topic.toLowerCase());
+              return (
+                <Link
+                  key={f.topic}
+                  className={`topic-opt${on ? " on" : ""}`}
+                  href={railHref({
+                    q: query,
+                    topics: toggleTopic(selectedTopics, f.topic),
+                    sort: currentSort,
+                  })}
+                  aria-current={on ? "true" : undefined}
+                >
+                  <span className="topic-radio" aria-hidden="true" />
+                  <span className="topic-name">{f.topic}</span>
+                  <span className="topic-count">{f.count}</span>
+                </Link>
+              );
+            })
+          )}
+        </div>
+      </div>
     </nav>
   );
 }
