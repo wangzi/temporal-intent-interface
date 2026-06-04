@@ -948,6 +948,13 @@ body.nav-open .scrim {
   text-decoration: none;
   color: var(--ink);
 }
+/* Touch-target: extend the tap area to ≥44×44 around the 34px ring. */
+.attn-back::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+}
 .attn-back-mark {
   width: 34px;
   height: 34px;
@@ -1270,6 +1277,13 @@ body.nav-open .scrim {
     left 0.28s var(--ease),
     background 0.15s var(--ease);
 }
+/* Touch-target: extend the tap area to ≥44×44 without growing the 40px dot. */
+.rail-toggle::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+}
 /* Collapsed dot, hover: invert to white + reveal the count (37). */
 .rail-toggle:hover {
   background: #ffffff;
@@ -1355,6 +1369,8 @@ body.nav-open .scrim {
   border-bottom: 1px solid var(--rule);
   border-radius: 0;
   padding: 6px 2px;
+  /* Touch-target: ≥44px tall tap area for the search field (glyph size kept). */
+  min-height: 44px;
 }
 .lens-search::placeholder {
   color: var(--system-faint);
