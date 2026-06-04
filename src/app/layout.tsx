@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Newsreader } from "next/font/google";
 
 import "./globals.css";
@@ -32,6 +32,14 @@ export const metadata: Metadata = {
     siteName: "z.",
     type: "website",
   },
+};
+
+// viewport-fit=cover lets the page extend under the notch so fixed controls
+// can be padded clear of it with env(safe-area-inset-*) (see globals.css).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
