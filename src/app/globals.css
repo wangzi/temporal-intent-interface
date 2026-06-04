@@ -1074,6 +1074,23 @@ body.nav-open .scrim {
   }
 }
 
+/* RANK-10 PROPOSAL (uncommitted): compact the doubled hero masthead on phones
+   so the first entry isn't pushed ~42% down. Halve the inter-glyph spacing and
+   shrink the reserved height; the ⇅ button + spine `top` are retuned so the
+   glyph stays centred in the button ring. */
+@media (max-width: 767px) {
+  .hero-term {
+    --hero-gap: 2.2em;
+    min-height: 6.5rem;
+  }
+  .hero-glyph {
+    top: 7rem;
+  }
+  .spine {
+    top: 121px;
+  }
+}
+
 .attn-label {
   font-family: var(--mono);
   font-size: var(--t-label);
