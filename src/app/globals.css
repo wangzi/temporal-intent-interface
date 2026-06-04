@@ -992,11 +992,12 @@ body.nav-open .scrim {
   outline-offset: 3px;
 }
 /* Narrow viewports: the spine hugs the text, so the button can't ride it —
-   the island leaves its CSS `left` alone below 768px; pin it near the top-left
-   so it stays a clear, reachable back control (still fixed on scroll). */
+   the island leaves its CSS `left` alone below 768px. Pin it in the left gutter
+   (content starts at --content-pad: 64px) BELOW the rail-toggle dot
+   (top:72px + 40px tall) so the two no longer overlap; still fixed on scroll. */
 @media (max-width: 767px) {
   .attn-back {
-    top: 76px;
+    top: 150px;
   }
 }
 
