@@ -885,16 +885,17 @@ body.nav-open .scrim {
   bottom: 0;
 }
 
-/* Bold circular "back" mark, on the OTHER side of the spine (in the left
-   margin) — a confident exit node, not a timid pill. The spine on the post
-   route sits at .attn-inner's left edge; right:100% pins the mark's right
-   edge to that edge, then the margin pushes it clear into the margin. */
+/* Bold circular "back" mark — a confident exit node, not a timid pill. Fixed
+   to the left edge so it (and the rail-toggle dot above it) stay reachable
+   while scrolling — no scrolling back to the top to navigate. Centred on the
+   same x as the rail-toggle dot (40px), stacked just below it. z below the
+   rail (50) + toggle (60) so the open rail cleanly covers it. */
 .attn-back {
-  position: absolute;
-  top: 70px;
-  right: 100%;
-  margin-right: 26px;
-  z-index: 6;
+  position: fixed;
+  top: 124px;
+  left: 40px;
+  transform: translateX(-50%);
+  z-index: 45;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -939,6 +940,7 @@ body.nav-open .scrim {
 @media (max-width: 700px) {
   .attn-back {
     position: static;
+    transform: none;
     flex-direction: row;
     gap: 10px;
     margin: 0 0 30px 0;
