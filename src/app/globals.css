@@ -618,9 +618,10 @@ body.nav-open .scrim {
   --hero-line-h: 1.5em;
   --hero-gap: 1.7em; /* airy space between the clock row and the data row */
   position: relative;
-  /* Only the two text rows are in-flow; the glyph is absolute and descends
-     past the hero into the lead-in to rest just above the first entry. */
-  min-height: 6rem;
+  /* Only the two text rows are in-flow; the cursor glyph is absolute and
+     descends to rest just below the data row — above the sort toggle that now
+     follows the hero. */
+  min-height: 7rem;
   padding: 24px 0 8px 0;
   font-family: var(--mono);
   font-size: 0.75rem;
@@ -631,10 +632,26 @@ body.nav-open .scrim {
 /* Text rows align with the entry copy — the same inset .entry uses:
    --content-pad on mobile/tablet, spine-x + content-pad at laptop. */
 .hero-term-line {
+  position: relative; /* anchors the row's › prompt onto the spine */
   min-height: var(--hero-line-h);
   padding-left: var(--content-pad);
   white-space: nowrap; /* single, height-stable row; can't reflow mid-type */
   overflow: hidden; /* contain an over-long line; no page-wide h-scroll */
+}
+
+/* Per-row › prompt on the spine (left of the row, like a CLI prompt). The
+   island hides these then fades each in as its row finishes typing; JS-off /
+   reduced-motion show them from the start. The text inset clears them, and the
+   row's overflow can't clip them (they sit in the left padding gutter). */
+.hero-prompt {
+  position: absolute;
+  left: calc(var(--spine-x) + 0.5px);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--system);
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: opacity 0.2s var(--ease);
 }
 .hero-term-line + .hero-term-line {
   margin-top: var(--hero-gap);
@@ -655,10 +672,10 @@ body.nav-open .scrim {
    SSR / JS-off rest position (just below the data row). */
 .hero-glyph {
   position: absolute;
-  /* Rest position (hero-relative, stable): on the spine, well below the text
-     rows and clear of the focus dot. Used by SSR / JS-off directly; the island
+  /* Rest position (hero-relative, stable): on the spine, just below the data
+     row and above the sort toggle. Used by SSR / JS-off directly; the island
      descends here by reverting its inline `top` at the end of the morph. */
-  top: 11rem;
+  top: 5.5rem;
   left: calc(var(--spine-x) + 0.5px);
   transform: translateX(-50%);
   color: var(--ink);

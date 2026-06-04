@@ -2,9 +2,11 @@
 // aligned to the entry column —
 //   1. a LIVE local clock (client-only; empty in SSR, height-reserved)
 //   2. `Last entry N days ago, M total entries` (server data; in the SSR HTML)
-// — plus a SINGLE glyph on the spine that TerminalHeroIsland morphs and
-// descends: blinking | (cursor) → > (prompt) → ↓ (scroll hint), travelling down
-// the spine as the rows type in.
+// — each row carries a › prompt glyph on the spine (left of the row), plus a
+// SINGLE cursor glyph on the spine that TerminalHeroIsland morphs and descends:
+// blinking | (cursor) → > (prompt) → ↓ (scroll hint), travelling down the spine
+// as the rows type in. The › prompts fade in as each row is typed (the island
+// hides them first); JS-off / reduced-motion show them immediately.
 //
 // This markup IS the JS-off-complete final state (PRD §17.4): the glyph ships
 // as the rested ↓ and the data row is fully present. Only the clock row is
@@ -34,8 +36,12 @@ export function TerminalHero({
       </span>
 
       {/* row 1 — live local clock. Empty slot in SSR; the island fills it
-          post-mount. aria-hidden: decorative time. */}
+          post-mount. aria-hidden: decorative time. The › prompt sits on the
+          spine (left of the row); the island fades it in as the row types. */}
       <div className="hero-term-line" data-hero-line="clock" aria-hidden="true">
+        <span className="hero-prompt" data-hero-prompt="clock" aria-hidden="true">
+          ›
+        </span>
         <span
           className="hero-term-clock"
           data-hero-clock
@@ -46,6 +52,9 @@ export function TerminalHero({
       {/* row 2 — server data string. Readable by assistive tech and present in
           SSR for JS-off. data-hero-final is the island's retype source. */}
       <div className="hero-term-line" data-hero-line="data">
+        <span className="hero-prompt" data-hero-prompt="data" aria-hidden="true">
+          ›
+        </span>
         <span className="hero-term-data" data-hero-final={dataLine}>
           {dataLine}
         </span>
