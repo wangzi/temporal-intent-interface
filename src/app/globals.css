@@ -652,6 +652,14 @@ body.nav-open .scrim {
   line-height: 1;
   transition: opacity 0.2s var(--ease);
 }
+/* Fun micro-animations: the time-row sparkle slowly spins; the entry-row pilcrow
+   breathes. (The cursor ⇅ bobs via .is-bounce.) Disabled under reduced motion. */
+.hero-prompt[data-hero-prompt="clock"] {
+  animation: hero-sparkle 9s linear infinite;
+}
+.hero-prompt[data-hero-prompt="data"] {
+  animation: hero-pulse 3.2s var(--ease) infinite;
+}
 .hero-term-line + .hero-term-line {
   margin-top: var(--hero-gap);
 }
@@ -711,6 +719,25 @@ body.nav-open .scrim {
   }
   50% {
     transform: translateX(-50%) translateY(4px);
+  }
+}
+/* Prompt micro-animations — translate(-50%,-50%) baked in so they stay centred
+   on the spine while they spin / breathe. */
+@keyframes hero-sparkle {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+@keyframes hero-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.18);
   }
 }
 
@@ -1121,10 +1148,12 @@ body.nav-open .scrim {
     scroll-behavior: auto !important;
   }
   /* The rule above covers `transition` only — keyframe `animation` is NOT
-     affected, so the terminal hero's blink + bounce must be killed by name. */
+     affected, so the terminal hero's blink + bounce + prompt sparkle/pulse must
+     be killed by name. */
   .hero-glyph,
   .hero-glyph.is-blink,
-  .hero-glyph.is-bounce {
+  .hero-glyph.is-bounce,
+  .hero-prompt {
     animation: none !important;
   }
 }

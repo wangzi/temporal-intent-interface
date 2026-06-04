@@ -30,9 +30,10 @@ export function TerminalHero({
   return (
     <div className="hero-term mono" data-hero-root>
       {/* The morphing glyph, on the spine. SSR / JS-off render it as the rested
-          ↓ (scroll hint). The island repositions + retypes it to | first. */}
+          ⇅ (the sort marker it settles into). The island repositions + retypes
+          it to | first, then morphs | → > → ⇅ as it descends. */}
       <span className="hero-glyph" data-hero-glyph aria-hidden="true">
-        ↓
+        ⇅
       </span>
 
       {/* row 1 — live local clock. Empty slot in SSR; the island fills it
@@ -40,7 +41,7 @@ export function TerminalHero({
           spine (left of the row); the island fades it in as the row types. */}
       <div className="hero-term-line" data-hero-line="clock" aria-hidden="true">
         <span className="hero-prompt" data-hero-prompt="clock" aria-hidden="true">
-          ›
+          ✻
         </span>
         <span
           className="hero-term-clock"
@@ -53,7 +54,7 @@ export function TerminalHero({
           SSR for JS-off. data-hero-final is the island's retype source. */}
       <div className="hero-term-line" data-hero-line="data">
         <span className="hero-prompt" data-hero-prompt="data" aria-hidden="true">
-          ›
+          ¶
         </span>
         <span className="hero-term-data" data-hero-final={dataLine}>
           {dataLine}

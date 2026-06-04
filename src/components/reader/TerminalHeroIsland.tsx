@@ -9,7 +9,7 @@
 //   1. blinking | (cursor) at the clock row
 //   2. morph | → >, type the clock row
 //   3. descend to the data row, type it
-//   4. morph > → ↓, descend to the CSS rest position, then bounce (scroll hint)
+//   4. morph > → ⇅, descend to the CSS rest position, then bob (the sort marker)
 //
 // The morph is an opacity cross-fade + textContent swap; the descent is a CSS
 // `top` transition. Every position is HERO-RELATIVE (row offsetTop, or the CSS
@@ -160,7 +160,7 @@ export function TerminalHeroIsland(): null {
       glyph.style.opacity = "0";
     });
     at(t + MORPH_MS, () => {
-      glyph.textContent = "↓";
+      glyph.textContent = "⇅";
       glyph.style.opacity = "1";
       glyph.style.top = ""; // → stylesheet `.hero-glyph { top }`, transitions there
     });
