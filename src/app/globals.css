@@ -1143,7 +1143,7 @@ body.nav-open .scrim {
   align-items: center;
   justify-content: center;
   position: fixed;
-  top: 52px;
+  top: 72px;
   left: 20px;
   z-index: 60; /* above the rail (50) so it stays clickable when open */
   width: 40px;
@@ -1224,7 +1224,8 @@ body.nav-open .scrim {
   .hero-glyph,
   .hero-glyph.is-blink,
   .hero-glyph.is-bounce,
-  .hero-prompt {
+  .hero-prompt,
+  .load-more-stone {
     animation: none !important;
   }
 }
@@ -1529,33 +1530,88 @@ body.nav-open .scrim {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
   padding: 6vh 0 10vh;
 }
+
+/* Go easter egg — "place a stone" to load the next page. No box; the stone you
+   place alternates Black → White (Go turns), and every page loaded is recorded
+   as a placed stone above. Black and white are both ringed so each reads on the
+   field in light or dark mode. */
+.go-stone,
+.load-more-stone {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(127, 127, 127, 0.32);
+}
+.go-stone.is-black,
+.load-more-stone.is-black {
+  background: radial-gradient(circle at 35% 32%, #4d4d4d, #1b1b1b 70%);
+}
+.go-stone.is-white,
+.load-more-stone.is-white {
+  background: radial-gradient(circle at 35% 32%, #ffffff, #e4e4df 70%);
+}
+
+/* The game record: pages loaded so far, as placed stones. */
+.go-record {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  max-width: 260px;
+}
+.go-stone {
+  width: 11px;
+  height: 11px;
+}
+
+/* The Load-more itself — the next stone + a quiet label. */
 .load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
   font-family: var(--mono);
   font-size: var(--t-label);
   color: var(--system);
   background: transparent;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 9px 18px;
+  padding: 4px;
   cursor: pointer;
-  transition:
-    color 0.15s var(--ease),
-    border-color 0.15s var(--ease);
+  transition: color 0.15s var(--ease);
+}
+.load-more-stone {
+  width: 22px;
+  height: 22px;
+  box-shadow:
+    inset 0 0 0 1px rgba(127, 127, 127, 0.32),
+    0 2px 7px rgba(0, 0, 0, 0.18);
+  transition: transform 0.18s var(--ease);
 }
 .load-more:hover:not(:disabled) {
   color: var(--ink);
-  border-color: var(--system-faint);
+}
+.load-more:hover:not(:disabled) .load-more-stone {
+  transform: translateY(-2px);
 }
 .load-more:disabled {
-  opacity: 0.5;
   cursor: default;
+  color: var(--system-faint);
+}
+.load-more[aria-busy="true"] .load-more-stone {
+  animation: stone-pulse 0.9s var(--ease) infinite;
+}
+@keyframes stone-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 .load-more:focus-visible {
   outline: 2px solid var(--focus);
-  outline-offset: 2px;
+  outline-offset: 4px;
+  border-radius: 6px;
 }
 .load-more-error {
   font-family: var(--mono);

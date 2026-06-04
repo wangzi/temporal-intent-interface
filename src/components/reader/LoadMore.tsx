@@ -52,6 +52,9 @@ export function LoadMore({
   const [items, setItems] = useState<PostSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
+  // Go easter egg: each loaded page is a placed stone, Black first then
+  // alternating — so `moves` doubles as the move count and stone parity.
+  const [moves, setMoves] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -75,6 +78,7 @@ export function LoadMore({
       const incoming = data.posts.filter((p) => matchesFilter(p, filter));
       setItems((prev) => [...prev, ...incoming]);
       setCursor(data.next_cursor);
+      setMoves((m) => m + 1); // a stone is placed
     } catch {
       setFailed(true); // fail soft — keep what's shown; the button retries
     } finally {
@@ -103,14 +107,36 @@ export function LoadMore({
         : null}
       {cursor !== null ? (
         <div className="load-more-wrap">
+          {/* The game record: one stone per page loaded, Black first. */}
+          {moves > 0 ? (
+            <div
+              className="go-record"
+              aria-hidden="true"
+              title={`${moves} ${moves === 1 ? "move" : "moves"} played`}
+            >
+              {Array.from({ length: moves }, (_, i) => (
+                <span
+                  key={i}
+                  className={`go-stone${i % 2 === 0 ? " is-black" : " is-white"}`}
+                />
+              ))}
+            </div>
+          ) : null}
           <button
             type="button"
             className="load-more"
             onClick={() => void loadMore()}
             disabled={loading}
             aria-busy={loading}
+            aria-label="Load more entries"
           >
-            {loading ? "Loading…" : "Load more"}
+            <span
+              className={`load-more-stone${moves % 2 === 0 ? " is-black" : " is-white"}`}
+              aria-hidden="true"
+            />
+            <span className="load-more-text">
+              {loading ? "Reading…" : "Load more"}
+            </span>
           </button>
           {failed ? (
             <span className="load-more-error" role="alert">
