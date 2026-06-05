@@ -58,6 +58,9 @@ function positionDot(): void {
   // is CSS). Small enough to sit on the spine at every width.
   const askAi = document.querySelector<HTMLElement>(".ask-ai-dot");
   if (askAi) askAi.style.left = `${x}px`;
+  // Expose the spine's viewport x so the Ask-AI panel can anchor its right edge
+  // to the spine and extend into the empty left margin.
+  document.documentElement.style.setProperty("--spine-vpx", `${x}px`);
 }
 
 function dotLineY(): number {

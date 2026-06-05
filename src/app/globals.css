@@ -877,6 +877,90 @@ body.nav-open .scrim {
   max-width: calc(100vw - 32px);
 }
 
+/* Wrapper is layout-invisible — its children (dot / panel / toast) are all
+   position:fixed. It exists only to scope outside-click detection. */
+.ask-ai {
+  display: contents;
+}
+.ask-ai-dot.is-open {
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--dot) 20%, transparent);
+}
+
+/* "Ask Google AI" panel — slides into the empty margin LEFT of the spine
+   (laptop+ only; below 1080px the dot copies + opens directly). Its right edge
+   anchors just left of the spine via --spine-vpx (set by ReaderControlsIsland);
+   text is right-aligned, hugging the spine side. */
+.ask-ai-panel {
+  position: fixed;
+  right: calc(100vw - var(--spine-vpx, 50vw) + 16px);
+  bottom: calc(60vh - 2.2rem);
+  z-index: 32;
+  width: 15rem;
+  max-width: calc(var(--spine-vpx, 50vw) - 24px);
+  padding: 12px 15px 14px;
+  text-align: right;
+  background: color-mix(in srgb, var(--field) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
+  animation: ask-ai-in 0.18s var(--ease);
+}
+@keyframes ask-ai-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.ask-ai-panel-head {
+  margin: 0 0 8px;
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+.ask-ai-opt {
+  display: block;
+  width: 100%;
+  text-align: right;
+  padding: 6px 0;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.ask-ai-opt:hover,
+.ask-ai-opt:focus-visible {
+  color: var(--dot);
+  outline: none;
+}
+.ask-ai-ask {
+  margin-top: 8px;
+  padding-top: 9px;
+  border-top: 1px solid var(--rule);
+}
+.ask-ai-input {
+  width: 100%;
+  text-align: right;
+  background: transparent;
+  border: 0;
+  padding: 2px 0;
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+.ask-ai-input::placeholder {
+  color: var(--system-faint);
+}
+.ask-ai-input:focus-visible {
+  outline: none;
+  color: var(--dot);
+}
+
 /* ============================================================
    Terminal hero — the head of the spine. A CLI status readout: two text rows
    (a live client-only clock, then the server data string) aligned to the entry
@@ -1694,7 +1778,8 @@ body.nav-open .scrim {
   /* The rule above covers `transition` only — keyframe `animation` is NOT
      affected, so the ✻ clock sparkle + load-more pulse are killed by name. */
   .hero-prompt,
-  .load-more-stone {
+  .load-more-stone,
+  .ask-ai-panel {
     animation: none !important;
   }
 }
