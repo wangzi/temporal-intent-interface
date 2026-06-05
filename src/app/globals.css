@@ -101,7 +101,7 @@
   --dot-vh: 40;
   /* Footer hidden for now → no reserved footer space, so the spine
      terminates at the page bottom. Restore to 300px to bring it back. */
-  --footer-h: 72px;
+  --footer-h: 44px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
@@ -578,6 +578,11 @@ body.nav-open .scrim {
 }
 .site-footer-link:hover {
   color: var(--ink);
+}
+.site-footer-est {
+  color: var(--system-faint);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
 }
 
 /* ============================================================
