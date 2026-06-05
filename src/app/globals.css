@@ -1567,6 +1567,51 @@ body.nav-open .scrim {
   }
 }
 
+/* ============================================================
+   Large-display reading scale-up (4K / 5K). On big displays the 66ch
+   column sits tiny in a vast margin. We scale the WHOLE reading
+   experience up by raising the ROOT font-size at large CSS-px widths:
+   every rem type token, em rhythm, and `ch`-based measure grows by the
+   SAME ratio, so each line stays ~66 characters while text + column get
+   physically larger. `--measure` stays 66ch verbatim.
+
+   Why the ROOT font-size and not per-token: `ch` resolves against each
+   element's OWN font, and the archive mixes sizes (titles, --t-insight
+   body, meta). Scaling tokens individually desyncs those per-element
+   measures and their containers; scaling the root keeps every 66ch
+   proportional and the layout math consistent across both routes.
+
+   Gated on CSS-px WIDTH only — never min-resolution/DPR, since a Retina
+   laptop is DPR 2 just like a 5K iMac. Browsers report ~1920 CSS-px for
+   4K-on-Mac @default and ~2560 for a 5K iMac / Studio Display @default
+   (also Windows 4K @150%). Laptop (≤1919px) keeps the tuned 16px root.
+   Pure CSS → SSR / JS-off safe. Fixed-px chrome (content-pad, spine-x,
+   dot, the hidden topbar/FAB) holds its px value — a small, intended
+   trade; only the meta gutter is widened so the larger meta text fits.
+   A 3rd tier (~3200px, near-native-1x) is held for later.
+   ============================================================ */
+
+/* Entry tier — 4K-on-Mac @default (~1920 CSS-px) + 1080p-class desktops. */
+@media (min-width: 1920px) {
+  html {
+    font-size: 17px;
+  }
+  :root {
+    --meta-width: 124px;
+  }
+}
+
+/* Primary — 5K iMac / Studio Display @default (~2560 CSS-px),
+   Windows 4K @150%. The strongest scale-up. */
+@media (min-width: 2560px) {
+  html {
+    font-size: 19px;
+  }
+  :root {
+    --meta-width: 144px;
+  }
+}
+
 /* Reduced motion: kill all transitions + smooth scroll. */
 @media (prefers-reduced-motion: reduce) {
   * {
