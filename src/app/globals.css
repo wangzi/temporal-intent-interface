@@ -1148,6 +1148,20 @@ body.nav-open .scrim {
   overflow-wrap: normal;
 }
 
+/* Code reads better wider than the 66ch prose measure. On laptop+ viewports
+   (where the centered column leaves room on the right), let the code panel
+   extend PAST the prose's right edge — its left edge stays aligned with the
+   prose so the rhythm holds and it never reaches into the spine/back gutter on
+   the left. Below 1080px the in-column panel holds and long lines scroll.
+   50vw + 190px ≈ the room to a comfortable right gutter for the centered
+   column; capped at 50rem so it never gets absurdly wide. */
+@media (min-width: 1080px) {
+  .attn-body pre {
+    max-width: none;
+    width: min(50rem, calc(50vw + 190px));
+  }
+}
+
 /* Syntax highlighting — the engine's sanitized body_html now carries
    highlight.js token classes (hljs-*) on code-fence content. Color them to
    match the studio (GitHub light/dark). The .attn-body pre panel bg + --ink
