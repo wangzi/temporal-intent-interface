@@ -426,8 +426,8 @@ body.nav-open .scrim {
   position: absolute;
   /* Head sits level with the sort-toggle row, so the timeline reads as hanging
      from the `Now ⇅ Past` toggle; the hero's ✻ clock floats above it. Base
-     64px; laptop adds the 56px .col padding-top → 120px (see the ≥1080 rule). */
-  top: 64px;
+     88px; laptop adds the 56px .col padding-top → 144px (see the ≥1080 rule). */
+  top: 88px;
   bottom: var(--footer-h);
   left: var(--spine-x, 28px);
   width: 1px;
@@ -486,7 +486,7 @@ body.nav-open .scrim {
   padding: 2px 0;
   background: var(--field);
   color: var(--ink);
-  font-size: 1.05em;
+  font-size: 0.95rem; /* match the ✻ clock prompt (.hero-prompt) */
   line-height: 1;
 }
 
@@ -823,7 +823,9 @@ body.nav-open .scrim {
      its own entry-column inset. */
   --hero-line-h: 1.5em;
   position: relative;
-  padding: 24px 0 4px 0;
+  /* Bottom padding gives ~3× the breathing room after the clock before the sort
+     toggle; the spine `top` is retuned to match (keeps the ⇅ capping the head). */
+  padding: 24px 0 28px 0;
   font-family: var(--mono);
   font-size: 0.75rem;
   line-height: 1.5;
@@ -1182,7 +1184,7 @@ body.nav-open .scrim {
     left: var(--spine-x);
     /* +56px for the .col padding-top at this breakpoint, so the head still sits
        at the sort-toggle row. */
-    top: 120px;
+    top: 144px;
   }
   /* (Post-route spine override now lives globally as `.attn-inner
      .spine`, above — it wins by specificity at every breakpoint.) */
