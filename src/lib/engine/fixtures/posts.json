@@ -6,13 +6,46 @@
       "title": "Why Technology Still Needs Humanity",
       "published_at": "2026-05-25T00:00:00Z",
       "reading_time": 2,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "Humanity & Technology",
       "intent_statement": "Explore whether technology can amplify human judgment without replacing agency.",
       "central_question": "Can a tool extend human judgment without quietly replacing it?",
       "core_insight": "Technology becomes meaningful when joined to context, judgment, and care.",
       "core_insight_visible": true,
-      "topics": ["tools", "judgment", "agency"],
+      "topics": [
+        "tools",
+        "judgment",
+        "agency"
+      ],
+      "pinned_until": null
+    },
+    {
+      "post_id": "p-009",
+      "slug": "the-shape-of-a-runtime-contract",
+      "title": "The Shape of a Runtime Contract",
+      "published_at": "2026-05-20T00:00:00Z",
+      "reading_time": 4,
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
+      "intent_label": "Architecture",
+      "intent_statement": "Keep a type honest across the async boundary where it is easiest to lose.",
+      "central_question": "What must a runtime slot guarantee to be trusted?",
+      "core_insight": "A contract you cannot see is a contract you cannot keep.",
+      "core_insight_visible": true,
+      "topics": [
+        "architecture",
+        "types",
+        "async"
+      ],
       "pinned_until": null
     },
     {
@@ -21,13 +54,22 @@
       "title": "Reading as an Active Operation",
       "published_at": "2026-05-14T00:00:00Z",
       "reading_time": 3,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "AI-Native Reading",
       "intent_statement": "Argue that reading should become an operation the reader performs, not content the reader receives.",
       "central_question": "What changes if a page can be thought with, not just read?",
       "core_insight": "The unit of reading shifts from the page to the passage you choose to act on.",
       "core_insight_visible": true,
-      "topics": ["reading", "attention", "ai-native"],
+      "topics": [
+        "reading",
+        "attention",
+        "ai-native"
+      ],
       "pinned_until": null
     },
     {
@@ -36,13 +78,22 @@
       "title": "Time Is the Honest Axis",
       "published_at": "2026-04-26T00:00:00Z",
       "reading_time": 2,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "Temporal Interfaces",
       "intent_statement": "Hold that the vertical axis must represent chronological truth and nothing else.",
       "central_question": "What does the vertical line mean?",
       "core_insight": "Mixing semantic distance into the time axis makes both unreadable.",
       "core_insight_visible": true,
-      "topics": ["time", "interface", "trust"],
+      "topics": [
+        "time",
+        "interface",
+        "trust"
+      ],
       "pinned_until": null
     },
     {
@@ -51,13 +102,22 @@
       "title": "The Cost of Frictionless",
       "published_at": "2026-03-31T00:00:00Z",
       "reading_time": 4,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "Automation Without Taste",
       "intent_statement": "Warn that automating judgment away can degrade the meaning it was meant to serve.",
       "central_question": "What gets removed when we remove every step?",
       "core_insight": "Some friction is the place where taste and intent actually live.",
       "core_insight_visible": true,
-      "topics": ["automation", "taste", "judgment"],
+      "topics": [
+        "automation",
+        "taste",
+        "judgment"
+      ],
       "pinned_until": null
     },
     {
@@ -66,13 +126,22 @@
       "title": "A Journal Is a Field, Not a List",
       "published_at": "2026-02-13T00:00:00Z",
       "reading_time": 3,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "Memory Systems",
       "intent_statement": "Reframe the archive as a temporal field of meaning rather than a stack of posts.",
       "central_question": "How does an archive remember instead of forget?",
       "core_insight": "Old entries are not buried; they are the ground the new ones stand on.",
       "core_insight_visible": true,
-      "topics": ["memory", "archive", "compounding"],
+      "topics": [
+        "memory",
+        "archive",
+        "compounding"
+      ],
       "pinned_until": null
     },
     {
@@ -81,13 +150,22 @@
       "title": "Provenance Before Persuasion",
       "published_at": "2026-01-21T00:00:00Z",
       "reading_time": 2,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "AI-Native Reading",
       "intent_statement": "Insist that generated text must be visibly distinct from authored prose, always.",
       "central_question": "What makes a generated sentence trustworthy?",
       "core_insight": "Trust comes from seeing where a thought came from, not from how smooth it reads.",
       "core_insight_visible": true,
-      "topics": ["provenance", "trust", "ai"],
+      "topics": [
+        "provenance",
+        "trust",
+        "ai"
+      ],
       "pinned_until": null
     },
     {
@@ -96,13 +174,22 @@
       "title": "Tools That Return Attention",
       "published_at": "2025-12-07T00:00:00Z",
       "reading_time": 3,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "Humanity & Technology",
       "intent_statement": "Define a good tool as one that returns the reader's attention rather than consuming it.",
       "central_question": "What is the right thing to measure a tool by?",
       "core_insight": "Measure a tool by the attention it gives back, not the time it captures.",
       "core_insight_visible": true,
-      "topics": ["tools", "attention", "engagement"],
+      "topics": [
+        "tools",
+        "attention",
+        "engagement"
+      ],
       "pinned_until": null
     },
     {
@@ -111,13 +198,22 @@
       "title": "You Are Here",
       "published_at": "2025-10-14T00:00:00Z",
       "reading_time": 2,
-      "authors": [{ "id": "u-zi", "display_name": "Zi" }],
+      "authors": [
+        {
+          "id": "u-zi",
+          "display_name": "Zi"
+        }
+      ],
       "intent_label": "Temporal Interfaces",
       "intent_statement": "Propose a single fixed marker for 'now' through which all content flows.",
       "central_question": "Where do you stand when you are reading time?",
       "core_insight": "One stable point of attention is calmer than a marker that chases the page.",
       "core_insight_visible": true,
-      "topics": ["dot", "attention", "stillness"],
+      "topics": [
+        "dot",
+        "attention",
+        "stillness"
+      ],
       "pinned_until": null
     }
   ],
