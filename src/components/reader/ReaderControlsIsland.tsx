@@ -54,6 +54,10 @@ function positionDot(): void {
     if (window.innerWidth >= 768) back.style.left = `${x}px`;
     else back.style.removeProperty("left");
   }
+  // The post route's "Ask AI" dot rides the same spine x (its vertical position
+  // is CSS). Small enough to sit on the spine at every width.
+  const askAi = document.querySelector<HTMLElement>(".ask-ai-dot");
+  if (askAi) askAi.style.left = `${x}px`;
 }
 
 function dotLineY(): number {

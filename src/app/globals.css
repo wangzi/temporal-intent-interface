@@ -804,6 +804,79 @@ body.nav-open .scrim {
   box-shadow: 0 0 0 5px color-mix(in srgb, var(--dot) 12%, transparent);
 }
 
+/* "Ask AI" dot — post route only (mounted by AskAiDot, x-positioned onto the
+   spine by ReaderControlsIsland, just below the Back node). Click copies the
+   article + opens Google AI Mode. Pure enhancement; absent with JS off. */
+.ask-ai-dot {
+  position: fixed;
+  top: calc(40vh + 2.75rem);
+  left: var(--spine-x, 28px); /* island overrides with the real spine x */
+  transform: translate(-50%, -50%);
+  z-index: 31;
+  width: 11px;
+  height: 11px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dot);
+  cursor: pointer;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot) 12%, transparent);
+  transition: box-shadow 0.18s var(--ease);
+}
+/* ≥44px tap target without growing the dot. */
+.ask-ai-dot::before {
+  content: "";
+  position: absolute;
+  inset: -17px;
+  border-radius: 50%;
+}
+.ask-ai-dot:hover,
+.ask-ai-dot:focus-visible {
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--dot) 20%, transparent);
+}
+.ask-ai-dot:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 5px;
+}
+/* Hover/focus label, in the gutter to the right of the dot. */
+.ask-ai-dot-label {
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--system);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s var(--ease);
+}
+.ask-ai-dot:hover .ask-ai-dot-label,
+.ask-ai-dot:focus-visible .ask-ai-dot-label {
+  opacity: 1;
+}
+/* Confirmation toast — the reader has to paste, so confirm the copy happened.
+   Bottom-centre so it never collides with the mobile ☰ nav button (bottom-right). */
+.ask-ai-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 9px 14px;
+  background: color-mix(in srgb, var(--field) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--system);
+  max-width: calc(100vw - 32px);
+}
+
 /* ============================================================
    Terminal hero — the head of the spine. A CLI status readout: two text rows
    (a live client-only clock, then the server data string) aligned to the entry
