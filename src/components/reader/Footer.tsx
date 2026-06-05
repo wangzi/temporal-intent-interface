@@ -7,6 +7,8 @@ import Link from "next/link";
 
 import { formatAbsoluteDate } from "@/lib/format";
 
+import { ThemeToggle } from "./ThemeToggle";
+
 export function Footer({
   entryCount,
   updatedISO,
@@ -31,18 +33,31 @@ export function Footer({
           </span>
         ) : null}
         {updatedISO ? <span>updated {formatAbsoluteDate(updatedISO)}</span> : null}
+        {/* Keyboard-nav discoverability — archive only (where entryCount is set). */}
+        {typeof entryCount === "number" ? (
+          <span
+            className="kbd-hint"
+            title="Keyboard: ↑↓ or j/k move between entries, Enter opens, Esc returns"
+          >
+            <kbd>↑</kbd>
+            <kbd>↓</kbd> navigate · <kbd>↵</kbd> open
+          </span>
+        ) : null}
       </div>
-      <nav className="site-footer-links" aria-label="Site links">
-        <a href="https://stillinlove.co" className="site-footer-link">
-          About
-        </a>
-        <a href="/feed.xml" className="site-footer-link">
-          RSS
-        </a>
-        <a href="https://studio.stillinlove.co" className="site-footer-link">
-          Studio →
-        </a>
-      </nav>
+      <div className="site-footer-end">
+        <nav className="site-footer-links" aria-label="Site links">
+          <a href="https://stillinlove.co" className="site-footer-link">
+            About
+          </a>
+          <a href="/feed.xml" className="site-footer-link">
+            RSS
+          </a>
+          <a href="https://studio.stillinlove.co" className="site-footer-link">
+            Studio →
+          </a>
+        </nav>
+        <ThemeToggle />
+      </div>
     </footer>
   );
 }

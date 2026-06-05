@@ -56,7 +56,18 @@ export default function RootLayout({
       suppressHydrationWarning
       className={newsreader.variable}
     >
-      <body>{children}</body>
+      <body>
+        {/* No-flash theme init: apply a manually-chosen Light/Dark before paint.
+            Absent/`system` → no attribute → globals.css @media handles it.
+            Runs synchronously; JS-off readers simply get the system theme. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}})()",
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

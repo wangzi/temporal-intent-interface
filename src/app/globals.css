@@ -106,8 +106,13 @@
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
+/* Dark theme tokens. Applied (a) by system preference unless the reader has
+   manually chosen Light, and (b) always when manually set to Dark. The manual
+   choice is written to <html data-theme> by a no-flash inline script
+   (layout.tsx) + the footer ThemeToggle; JS-off falls back to the system
+   @media below. (Token values intentionally duplicated across the two rules.) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-field: #0e0e0e;
     --color-ink: #eceae4;
     --color-ink-soft: #c4c0b6;
@@ -117,6 +122,16 @@
     --color-branch: #3a3a36;
     --color-rule: #222220;
   }
+}
+:root[data-theme="dark"] {
+  --color-field: #0e0e0e;
+  --color-ink: #eceae4;
+  --color-ink-soft: #c4c0b6;
+  --color-system: #9a9a92;
+  --color-system-faint: #6b6b63;
+  --color-dot: #ff5a5f;
+  --color-branch: #3a3a36;
+  --color-rule: #222220;
 }
 
 /* ============================================================
@@ -578,6 +593,57 @@ body.nav-open .scrim {
 }
 .site-footer-link:hover {
   color: var(--ink);
+}
+/* Right-side footer cluster: links + theme toggle. */
+.site-footer-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+/* Keyboard-nav discoverability hint (archive footer). */
+.kbd-hint {
+  color: var(--system-faint);
+  white-space: nowrap;
+}
+.kbd-hint kbd {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  color: var(--system);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin: 0 1px;
+}
+/* Theme toggle — Light / Dark / Auto (footer, JS-only enhancement). */
+.theme-toggle {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  padding: 2px;
+}
+.theme-toggle-opt {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  background: transparent;
+  border: 0;
+  padding: 7px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    color 0.15s var(--ease),
+    background 0.15s var(--ease);
+}
+.theme-toggle-opt:hover {
+  color: var(--ink);
+}
+.theme-toggle-opt.on {
+  color: var(--field);
+  background: var(--ink);
 }
 
 /* ============================================================
