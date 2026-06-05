@@ -229,12 +229,24 @@ export default async function Home({
   // ── Default feed ───────────────────────────────────────────────────────────
   const filter = sp.filter && sp.filter !== "all" ? sp.filter : undefined;
 
+  // Exhaust the archive so the head-of-spine stats (count + last entry) and the
+  // footer reflect the TRUE total instead of just page-1 length, and JS-off
+  // readers see every entry rather than the first ~100. The page is ISR
+  // (revalidate=60), so the fan-out is amortized across all readers and runs at
+  // most once per minute. Fail-soft: a mid-stream failure keeps the pages we
+  // already loaded — better partial than empty. MAX_PAGES is a defensive cap
+  // (= 20k posts at PAGE_SIZE 100); well above the engine's bounded scan.
   let allPosts: PostSummary[] = [];
-  let nextCursor: string | null = null;
+  const nextCursor: string | null = null; // SSR drained → LoadMore is dormant.
+  const MAX_PAGES = 200;
   try {
-    const response = await listPosts({ sort });
-    allPosts = response.posts;
-    nextCursor = response.next_cursor;
+    let cursor: string | undefined;
+    for (let i = 0; i < MAX_PAGES; i++) {
+      const response = await listPosts({ sort, cursor });
+      allPosts.push(...response.posts);
+      if (!response.next_cursor) break;
+      cursor = response.next_cursor;
+    }
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error("[home] engine error:", err);
