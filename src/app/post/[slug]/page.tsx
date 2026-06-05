@@ -12,6 +12,7 @@ import { LensRail } from "@/components/reader/LensRail";
 import { ReaderControlsIsland } from "@/components/reader/ReaderControlsIsland";
 import { SelectionLayer } from "@/components/reader/SelectionLayer";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
+import { AskAiDot } from "@/components/reader/AskAiDot";
 import { AttentionView } from "@/components/reader/AttentionView";
 import {
   EngineNotFoundError,
@@ -102,6 +103,7 @@ export default async function PostPage({
             intent_statement: post.intent_statement,
           }}
         />
+        <AskAiDot title={post.title} />
       </TemporalLayout>
     );
   } catch (err) {
