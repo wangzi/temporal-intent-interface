@@ -1148,6 +1148,32 @@ body.nav-open .scrim {
   overflow-wrap: normal;
 }
 
+/* Syntax highlighting — the engine's sanitized body_html now carries
+   highlight.js token classes (hljs-*) on code-fence content. Color them to
+   match the studio (GitHub light/dark). The .attn-body pre panel bg + --ink
+   are already theme-aware, so the tokens just track prefers-color-scheme. */
+.attn-body .hljs-comment, .attn-body .hljs-quote { color: #6e7781; font-style: italic; }
+.attn-body .hljs-keyword, .attn-body .hljs-selector-tag, .attn-body .hljs-doctag, .attn-body .hljs-type, .attn-body .hljs-name { color: #cf222e; }
+.attn-body .hljs-literal, .attn-body .hljs-number, .attn-body .hljs-variable, .attn-body .hljs-template-variable, .attn-body .hljs-tag .hljs-attr { color: #0550ae; }
+.attn-body .hljs-string, .attn-body .hljs-regexp, .attn-body .hljs-addition, .attn-body .hljs-meta .hljs-string { color: #0a3069; }
+.attn-body .hljs-title, .attn-body .hljs-section, .attn-body .hljs-title.function_ { color: #8250df; }
+.attn-body .hljs-built_in, .attn-body .hljs-class .hljs-title, .attn-body .hljs-title.class_, .attn-body .hljs-symbol, .attn-body .hljs-bullet, .attn-body .hljs-subst { color: #953800; }
+.attn-body .hljs-attr, .attn-body .hljs-attribute, .attn-body .hljs-selector-class, .attn-body .hljs-selector-attr, .attn-body .hljs-selector-pseudo, .attn-body .hljs-link, .attn-body .hljs-meta { color: #0550ae; }
+.attn-body .hljs-deletion { color: #82071e; }
+.attn-body .hljs-emphasis { font-style: italic; }
+.attn-body .hljs-strong { font-weight: 600; }
+
+@media (prefers-color-scheme: dark) {
+  .attn-body .hljs-comment, .attn-body .hljs-quote { color: #8b949e; }
+  .attn-body .hljs-keyword, .attn-body .hljs-selector-tag, .attn-body .hljs-doctag, .attn-body .hljs-type, .attn-body .hljs-name { color: #ff7b72; }
+  .attn-body .hljs-literal, .attn-body .hljs-number, .attn-body .hljs-variable, .attn-body .hljs-template-variable, .attn-body .hljs-tag .hljs-attr { color: #79c0ff; }
+  .attn-body .hljs-string, .attn-body .hljs-regexp, .attn-body .hljs-addition, .attn-body .hljs-meta .hljs-string { color: #a5d6ff; }
+  .attn-body .hljs-title, .attn-body .hljs-section, .attn-body .hljs-title.function_ { color: #d2a8ff; }
+  .attn-body .hljs-built_in, .attn-body .hljs-class .hljs-title, .attn-body .hljs-title.class_, .attn-body .hljs-symbol, .attn-body .hljs-bullet, .attn-body .hljs-subst { color: #ffa657; }
+  .attn-body .hljs-attr, .attn-body .hljs-attribute, .attn-body .hljs-selector-class, .attn-body .hljs-selector-attr, .attn-body .hljs-selector-pseudo, .attn-body .hljs-link, .attn-body .hljs-meta { color: #79c0ff; }
+  .attn-body .hljs-deletion { color: #ffa198; }
+}
+
 /* Emphasis. */
 .attn-body strong {
   font-weight: 600;
