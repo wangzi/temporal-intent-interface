@@ -27,15 +27,16 @@ export function TemporalLayout({
         Skip to content
       </a>
       {topBar}
-      {/* Rail toggle — a black circle (click to expand, click again to
-          collapse). CSS-only via a hidden checkbox
-          (`.rail-toggle-input:checked ~ .rail`), so it works with JS off.
-          Laptop+ only; mobile uses the TopBar hamburger. */}
+      {/* Rail toggle — opens/collapses the rail (LensRail: search, focus
+          routes, sort). CSS-only via this hidden checkbox
+          (`.rail-toggle-input:checked ~ .rail`), so it works with JS off and is
+          keyboard-focusable. Laptop+: a disc in the left margin; mobile/tablet:
+          a bottom-right thumb-zone button (see globals.css `.rail-toggle`). */}
       <input
         type="checkbox"
         id="rail-toggle"
         className="rail-toggle-input"
-        aria-label="Expand navigation menu"
+        aria-label="Navigation menu"
       />
       <label
         htmlFor="rail-toggle"

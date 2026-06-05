@@ -1323,10 +1323,14 @@ body.nav-open .scrim {
   }
 }
 
-/* Rail toggle — a black circle at EVERY screen size that opens/collapses the
-   rail. CSS-only via the hidden checkbox (`:checked ~ .rail`), so it works with
-   JS off and is keyboard-focusable. The circle sits at the left edge and slides
-   to the rail's right edge when open, so it's always a clear toggle. */
+/* Rail toggle — opens/collapses the rail. CSS-only via the hidden checkbox
+   (`:checked ~ .rail`), so it works with JS off and is keyboard-focusable.
+   Laptop+ (≥1080px): a disc in the left margin that slides to the rail's right
+   edge when open. Mobile/tablet (≤1079px): a bottom-right thumb-zone button —
+   see the @media (max-width: 1079px) override below. (The disc fills with solid
+   var(--ink), which flips to a pale cream circle in dark mode; on mobile the
+   narrower --content-pad let that circle overlap the hero clock's leading digit,
+   so the override replaces it with a field-matched pill + a ☰ glyph.) */
 .rail-toggle-input {
   position: fixed;
   width: 1px;
@@ -1388,6 +1392,53 @@ body.nav-open .scrim {
    rule (more classes), so 78 wins while the rail is open. */
 .rail-toggle-input:checked ~ .rail-toggle:hover::after {
   content: "78";
+}
+
+/* Mobile / tablet (≤1079px): the rail opener is a bottom-right thumb-zone
+   button, not a top-left disc. A field-matched, blurred pill with a ☰ glyph —
+   never a solid --ink disc (which flipped to a pale cream circle in dark mode
+   and painted over the hero clock's leading digit). Same checkbox disclosure,
+   so it stays JS-off and keyboard-operable. It holds its corner when open and
+   shows ✕ as the close affordance (the scrim still closes on outside-tap). */
+@media (max-width: 1079px) {
+  .rail-toggle {
+    top: auto;
+    left: auto;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
+    width: 48px;
+    height: 48px;
+    background: color-mix(in srgb, var(--field) 86%, transparent);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    transition: background 0.15s var(--ease);
+  }
+  /* Persistent glyph — the disc had none (its count only showed on hover, which
+     touch never triggers). */
+  .rail-toggle::after,
+  .rail-toggle:hover::after {
+    content: "☰";
+    font-size: 1.125rem;
+    line-height: 1;
+    color: var(--ink);
+  }
+  /* No hover-invert on touch. */
+  .rail-toggle:hover {
+    background: color-mix(in srgb, var(--field) 86%, transparent);
+  }
+  /* Open: hold the corner (don't slide to the rail edge) and show ✕. */
+  .rail-toggle-input:checked ~ .rail-toggle {
+    left: auto;
+    right: calc(20px + env(safe-area-inset-right, 0px));
+    background: color-mix(in srgb, var(--field) 92%, transparent);
+  }
+  .rail-toggle-input:checked ~ .rail-toggle::after,
+  .rail-toggle-input:checked ~ .rail-toggle:hover::after {
+    content: "✕";
+  }
 }
 
 /* Click-outside-to-collapse: a full-viewport label bound to the same checkbox,
