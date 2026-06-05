@@ -12,9 +12,31 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { copyToClipboard } from "@/lib/copy-prompt";
-
 const AI_MODE_URL = "https://www.google.com/search?udm=50";
+
+// SYNCHRONOUS clipboard write (hidden textarea + execCommand). We can't use the
+// async navigator.clipboard.writeText here: it's fired-and-forgotten right
+// before window.open(), which steals focus, and writeText fails the instant the
+// document loses focus — leaving the clipboard stuck on a previous copy (every
+// prompt then pasted the same text). execCommand('copy') completes within the
+// click gesture, before the new tab takes focus.
+function copyTextSync(text: string): void {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText =
+      "position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;pointer-events:none";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+  } catch {
+    // best effort — the copy is non-critical to opening AI Mode
+  }
+}
 const PANEL_MIN_WIDTH = 1080; // below this there's no left margin → direct action
 const TOAST_MS = 4500;
 
@@ -48,7 +70,8 @@ export function AskAiDot({ title }: { title: string }) {
   function send(prefix: string): void {
     const article = articleText();
     const payload = prefix ? `${prefix}\n\n${article}` : article;
-    void copyToClipboard(payload); // never throws
+    // Copy first (synchronously, while focused), THEN open the tab.
+    copyTextSync(payload);
     window.open(AI_MODE_URL, "_blank", "noopener,noreferrer");
     setOpen(false);
     setQuestion("");
