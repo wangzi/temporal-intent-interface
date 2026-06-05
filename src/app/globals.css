@@ -1041,6 +1041,155 @@ body.nav-open .scrim {
   max-width: var(--measure);
 }
 
+/* ── Technical / rich markdown inside the post body ──────────────────────────
+   Engine-sanitized allowlist (PRD §9): h2/h3, ul/ol/li, blockquote, code, pre,
+   hr, a, strong/em, img. Prose stays serif; code reads as monospace on a quiet
+   field-tinted panel. All token-driven, so it tracks light/dark automatically. */
+
+/* Section headings — serif, sized between body and the article title. */
+.attn-body h2,
+.attn-body h3 {
+  font-family: var(--serif);
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+  max-width: var(--measure);
+  margin: 1.9em 0 0.5em;
+}
+.attn-body h2 {
+  font-size: 1.5rem;
+}
+.attn-body h3 {
+  font-size: 1.2rem;
+}
+/* No leading gap if the body opens on a heading. */
+.attn-body > :first-child {
+  margin-top: 0;
+}
+
+/* Lists — serif, same measure + rhythm as paragraphs. */
+.attn-body ul,
+.attn-body ol {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.62;
+  color: var(--ink);
+  max-width: var(--measure);
+  margin: 0 0 1.25em;
+  padding-left: 1.4em;
+}
+/* Restore markers — the Tailwind preflight reset sets list-style: none. */
+.attn-body ul {
+  list-style: disc outside;
+}
+.attn-body ol {
+  list-style: decimal outside;
+}
+.attn-body li {
+  margin-bottom: 0.4em;
+}
+.attn-body li::marker {
+  color: var(--system-faint);
+}
+
+/* Blockquote — a quiet aside with a spine-coloured left rule. */
+.attn-body blockquote {
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: var(--measure);
+  margin: 1.5em 0;
+  padding-left: 1.1em;
+  border-left: 2px solid var(--branch);
+}
+.attn-body blockquote p {
+  color: inherit;
+  margin-bottom: 0.6em;
+}
+
+/* Inline code — monospace token on a faint field-tinted chip. */
+.attn-body code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--rule) 38%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rule) 60%, transparent);
+  border-radius: 4px;
+  padding: 0.1em 0.34em;
+  overflow-wrap: anywhere; /* a long token can't blow out the line */
+}
+
+/* Code blocks — a scrollable monospace panel. */
+.attn-body pre {
+  max-width: var(--measure);
+  margin: 1.5em 0;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--rule) 26%, transparent);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  tab-size: 2;
+}
+/* Reset the inline-code chip for code INSIDE a pre (it's the panel now). */
+.attn-body pre code {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+/* Emphasis. */
+.attn-body strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.attn-body em {
+  font-style: italic;
+}
+
+/* Body links — underlined, accent on hover. */
+.attn-body a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--branch);
+  text-underline-offset: 2px;
+  transition:
+    text-decoration-color 0.15s,
+    color 0.15s;
+}
+.attn-body a:hover {
+  color: var(--dot);
+  text-decoration-color: var(--dot);
+}
+
+/* Horizontal rule — a quiet hairline divider. */
+.attn-body hr {
+  border: 0;
+  height: 1px;
+  background: var(--rule);
+  max-width: var(--measure);
+  margin: 2.2em 0;
+}
+
+/* Inline images / media. */
+.attn-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5em 0;
+}
+
 .attn-hint {
   font-family: var(--mono);
   font-size: 0.6875rem;

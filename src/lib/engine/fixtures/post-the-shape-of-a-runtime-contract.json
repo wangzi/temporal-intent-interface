@@ -1,0 +1,30 @@
+{
+  "post": {
+    "post_id": "p-009",
+    "slug": "the-shape-of-a-runtime-contract",
+    "title": "The Shape of a Runtime Contract",
+    "published_at": "2026-05-20T00:00:00Z",
+    "reading_time": 4,
+    "authors": [
+      {
+        "id": "u-zi",
+        "display_name": "Zi"
+      }
+    ],
+    "intent_label": "Architecture",
+    "intent_statement": "Keep a type honest across the async boundary where it is easiest to lose.",
+    "central_question": "What must a runtime slot guarantee to be trusted?",
+    "core_insight": "A contract you cannot see is a contract you cannot keep.",
+    "core_insight_visible": true,
+    "topics": [
+      "architecture",
+      "types",
+      "async"
+    ],
+    "pinned_until": null,
+    "body_html": "<p data-text-origin=\"canonical\">Most of a system's character is decided at its <em>edges</em> &mdash; the contracts where one layer hands work to another. This week I sketched the runtime slot the ingestion path leans on.</p>\n<h2>The frame to hold</h2>\n<p data-text-origin=\"canonical\">A slot is just a typed box with an id. The discipline is keeping the type honest across the <code>async</code> boundary, where it is easiest to quietly lose.</p>\n<pre><code class=\"language-python\"># The frame to hold: modern async + typing contract boundary\nimport asyncio\nfrom typing import TypeAlias, Generic, TypeVar\n\nT = TypeVar(\"T\")\nPayloadID: TypeAlias = str\n\nclass RuntimeSlot(Generic[T]):\n    def __init__(self, slot_id: PayloadID, data: T) -> None:\n        self.slot_id = slot_id\n        self.data = data\n\nasync def execute(path: RuntimeSlot[bytes]) -> None:\n    # 3.12+ event-loop execution path; never block the caller\n    await asyncio.sleep(0)\n</code></pre>\n<h3>What the boundary guarantees</h3>\n<ul>\n<li>A slot's <code>slot_id</code> is opaque &mdash; never parsed, only compared.</li>\n<li><strong>Ingestion</strong> owns creation; the runtime only reads.</li>\n<li>Failure is a value, not an exception, once we cross into the loop.</li>\n</ul>\n<blockquote>A contract you cannot see is a contract you cannot keep.</blockquote>\n<h3>Order of operations</h3>\n<ol>\n<li>Validate the payload at the door.</li>\n<li>Wrap it in a slot with a fresh id.</li>\n<li>Hand the slot to the loop and forget the raw bytes.</li>\n</ol>\n<p data-text-origin=\"canonical\">The client mirrors it with one narrow call:</p>\n<pre><code class=\"language-typescript\">const slot = await runtime.admit({ id: makeId(), data: payload });\nif (!slot.ok) return fail(slot.error);\n</code></pre>\n<hr>\n<p data-text-origin=\"canonical\">More on the ingestion side in the <a href=\"/post/you-are-here\">field notes</a>. The shape is small; holding it honestly is the work.</p>",
+    "media": [],
+    "video_link": null,
+    "updated_at": "2026-05-20T00:00:00Z"
+  }
+}
