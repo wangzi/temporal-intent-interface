@@ -435,18 +435,9 @@ body.nav-open .scrim {
   opacity: 0.9;
 }
 
-/* Small cap dot at the spine head (mirrors the ::after end-cap) — a quiet,
-   defined start for the line. No ring: the ⇅ now lives inside the sort toggle. */
-.spine::before {
-  content: "";
-  position: absolute;
-  left: -2px;
-  top: -1px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--branch);
-}
+/* No cap at the spine head on the archive: the ⇅ sort marker (.spine-sort-swap)
+   sits centred on the line here and caps it. (The post route has no ⇅; its spine
+   just starts at the top — see .attn-inner .spine.) */
 
 .spine::after {
   /* Quiet end-cap at the deep archive. */
@@ -460,11 +451,13 @@ body.nav-open .scrim {
   background: var(--branch);
 }
 
-/* Spine sort — one integrated `Now ⇅ Past` toggle at the head of the timeline.
-   The label shows the current top→bottom order; tapping flips it. The leading
-   endpoint (current top of the feed) carries the red accent. URL-driven, so it
-   sorts JS-off. Aligns with the entry column + the hero row. */
+/* Spine sort — the active-state toggle at the head of the timeline. Only the
+   current top-of-feed state shows ("Now" when newest-first, "Past" when
+   oldest-first), in the red accent; tapping flips the sort. The ⇅ marker sits
+   centred ON the spine to its left and caps the line, so the toggle reads as the
+   timeline's head node. URL-driven, so it sorts JS-off. */
 .spine-sort {
+  position: relative; /* anchors the ⇅ marker onto the spine */
   padding: 8px 0 12px var(--content-pad);
   font-family: var(--mono);
   font-size: 0.6875rem;
@@ -472,21 +465,26 @@ body.nav-open .scrim {
   text-transform: uppercase;
 }
 .spine-sort-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  color: var(--system-faint);
-  white-space: nowrap;
+  display: inline-block;
+  color: var(--dot); /* active state = accent */
   transition: color 0.15s;
 }
 .spine-sort-toggle:hover {
   color: var(--ink);
 }
-/* Leading endpoint = current top of the feed. */
-.spine-sort-end:first-child {
-  color: var(--dot);
+.spine-sort-end {
+  white-space: nowrap;
 }
+/* ⇅ marker — centred on the 1px spine (+0.5px lands it dead-centre), capping
+   the line. A field fill masks the line behind it so the spine emerges below. */
 .spine-sort-swap {
+  position: absolute;
+  left: calc(var(--spine-x) + 0.5px);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  padding: 2px 0;
+  background: var(--field);
   color: var(--ink);
   font-size: 1.05em;
   line-height: 1;

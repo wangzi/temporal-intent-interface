@@ -39,10 +39,9 @@ export function SpineSort({
 }) {
   const isNewest = currentSort === "newest";
   const next: SortOrder = isNewest ? "oldest" : "newest";
-  // The leading endpoint is the current top of the feed; the trailing endpoint
-  // is the bottom. Tapping flips to `next`.
-  const leadLabel = isNewest ? "Now" : "Past";
-  const trailLabel = isNewest ? "Past" : "Now";
+  // Show only the ACTIVE state — the current top of the feed. The ⇅ (a
+  // spine-anchored marker, left of the label) signals the toggle; tapping flips.
+  const activeLabel = isNewest ? "Now" : "Past";
 
   return (
     <nav className="spine-sort" aria-label="Sort order">
@@ -53,11 +52,10 @@ export function SpineSort({
           isNewest ? "newest" : "oldest"
         } first. Switch to ${isNewest ? "oldest" : "newest"} first.`}
       >
-        <span className="spine-sort-end">{leadLabel}</span>
         <span className="spine-sort-swap" aria-hidden="true">
           ⇅
         </span>
-        <span className="spine-sort-end">{trailLabel}</span>
+        <span className="spine-sort-end">{activeLabel}</span>
       </Link>
     </nav>
   );
