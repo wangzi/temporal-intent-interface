@@ -1,7 +1,8 @@
-// Sort control, integrated into the spine as a small node at the head of the
-// timeline. Two direction links — Now → Past (newest) / Past → Now (oldest) —
-// that preserve the current query, topic selection, AND active Focus route, so a
-// sort flip never drops the view. URL-driven <Link>s, so it sorts JS-off.
+// Sort toggle — one integrated control at the head of the spine: `Now ⇅ Past`
+// (or `Past ⇅ Now` when reversed). The label shows the CURRENT top→bottom order;
+// tapping the toggle flips it. A URL-driven <Link>, so it sorts JS-off and
+// preserves the current query, topic selection, AND active Focus route, so a
+// sort flip never drops the view.
 
 import Link from "next/link";
 
@@ -36,21 +37,27 @@ export function SpineSort({
   /** Active Focus route id, preserved across a sort flip (or null). */
   activeRoute?: string | null;
 }) {
+  const isNewest = currentSort === "newest";
+  const next: SortOrder = isNewest ? "oldest" : "newest";
+  // The leading endpoint is the current top of the feed; the trailing endpoint
+  // is the bottom. Tapping flips to `next`.
+  const leadLabel = isNewest ? "Now" : "Past";
+  const trailLabel = isNewest ? "Past" : "Now";
+
   return (
     <nav className="spine-sort" aria-label="Sort order">
       <Link
-        className={`spine-sort-opt${currentSort === "newest" ? " on" : ""}`}
-        href={sortHref("newest", query, selectedTopics, activeRoute)}
-        aria-current={currentSort === "newest" ? "true" : undefined}
+        className="spine-sort-toggle"
+        href={sortHref(next, query, selectedTopics, activeRoute)}
+        aria-label={`Sorted ${
+          isNewest ? "newest" : "oldest"
+        } first. Switch to ${isNewest ? "oldest" : "newest"} first.`}
       >
-        Now → Past
-      </Link>
-      <Link
-        className={`spine-sort-opt${currentSort === "oldest" ? " on" : ""}`}
-        href={sortHref("oldest", query, selectedTopics, activeRoute)}
-        aria-current={currentSort === "oldest" ? "true" : undefined}
-      >
-        Past → Now
+        <span className="spine-sort-end">{leadLabel}</span>
+        <span className="spine-sort-swap" aria-hidden="true">
+          ⇅
+        </span>
+        <span className="spine-sort-end">{trailLabel}</span>
       </Link>
     </nav>
   );

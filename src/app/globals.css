@@ -424,13 +424,10 @@ body.nav-open .scrim {
    so the timeline visually runs into the footer's top edge. */
 .spine {
   position: absolute;
-  /* The timeline HANGS from the ⇅ sort button: the spine starts at the sort
-     toggle row (where the hero's ⇅ glyph rests), so the button caps the line
-     and ✻/| float above it with no line through them. 186px = base ⇅ row;
-     laptop adds the 56px .col padding-top → 242px (see the ≥1080 rule). Keep
-     this aligned with the .hero-glyph rest (top: 10.7rem) so ⇅ sits centred in
-     the button ring below. */
-  top: 186px;
+  /* Head sits level with the sort-toggle row, so the timeline reads as hanging
+     from the `Now ⇅ Past` toggle; the hero's ✻ clock floats above it. Base
+     64px; laptop adds the 56px .col padding-top → 120px (see the ≥1080 rule). */
+  top: 64px;
   bottom: var(--footer-h);
   left: var(--spine-x, 28px);
   width: 1px;
@@ -438,21 +435,17 @@ body.nav-open .scrim {
   opacity: 0.9;
 }
 
-/* The ⇅ sort BUTTON — an open ring that caps the spine. The hero's ⇅ glyph
-   rests centred inside it (the field fill hides the line behind the ring, so
-   the line appears to start at the button's lower edge). */
+/* Small cap dot at the spine head (mirrors the ::after end-cap) — a quiet,
+   defined start for the line. No ring: the ⇅ now lives inside the sort toggle. */
 .spine::before {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 0;
-  width: 30px;
-  height: 30px;
-  transform: translate(-50%, -50%);
+  left: -2px;
+  top: -1px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  border: 1px solid var(--branch);
-  background: var(--field);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  background: var(--branch);
 }
 
 .spine::after {
@@ -467,30 +460,36 @@ body.nav-open .scrim {
   background: var(--branch);
 }
 
-/* Spine sort — the now→past / past→now toggle. The labels align with the entry
-   column + the hero rows; there's no dot — the hero's cursor glyph descends from
-   the rows above and settles on the spine at this row as the marker (see the
-   .hero-glyph rest position). Relocated here from the Lens rail. */
+/* Spine sort — one integrated `Now ⇅ Past` toggle at the head of the timeline.
+   The label shows the current top→bottom order; tapping flips it. The leading
+   endpoint (current top of the feed) carries the red accent. URL-driven, so it
+   sorts JS-off. Aligns with the entry column + the hero row. */
 .spine-sort {
-  padding: 10px 0 10px var(--content-pad);
-  display: flex;
-  gap: 18px;
-  align-items: center;
+  padding: 8px 0 12px var(--content-pad);
   font-family: var(--mono);
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.spine-sort-opt {
+.spine-sort-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   color: var(--system-faint);
   white-space: nowrap;
   transition: color 0.15s;
 }
-.spine-sort-opt:hover {
+.spine-sort-toggle:hover {
   color: var(--ink);
 }
-.spine-sort-opt.on {
+/* Leading endpoint = current top of the feed. */
+.spine-sort-end:first-child {
   color: var(--dot);
+}
+.spine-sort-swap {
+  color: var(--ink);
+  font-size: 1.05em;
+  line-height: 1;
 }
 
 /* Feed status (search "N results …") + empty rows — align to the entry column
@@ -820,19 +819,13 @@ body.nav-open .scrim {
    explicitly there (search "reduce").
    ============================================================ */
 .hero-term {
-  /* Reserve the rows up front so typing + the clock's arrival never reflow
-     (zero CLS). The glyph is absolute (out of flow) so it never affects layout.
-     The container spans from the column's left edge so the glyph can sit on the
-     spine; the text rows carry their own entry-column inset. */
+  /* One in-flow row (the live clock); its height is reserved on .hero-term-line
+     so the clock's post-mount arrival never reflows (zero CLS). Spans from the
+     column's left edge so the ✻ prompt can sit on the spine; the row carries
+     its own entry-column inset. */
   --hero-line-h: 1.5em;
-  --hero-gap: 4.83em; /* doubled glyph/text spacing (~76px between glyphs) */
   position: relative;
-  /* Only the two text rows are in-flow; the cursor glyph is absolute and
-     descends to rest on the sort toggle that follows the hero. Tuned so the
-     three spine glyphs (✻ time / ¶ entry / ⇅ toggle) are evenly spaced — at
-     double the original gap. */
-  min-height: 10.5rem;
-  padding: 24px 0 8px 0;
+  padding: 24px 0 4px 0;
   font-family: var(--mono);
   font-size: 0.75rem;
   line-height: 1.5;
@@ -863,21 +856,10 @@ body.nav-open .scrim {
   line-height: 1;
   transition: opacity 0.2s var(--ease);
 }
-/* Restrained motion: only the time-row sparkle turns, very slowly. The
-   entry row carries a thin blinking | cursor; the ⇅ is a static button (no
-   bob). All share --ink; all disabled under reduced motion. */
+/* Restrained motion: the time-row ✻ sparkle turns, very slowly (disabled under
+   reduced motion — see "reduce"). */
 .hero-prompt[data-hero-prompt="clock"] {
   animation: hero-sparkle 9s linear infinite;
-}
-/* The entry-row | is a slim cursor — far lighter than the old ¶, so its blink
-   reads as a calm terminal cursor rather than a distraction. It blinks only
-   after the island reveals it (.is-blink), once the typing cursor has left the
-   row. Natural cursor cadence (~1.1s on / off). */
-.hero-prompt[data-hero-prompt="data"].is-blink {
-  animation: hero-blink 1.1s steps(1, end) infinite;
-}
-.hero-term-line + .hero-term-line {
-  margin-top: var(--hero-gap);
 }
 
 /* Live-clock slot: empty in SSR, filled by the island post-mount. */
@@ -885,67 +867,9 @@ body.nav-open .scrim {
   display: inline-block;
   min-height: 1em;
 }
-.hero-term-data {
-  color: var(--ink-soft);
-}
 
-/* The single morphing glyph, anchored on the spine. Centred on the 1px spine
-   (+0.5px lands it dead-centre); the island drives `top` (descent), `opacity`
-   (morph cross-fade), and textContent (| → > → ↓). The CSS `top` here is the
-   SSR / JS-off rest position (just below the data row). */
-.hero-glyph {
-  position: absolute;
-  /* Rest position (hero-relative, stable): on the spine, level with the sort
-     toggle row that follows the hero — the glyph IS the toggle's marker (there
-     is no dot). Tuned with the hero min-height so the three glyphs are evenly
-     spaced. Used by SSR / JS-off directly; the island reverts its inline `top`
-     at the end of the morph to land here. */
-  /* Rests dead-centre in the spine's button ring (::before) at the sort row —
-     keep aligned with the .spine `top` (242px laptop / 186px base). */
-  top: 11rem;
-  left: calc(var(--spine-x) + 0.5px);
-  transform: translateX(-50%);
-  /* Sit above the spine's button ring (::before) so the ⇅ shows inside it. */
-  z-index: 1;
-  color: var(--ink);
-  font-size: 1.25rem;
-  line-height: 1;
-  transition:
-    top 0.42s var(--ease),
-    opacity 0.16s linear;
-}
-/* Phase-1 cursor blink — toggled by the island while typing. */
-.hero-glyph.is-blink {
-  animation: hero-blink 1s steps(1, end) infinite;
-}
-/* Rested ⇅ is a static button (the island still adds .is-bounce; no motion). */
-.hero-glyph.is-bounce {
-  animation: none;
-}
-
-@keyframes hero-blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  50.01%,
-  100% {
-    opacity: 0;
-  }
-}
-/* translateX(-50%) baked in so the vertical bounce keeps the spine centring. */
-@keyframes hero-bounce {
-  0%,
-  100% {
-    transform: translateX(-50%) translateY(0);
-  }
-  50% {
-    transform: translateX(-50%) translateY(4px);
-  }
-}
-/* Sparkle spin for the ✻ prompt — translate(-50%,-50%) baked in so it stays
-   centred on the spine while it rotates. (The ¶ prompt reuses hero-blink; the
-   ⇅ cursor reuses hero-bounce.) */
+/* Sparkle spin for the ✻ clock prompt — translate(-50%,-50%) baked in so it
+   stays centred on the spine while it rotates. */
 @keyframes hero-sparkle {
   from {
     transform: translate(-50%, -50%) rotate(0deg);
@@ -1083,22 +1007,6 @@ body.nav-open .scrim {
   }
 }
 
-/* RANK-10 PROPOSAL (uncommitted): compact the doubled hero masthead on phones
-   so the first entry isn't pushed ~42% down. Halve the inter-glyph spacing and
-   shrink the reserved height; the ⇅ button + spine `top` are retuned so the
-   glyph stays centred in the button ring. */
-@media (max-width: 767px) {
-  .hero-term {
-    --hero-gap: 2.2em;
-    min-height: 6.5rem;
-  }
-  .hero-glyph {
-    top: 7rem;
-  }
-  .spine {
-    top: 121px;
-  }
-}
 
 .attn-label {
   font-family: var(--mono);
@@ -1274,9 +1182,9 @@ body.nav-open .scrim {
   }
   .spine {
     left: var(--spine-x);
-    /* +56px for the .col padding-top at this breakpoint, so the button still
-       caps the spine at the ⇅ sort-toggle row. */
-    top: 242px;
+    /* +56px for the .col padding-top at this breakpoint, so the head still sits
+       at the sort-toggle row. */
+    top: 120px;
   }
   /* (Post-route spine override now lives globally as `.attn-inner
      .spine`, above — it wins by specificity at every breakpoint.) */
@@ -1477,11 +1385,7 @@ body.nav-open .scrim {
     scroll-behavior: auto !important;
   }
   /* The rule above covers `transition` only — keyframe `animation` is NOT
-     affected, so the terminal hero's blink + bounce + prompt sparkle/pulse must
-     be killed by name. */
-  .hero-glyph,
-  .hero-glyph.is-blink,
-  .hero-glyph.is-bounce,
+     affected, so the ✻ clock sparkle + load-more pulse are killed by name. */
   .hero-prompt,
   .load-more-stone {
     animation: none !important;
