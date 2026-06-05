@@ -24,7 +24,6 @@ import {
   listPosts,
   searchPosts,
 } from "@/lib/engine/client";
-import { daysAgo } from "@/lib/format";
 import type {
   FocusResponse,
   FocusRouteResponse,
@@ -260,17 +259,6 @@ export default async function Home({
       )
     : allPosts;
 
-  // Head-of-spine stats for the terminal hero, derived from the whole archive.
-  const totalEntriesCount = allPosts.length;
-  const latestIso =
-    allPosts.length > 0
-      ? allPosts.reduce(
-          (max, p) => (p.published_at > max ? p.published_at : max),
-          allPosts[0]!.published_at,
-        )
-      : null;
-  const lastEntryDays = latestIso ? daysAgo(latestIso, now) : 0;
-
   return (
     <TemporalLayout
       topBar={<TopBar posts={allPosts} currentFilter={filter} />}
@@ -285,14 +273,8 @@ export default async function Home({
       }
     >
       <Spine />
-      {/* Spine head order: time + last-entry (the hero) first, then the sort
-          toggle below the hero's resting glyph. */}
-      {allPosts.length > 0 ? (
-        <TerminalHero
-          lastEntryDays={lastEntryDays}
-          totalEntriesCount={totalEntriesCount}
-        />
-      ) : null}
+      {/* Spine head: the live-clock hero, then the sort toggle below it. */}
+      {allPosts.length > 0 ? <TerminalHero /> : null}
       <SpineSort currentSort={sort} query={query} selectedTopics={[]} />
       <ol
         id="feed"
@@ -316,7 +298,7 @@ export default async function Home({
         initialCount={visiblePosts.length}
         now={now}
       />
-      <Footer entryCount={totalEntriesCount} updatedISO={latestIso} />
+      <Footer />
       <Dot />
       <ReaderControlsIsland />
       <TerminalHeroIsland />

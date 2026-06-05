@@ -1,44 +1,12 @@
-// Terminal hero — the head of the spine. A CLI status readout: two text rows
-// aligned to the entry column —
-//   1. a LIVE local clock (client-only; empty in SSR, height-reserved)
-//   2. `Last entry N days ago, M total entries` (server data; in the SSR HTML)
-// — each row carries a › prompt glyph on the spine (left of the row), plus a
-// SINGLE cursor glyph on the spine that TerminalHeroIsland morphs and descends:
-// blinking | (cursor) → > (prompt) → ↓ (scroll hint), travelling down the spine
-// as the rows type in. The › prompts fade in as each row is typed (the island
-// hides them first); JS-off / reduced-motion show them immediately.
-//
-// This markup IS the JS-off-complete final state (PRD §17.4): the glyph ships
-// as the rested ↓ and the data row is fully present. Only the clock row is
-// client-only, and its height is reserved so its post-mount arrival causes no
-// layout shift. The island clears + retypes the rows and drives the glyph; see
-// globals.css `.hero-term*` / `.hero-glyph`.
+// Terminal hero — the head of the column: a single CLI status row carrying a
+// LIVE local clock (client-only; empty in SSR, height-reserved → no CLS). A ✻
+// prompt sits on the spine to the left of the row. JS-off shows the ✻ + an
+// empty (height-reserved) clock slot; TerminalHeroIsland fills the clock
+// post-mount. Decorative time only — aria-hidden.
 
-export function TerminalHero({
-  lastEntryDays,
-  totalEntriesCount,
-}: {
-  lastEntryDays: number;
-  totalEntriesCount: number;
-}) {
-  const dataLine = `Last entry ${lastEntryDays} ${
-    lastEntryDays === 1 ? "day" : "days"
-  } ago, ${totalEntriesCount} total ${
-    totalEntriesCount === 1 ? "entry" : "entries"
-  }`;
-
+export function TerminalHero() {
   return (
     <div className="hero-term mono" data-hero-root>
-      {/* The morphing glyph, on the spine. SSR / JS-off render it as the rested
-          ⇅ (the sort marker it settles into). The island repositions + retypes
-          it to | first, then morphs | → > → ⇅ as it descends. */}
-      <span className="hero-glyph" data-hero-glyph aria-hidden="true">
-        ⇅
-      </span>
-
-      {/* row 1 — live local clock. Empty slot in SSR; the island fills it
-          post-mount. aria-hidden: decorative time. The › prompt sits on the
-          spine (left of the row); the island fades it in as the row types. */}
       <div className="hero-term-line" data-hero-line="clock" aria-hidden="true">
         <span className="hero-prompt" data-hero-prompt="clock" aria-hidden="true">
           ✻
@@ -48,17 +16,6 @@ export function TerminalHero({
           data-hero-clock
           suppressHydrationWarning
         />
-      </div>
-
-      {/* row 2 — server data string. Readable by assistive tech and present in
-          SSR for JS-off. data-hero-final is the island's retype source. */}
-      <div className="hero-term-line" data-hero-line="data">
-        <span className="hero-prompt" data-hero-prompt="data" aria-hidden="true">
-          |
-        </span>
-        <span className="hero-term-data" data-hero-final={dataLine}>
-          {dataLine}
-        </span>
       </div>
     </div>
   );
