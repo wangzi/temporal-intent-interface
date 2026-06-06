@@ -1530,6 +1530,13 @@ html.is-scrolling .attn-back-label {
     padding-right: 18px;
   }
 
+  /* Mobile: looser vertical rhythm between entries — +30% over the 5.5vh
+     base (top + bottom) so the feed breathes more on a phone. */
+  .entry {
+    padding-top: 7.15vh;
+    padding-bottom: 7.15vh;
+  }
+
   /* The inline topbar filter chips belong to 701–1079px only. On
      mobile the same options live inside the bottom sheet. */
   .topbar-nav {
