@@ -194,6 +194,8 @@ export function ReaderControlsIsland(): null {
       if (settleTimer !== null) window.clearTimeout(settleTimer);
       settleTimer = window.setTimeout(() => {
         setDotBig(true);
+        // Scroll has stopped — hide the spine labels (Back / Ask AI).
+        document.documentElement.classList.remove("is-scrolling");
         settleTimer = null;
       }, SETTLE_MS);
     }
@@ -211,6 +213,8 @@ export function ReaderControlsIsland(): null {
           revealByDistance(entries);
         }
         setDotBig(false);
+        // Reveal the spine labels (Back / Ask AI) while moving; settle hides them.
+        document.documentElement.classList.add("is-scrolling");
         scheduleSettle();
         ticking = false;
       });
@@ -297,6 +301,7 @@ export function ReaderControlsIsland(): null {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("keydown", onKeydown);
       if (settleTimer !== null) window.clearTimeout(settleTimer);
+      document.documentElement.classList.remove("is-scrolling");
     };
   }, [isPost, router]);
 

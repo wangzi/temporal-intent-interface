@@ -862,8 +862,9 @@ body.nav-open .scrim {
   outline: 2px solid var(--focus);
   outline-offset: 4px;
 }
-/* Persistent "Ask AI →" label in the margin LEFT of the spine — always visible
-   so the ring's purpose is discoverable; brightens to the accent on hover. */
+/* "Ask AI →" label in the margin LEFT of the spine. Hidden when idle; revealed
+   while the reader scrolls (ReaderControlsIsland toggles html.is-scrolling) and
+   on hover/focus, where it also brightens to the accent. */
 .ask-ai-dot-label {
   position: absolute;
   right: calc(100% + 12px); /* LEFT of the ring */
@@ -874,8 +875,16 @@ body.nav-open .scrim {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--system-faint);
+  opacity: 0;
   pointer-events: none;
-  transition: color 0.15s var(--ease);
+  transition:
+    opacity 0.18s var(--ease),
+    color 0.15s var(--ease);
+}
+html.is-scrolling .ask-ai-dot-label,
+.ask-ai-dot:hover .ask-ai-dot-label,
+.ask-ai-dot:focus-visible .ask-ai-dot-label {
+  opacity: 1;
 }
 .ask-ai-dot:hover .ask-ai-dot-label,
 .ask-ai-dot:focus-visible .ask-ai-dot-label {
@@ -1082,9 +1091,11 @@ body.nav-open .scrim {
    ============================================================ */
 .attn-inner {
   position: relative;
-  max-width: calc(var(--measure) + 80px);
+  /* +20px on the left inset puts more air between the spine and the prose; the
+     matching +20 on max-width keeps the measure unchanged. */
+  max-width: calc(var(--measure) + 100px);
   margin: 0 auto;
-  padding: 80px 28px 120px var(--content-pad);
+  padding: 80px 28px 120px calc(var(--content-pad) + 20px);
 }
 
 /* The post route (AttentionView) renders the shared <Spine/> (.spine)
@@ -1172,7 +1183,8 @@ body.nav-open .scrim {
   border-color: var(--ink);
 }
 .attn-back:hover .attn-back-label,
-.attn-back:focus-visible .attn-back-label {
+.attn-back:focus-visible .attn-back-label,
+html.is-scrolling .attn-back-label {
   opacity: 1;
   transform: translate(0, -50%);
 }
