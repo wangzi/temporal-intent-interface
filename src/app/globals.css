@@ -1639,56 +1639,57 @@ html.is-scrolling .attn-back-label {
   transform: translateX(0);
 }
 .rail-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   position: fixed;
   /* Safe-area: clear the notch (top) and landscape inset (left). */
   top: calc(72px + env(safe-area-inset-top, 0px));
   left: calc(20px + env(safe-area-inset-left, 0px));
   z-index: 60; /* above the rail (50) so it stays clickable when open */
-  width: 40px;
-  height: 40px;
+  width: 34px; /* matches the Back / Ask-AI rings — one ring family */
+  height: 34px;
   border-radius: 50%;
-  background: var(--ink);
-  cursor: pointer;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-  /* The hover number (::after). Black on the white states; never seen on the
-     plain black dot since the number only appears on hover/expanded. */
-  font-family: var(--mono);
-  font-size: 0.875rem;
+  border: 1px solid var(--branch);
+  background: var(--field);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   color: var(--ink);
+  cursor: pointer;
   transition:
     left 0.28s var(--ease),
-    background 0.15s var(--ease);
+    border-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease);
 }
-/* Touch-target: extend the tap area to ≥44×44 without growing the 40px dot. */
+/* ☰ menu glyph, centred in the ring (→ ✕ when the rail is open). */
+.rail-toggle::after {
+  content: "☰";
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1;
+  color: var(--ink);
+}
+/* Touch-target: extend the tap area to ≥44×44 around the 34px ring. */
 .rail-toggle::before {
   content: "";
   position: absolute;
-  inset: -2px;
+  inset: -5px;
   border-radius: 50%;
 }
-/* Collapsed dot, hover: invert to white + reveal the count (37). */
-.rail-toggle:hover {
-  background: #ffffff;
-}
-.rail-toggle:hover::after {
-  content: "37";
+.rail-toggle:hover,
+.rail-toggle-input:focus-visible + .rail-toggle {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink) 8%, transparent);
 }
 .rail-toggle-input:focus-visible + .rail-toggle {
   outline: 2px solid var(--focus);
-  outline-offset: 3px;
+  outline-offset: 4px;
 }
-/* Rail expanded: the dot is white, and slides to the rail's right edge. */
+/* Rail open: slide to the rail's right edge and show ✕. */
 .rail-toggle-input:checked ~ .rail-toggle {
   left: calc(var(--rail-reveal-w) + 16px);
-  background: #ffffff;
+  border-color: var(--ink);
 }
-/* Expanded dot, hover: reveal its count (78). Outranks the collapsed :hover
-   rule (more classes), so 78 wins while the rail is open. */
-.rail-toggle-input:checked ~ .rail-toggle:hover::after {
-  content: "78";
+.rail-toggle-input:checked ~ .rail-toggle::after {
+  content: "✕";
 }
 
 /* Mobile / tablet (≤1079px): the rail opener is a bottom-right thumb-zone
@@ -1713,8 +1714,7 @@ html.is-scrolling .attn-back-label {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
     transition: background 0.15s var(--ease);
   }
-  /* Persistent glyph — the disc had none (its count only showed on hover, which
-     touch never triggers). */
+  /* Larger glyph for the 48px touch FAB (the desktop ring uses 0.8125rem). */
   .rail-toggle::after,
   .rail-toggle:hover::after {
     content: "☰";
