@@ -235,7 +235,6 @@ a {
     0 max(18px, env(safe-area-inset-left, 0px));
   background: color-mix(in srgb, var(--field) 86%, transparent);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--rule);
 }
 
 .brand {

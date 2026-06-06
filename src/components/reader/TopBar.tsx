@@ -75,9 +75,6 @@ export function TopBar({
   return (
     <>
       <header className="topbar">
-        <span className="brand">
-          z<b>.</b>
-        </span>
         <nav className="topbar-nav" aria-label="Sections">
           <Link
             className={`navlink${noFilter ? " on" : ""}`}
