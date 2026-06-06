@@ -1246,14 +1246,21 @@ html.is-scrolling .attn-back-label {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
-/* Narrow viewports: the spine hugs the text, so the button can't ride it —
-   the island leaves its CSS `left` alone below 768px. Pin it in the left gutter
-   (content starts at --content-pad: 64px) BELOW the rail-toggle dot
-   (top:72px + 40px tall) so the two no longer overlap; still fixed on scroll. */
+/* Narrow viewports: pull the spine off the screen edge into the left gutter
+   (--spine-x) and align the Back + Ask-AI rings onto it, so the three read as
+   one tidy node-column instead of three scattered circles. JS-on, both rings
+   ride the spine's real x via the island; these are the JS-off / pre-hydration
+   fallbacks. The body (at --content-pad) still clears the gutter. */
 @media (max-width: 767px) {
+  .attn-inner .spine {
+    left: var(--spine-x);
+  }
+  .attn-back,
+  .ask-ai-dot {
+    left: var(--spine-x);
+  }
   .attn-back {
-    /* +safe-area-inset-top so it tracks the rail-toggle (which also shifts
-       down under the notch) and the two stay clear of each other. */
+    /* Top node, below the masthead; +safe-area-inset-top clears the notch. */
     top: calc(150px + env(safe-area-inset-top, 0px));
   }
 }
