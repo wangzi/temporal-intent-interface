@@ -46,14 +46,12 @@ function positionDot(): void {
   const x = spine.getBoundingClientRect().left;
   const dot = document.getElementById("dot");
   if (dot) dot.style.left = `${x}px`;
-  // The post route's back button rides the spine at the same X anchor — but
-  // only on laptop+, where there's margin for it. On narrow widths the spine
-  // hugs the text, so it falls back to its CSS top-left position.
+  // The post route's back button rides the spine at the same X anchor, at every
+  // width. On mobile the spine now sits in the left gutter (see `.attn-inner
+  // .spine` in globals.css), so the ring is no longer clipped at the screen
+  // edge — Back + Ask-AI line up as one node column on the spine.
   const back = document.querySelector<HTMLElement>(".attn-back");
-  if (back) {
-    if (window.innerWidth >= 768) back.style.left = `${x}px`;
-    else back.style.removeProperty("left");
-  }
+  if (back) back.style.left = `${x}px`;
   // The post route's "Ask AI" dot rides the same spine x (its vertical position
   // is CSS). Small enough to sit on the spine at every width.
   const askAi = document.querySelector<HTMLElement>(".ask-ai-dot");
