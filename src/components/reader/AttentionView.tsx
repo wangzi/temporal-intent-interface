@@ -64,6 +64,43 @@ export function AttentionView({ post }: { post: PostDetail }) {
           ) : null}
         </div>
       </header>
+      {post.intent_statement ||
+      (post.core_insight_visible && post.core_insight) ||
+      post.central_question ||
+      post.topics.length > 0 ? (
+        <section className="attn-intent" aria-label="Intent">
+          {post.intent_statement ? (
+            <>
+              <span className="k">Intent</span>
+              <p className="statement" data-text-origin="canonical">
+                {post.intent_statement}
+              </p>
+            </>
+          ) : null}
+          {post.core_insight_visible && post.core_insight ? (
+            <>
+              <span className="k">Signal</span>
+              <p className="insight" data-text-origin="canonical">
+                {post.core_insight}
+              </p>
+            </>
+          ) : null}
+          {post.central_question ? (
+            <>
+              <span className="k">Question</span>
+              <p className="question" data-text-origin="canonical">
+                {post.central_question}
+              </p>
+            </>
+          ) : null}
+          {post.topics.length > 0 ? (
+            <>
+              <span className="k">Topics</span>
+              <p className="topics">{post.topics.join(" · ")}</p>
+            </>
+          ) : null}
+        </section>
+      ) : null}
       <CanonicalBody html={post.body_html} />
       <p className="attn-hint mono">
         Select any passage to copy a prompt · esc to return
