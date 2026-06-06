@@ -41,14 +41,20 @@ const PANEL_MIN_WIDTH = 1080; // below this there's no left margin → direct ac
 const TOAST_MS = 4500;
 
 const PROMPTS: { label: string; prefix: string }[] = [
-  { label: "Summarize", prefix: "Summarize this article." },
+  { label: "TL;DR", prefix: "Give a tight TL;DR of this article." },
   {
-    label: "Explain the key claim",
-    prefix: "Explain the key claim in this article and why it matters.",
+    label: "1st Principle",
+    prefix:
+      "Break this article down to first principles — the foundational assumptions and truths it rests on — then reason up from them.",
   },
   {
-    label: "Find counterarguments",
-    prefix: "Give the strongest counterarguments to this article.",
+    label: "Inversion",
+    prefix:
+      "Apply inversion to this article: instead of how to succeed, describe what would guarantee the opposite outcome or cause it to fail, and what that reveals.",
+  },
+  {
+    label: "ELI5",
+    prefix: "Explain this article like I'm five (ELI5), in simple, plain language.",
   },
 ];
 
