@@ -581,6 +581,21 @@ body.nav-open .scrim {
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
 }
+/* Studio bridge — the spine's terminal action. The timeline runs down into
+   this footer's top edge; the link sits at the line's foot and bridges out to
+   journalkit's authoring surface. Quiet by default; the red accent on
+   hover/focus ties it to the dot + sort-toggle accent language. */
+.site-footer-studio {
+  color: var(--system);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.15s var(--ease);
+}
+.site-footer-studio:hover,
+.site-footer-studio:focus-visible {
+  color: var(--dot);
+}
 
 /* ============================================================
    Entries — Layer 1 (Title + Intent), idle + enriched
