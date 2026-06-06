@@ -127,7 +127,7 @@ export function AskAiDot({ title }: { title: string }) {
         aria-label="Ask Google AI about this article"
       >
         <span className="ask-ai-dot-label mono" aria-hidden="true">
-          ↗ Ask AI
+          Ask AI →
         </span>
       </button>
 
