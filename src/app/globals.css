@@ -760,7 +760,8 @@ body.nav-open .scrim {
   transition: opacity 0.15s var(--ease);
 }
 
-.enrich .k {
+.enrich .k,
+.attn-intent .k {
   font-family: var(--mono);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -771,7 +772,8 @@ body.nav-open .scrim {
   margin-bottom: 5px;
 }
 
-.enrich .statement {
+.enrich .statement,
+.attn-intent .statement {
   font-family: var(--mono);
   font-size: var(--t-insight);
   line-height: 1.55;
@@ -779,11 +781,46 @@ body.nav-open .scrim {
   margin-bottom: 16px;
 }
 
-.enrich .insight {
+.enrich .insight,
+.attn-intent .insight {
   font-family: var(--mono);
   font-size: var(--t-insight);
   line-height: 1.55;
   color: var(--ink-soft);
+}
+
+/* Attention (article) full intent block — the post route shows the complete
+   thesis layer (Intent / Signal / Question / Topics) above the canonical body.
+   Type is shared with the timeline .enrich block; this version is static (no
+   scan-density fade) and is closed by a hairline rule before the body. */
+.attn-intent {
+  max-width: var(--measure);
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--rule);
+}
+.attn-intent .k {
+  margin-top: 18px;
+}
+.attn-intent .k:first-child {
+  margin-top: 0;
+}
+.attn-intent .statement,
+.attn-intent .insight,
+.attn-intent .question {
+  margin-bottom: 0;
+}
+.attn-intent .question {
+  font-family: var(--mono);
+  font-size: var(--t-insight);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.attn-intent .topics {
+  font-family: var(--mono);
+  font-size: var(--t-meta);
+  color: var(--system-faint);
+  letter-spacing: 0.02em;
 }
 
 /* Active entry. */
