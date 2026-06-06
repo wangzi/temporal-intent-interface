@@ -632,6 +632,9 @@ body.nav-open .scrim {
 
 .e-label {
   display: inline-block;
+  /* It's a <button>, which the UA centres — force left so a wrapped label
+     reads like the title + body, not centred. */
+  text-align: left;
   font-family: var(--mono);
   font-size: var(--t-label);
   color: var(--system);
