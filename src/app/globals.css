@@ -809,53 +809,87 @@ body.nav-open .scrim {
    article + opens Google AI Mode. Pure enhancement; absent with JS off. */
 .ask-ai-dot {
   position: fixed;
-  top: calc(40vh + 2.75rem);
+  /* Well below the Back node so the two spine rings read as a spaced pair. */
+  top: calc(40vh + 5.5rem);
   left: var(--spine-x, 28px); /* island overrides with the real spine x */
   transform: translate(-50%, -50%);
-  z-index: 31;
-  width: 11px;
-  height: 11px;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  width: 34px; /* matches the Back ring (.attn-back-mark) — balanced pair */
+  height: 34px;
   padding: 0;
-  border: 0;
   border-radius: 50%;
-  background: var(--dot);
+  border: 1px solid var(--branch);
+  background: var(--field);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot) 12%, transparent);
-  transition: box-shadow 0.18s var(--ease);
+  transition:
+    border-color 0.18s var(--ease),
+    box-shadow 0.18s var(--ease);
 }
-/* ≥44px tap target without growing the dot. */
+/* ≥44px tap target. */
 .ask-ai-dot::before {
   content: "";
   position: absolute;
-  inset: -17px;
+  inset: -5px;
   border-radius: 50%;
 }
+/* The red dot, centred in the ring — the clickable identity. */
+.ask-ai-dot::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--dot);
+  transition:
+    width 0.18s var(--ease),
+    height 0.18s var(--ease);
+}
 .ask-ai-dot:hover,
-.ask-ai-dot:focus-visible {
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--dot) 20%, transparent);
+.ask-ai-dot:focus-visible,
+.ask-ai-dot.is-open {
+  border-color: var(--dot);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot) 14%, transparent);
+}
+.ask-ai-dot:hover::after,
+.ask-ai-dot:focus-visible::after,
+.ask-ai-dot.is-open::after {
+  width: 11px;
+  height: 11px;
 }
 .ask-ai-dot:focus-visible {
   outline: 2px solid var(--focus);
-  outline-offset: 5px;
+  outline-offset: 4px;
 }
-/* Hover/focus label, in the gutter to the right of the dot. */
+/* Persistent "Ask AI →" label in the margin LEFT of the spine — always visible
+   so the ring's purpose is discoverable; brightens to the accent on hover. */
 .ask-ai-dot-label {
   position: absolute;
-  left: calc(100% + 14px);
+  right: calc(100% + 12px); /* LEFT of the ring */
   top: 50%;
   transform: translateY(-50%);
   white-space: nowrap;
-  font-size: 0.6875rem;
-  letter-spacing: 0.1em;
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--system);
-  opacity: 0;
+  color: var(--system-faint);
   pointer-events: none;
-  transition: opacity 0.15s var(--ease);
+  transition: color 0.15s var(--ease);
 }
 .ask-ai-dot:hover .ask-ai-dot-label,
 .ask-ai-dot:focus-visible .ask-ai-dot-label {
-  opacity: 1;
+  color: var(--dot);
+}
+/* Hide the label when the panel is open (it would overlap the panel) and on
+   narrow viewports where there's no left margin for it. */
+.ask-ai-dot.is-open .ask-ai-dot-label {
+  opacity: 0;
+}
+@media (max-width: 1079px) {
+  .ask-ai-dot-label {
+    display: none;
+  }
 }
 /* Confirmation toast — the reader has to paste, so confirm the copy happened.
    Bottom-centre so it never collides with the mobile ☰ nav button (bottom-right). */
@@ -882,9 +916,6 @@ body.nav-open .scrim {
 .ask-ai {
   display: contents;
 }
-.ask-ai-dot.is-open {
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--dot) 20%, transparent);
-}
 
 /* "Ask Google AI" panel — slides into the empty margin LEFT of the spine
    (laptop+ only; below 1080px the dot copies + opens directly). Its right edge
@@ -893,7 +924,7 @@ body.nav-open .scrim {
 .ask-ai-panel {
   position: fixed;
   right: calc(100vw - var(--spine-vpx, 50vw) + 16px);
-  bottom: calc(60vh - 2.2rem);
+  bottom: calc(60vh - 5.5rem);
   z-index: 32;
   width: 15rem;
   max-width: calc(var(--spine-vpx, 50vw) - 24px);
