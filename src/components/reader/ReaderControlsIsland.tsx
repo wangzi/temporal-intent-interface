@@ -186,6 +186,62 @@ export function ReaderControlsIsland(): null {
     let currentActive = entries.length ? nearestEntryIndex(entries) : -1;
     let settleTimer: number | null = null;
 
+    // Perf: cache each entry's DOCUMENT-space center Y so the scroll hot-path
+    // is pure arithmetic (center − scrollY) instead of ~3N getBoundingClientRect
+    // reads per frame (was: nearestEntryIndex + revealByDistance, each reading
+    // every entry, and revealByDistance re-running nearestEntryIndex). Scrolling
+    // never changes document-space positions, so the cache is only rebuilt when
+    // layout can change — window resize, and a ResizeObserver that fires once as
+    // each content-visibility:auto entry first renders to its real height.
+    let centers: number[] = [];
+    let cacheDirty = true;
+    function rebuildCenters(): void {
+      const sy = window.scrollY;
+      centers = entries.map((el) => {
+        if (!el) return Number.POSITIVE_INFINITY;
+        const r = el.getBoundingClientRect();
+        return sy + r.top + r.height / 2;
+      });
+      cacheDirty = false;
+    }
+    function focusLineDoc(): number {
+      return window.scrollY + window.innerHeight * DOT_VH;
+    }
+    function nearestFromCenters(lineDoc: number): number {
+      let bestIdx = 0;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < entries.length; i++) {
+        const el = entries[i];
+        if (!el || el.style.display === "none") continue;
+        const c = centers[i];
+        if (c === undefined) continue;
+        const distance = Math.abs(c - lineDoc);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          bestIdx = i;
+        }
+      }
+      return bestIdx;
+    }
+    // Opacity-only writes (composited, no layout) — cheap to do for all entries.
+    function revealFromCenters(lineDoc: number, activeIdx: number): void {
+      const range = window.innerHeight * REVEAL_VH || 1;
+      for (let i = 0; i < entries.length; i++) {
+        const el = entries[i];
+        if (!el) continue;
+        const enrich = el.querySelector<HTMLElement>(".enrich");
+        if (!enrich) continue;
+        if (i === activeIdx) {
+          enrich.style.opacity = "1";
+          continue;
+        }
+        const c = centers[i];
+        if (c === undefined) continue;
+        const t = 1 - Math.min(1, Math.abs(c - lineDoc) / range);
+        enrich.style.opacity = (MIN_REVEAL + (1 - MIN_REVEAL) * t).toFixed(3);
+      }
+    }
+
     // Settle only grows the dot back — the reveal itself is continuous, so
     // it needs no settle step (and never animates layout).
     function scheduleSettle(): void {
@@ -203,12 +259,14 @@ export function ReaderControlsIsland(): null {
       ticking = true;
       requestAnimationFrame(() => {
         if (entries.length > 0) {
-          const idx = nearestEntryIndex(entries);
+          if (cacheDirty) rebuildCenters();
+          const lineDoc = focusLineDoc();
+          const idx = nearestFromCenters(lineDoc);
           if (idx !== currentActive) {
             setActiveClass(entries, idx);
             currentActive = idx;
           }
-          revealByDistance(entries);
+          revealFromCenters(lineDoc, idx);
         }
         setDotBig(false);
         // Reveal the spine labels (Back / Ask AI) while moving; settle hides them.
@@ -221,13 +279,26 @@ export function ReaderControlsIsland(): null {
     function onResize(): void {
       positionDot();
       if (entries.length === 0) return;
-      const idx = nearestEntryIndex(entries);
+      rebuildCenters();
+      const lineDoc = focusLineDoc();
+      const idx = nearestFromCenters(lineDoc);
       if (idx !== currentActive) {
         setActiveClass(entries, idx);
         currentActive = idx;
       }
-      revealByDistance(entries);
+      revealFromCenters(lineDoc, idx);
     }
+
+    // Invalidate the center cache when an entry's rendered height changes
+    // (content-visibility:auto entries resize from the ~460px placeholder to
+    // their real height as they scroll into view). Coalesced into the next rAF.
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            cacheDirty = true;
+          })
+        : null;
+    if (ro) entries.forEach((el) => el && ro.observe(el));
 
     function moveTo(idx: number): void {
       if (entries.length === 0) return;
@@ -298,6 +369,7 @@ export function ReaderControlsIsland(): null {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("keydown", onKeydown);
+      if (ro) ro.disconnect();
       if (settleTimer !== null) window.clearTimeout(settleTimer);
       document.documentElement.classList.remove("is-scrolling");
     };

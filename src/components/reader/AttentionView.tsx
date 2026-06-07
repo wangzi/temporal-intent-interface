@@ -103,7 +103,10 @@ export function AttentionView({ post }: { post: PostDetail }) {
       ) : null}
       <CanonicalBody html={post.body_html} />
       <p className="attn-hint mono">
-        Select any passage to copy a prompt · esc to return
+        Select any passage to copy a prompt
+        {/* "esc to return" is keyboard-only — hidden on touch (no Esc key;
+            the ‹ ring is the back affordance there). */}
+        <span className="attn-hint-kbd"> · esc to return</span>
       </p>
     </article>
   );
