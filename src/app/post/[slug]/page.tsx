@@ -32,22 +32,44 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const { post } = await getPost(slug);
-    // Strip HTML for the description: take a plain-text excerpt.
-    const description = post.body_html
+    // Plain-text excerpt from the body. Truncate at a word boundary (never
+    // mid-word in a share card) and add an ellipsis.
+    const excerpt = post.body_html
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 160);
+      .trim();
+    const clip = (text: string, max: number): string => {
+      if (text.length <= max) return text;
+      const slice = text.slice(0, max);
+      const lastSpace = slice.lastIndexOf(" ");
+      const base = lastSpace > max * 0.5 ? slice.slice(0, lastSpace) : slice;
+      return `${base.replace(/[\s.,;:!?—–-]+$/u, "")}…`;
+    };
+    const label = post.intent_label?.trim();
+    // SEO meta description: the body excerpt.
+    const description = clip(excerpt, 155);
+    // Share-card line leads with the intent label (the hook), like the RSS
+    // items, then the excerpt.
+    const cardDescription = clip(label ? `${label} — ${excerpt}` : excerpt, 200);
     return {
       title: post.title,
       description,
       alternates: { canonical: `/post/${slug}` },
       openGraph: {
         title: post.title,
-        description,
+        description: cardDescription,
+        url: `/post/${slug}`,
         type: "article",
         publishedTime: post.published_at,
         authors: post.authors.map((a) => a.display_name),
+        images: [
+          {
+            url: `/post/${slug}/opengraph-image`,
+            width: 1200,
+            height: 630,
+            alt: post.title,
+          },
+        ],
       },
     };
   } catch (err) {
