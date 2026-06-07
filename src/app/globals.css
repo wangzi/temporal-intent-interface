@@ -464,12 +464,21 @@ body.nav-open .scrim {
   text-transform: uppercase;
 }
 .spine-sort-toggle {
+  position: relative;
   display: inline-block;
   color: var(--dot); /* active state = accent */
   transition: color 0.15s;
 }
 .spine-sort-toggle:hover {
   color: var(--ink);
+}
+/* The visible toggle is only ~24×17px. Extend the tap area to ≥44px (and left
+   over the ⇅ glyph) without changing the layout — same pattern as the ring
+   controls' ::before hit area. */
+.spine-sort-toggle::after {
+  content: "";
+  position: absolute;
+  inset: -14px -16px -14px -28px;
 }
 .spine-sort-end {
   white-space: nowrap;
@@ -781,6 +790,9 @@ body.nav-open .scrim {
   line-height: 1.55;
   color: var(--system);
   margin-bottom: 16px;
+  /* A long unbroken token (URL/path/identifier) in mono must wrap rather than
+     overflow the narrow mobile column. */
+  overflow-wrap: anywhere;
 }
 
 .enrich .insight,
@@ -789,6 +801,7 @@ body.nav-open .scrim {
   font-size: var(--t-insight);
   line-height: 1.55;
   color: var(--ink-soft);
+  overflow-wrap: anywhere;
 }
 
 /* Attention (article) full intent block — the post route shows the complete
@@ -1547,6 +1560,13 @@ html.is-scrolling .attn-back-label {
     padding-bottom: 7.15vh;
   }
 
+  /* Mobile readability: bump the archive scan body (Intent / Signal text) from
+     15px to 17px for sustained reading on a phone — closer to the post body. */
+  .enrich .statement,
+  .enrich .insight {
+    font-size: 1.0625rem;
+  }
+
   /* The inline topbar filter chips belong to 701–1079px only. On
      mobile the same options live inside the bottom sheet. */
   .topbar-nav {
@@ -1564,6 +1584,30 @@ html.is-scrolling .attn-back-label {
   .rail button.navlink {
     padding: 9px 0;
     font-size: 0.875rem;
+  }
+}
+
+/* Mobile + light: darken the faint meta/label grey for legibility on a small
+   screen — at #9a9a95 it sits ~2.7:1 on the cream field (under WCAG AA). Scoped
+   to ≤700px AND light only, so desktop and dark mode keep their values. */
+@media (max-width: 700px) and (prefers-color-scheme: light) {
+  :root {
+    --color-system-faint: #70706a;
+  }
+}
+
+/* Touch devices: the tap-highlight is intentionally transparent (it clashes
+   with the cream field UI), so without an :active state every tap feels dead.
+   Give tappables a quick dim. Also hide keyboard-only hints. (hover: none)
+   targets touch — desktop pointer/keyboard states are untouched. */
+@media (hover: none) {
+  a:active,
+  button:active,
+  .rail-toggle:active {
+    opacity: 0.55;
+  }
+  .attn-hint-kbd {
+    display: none;
   }
 }
 
@@ -1819,6 +1863,18 @@ html.is-scrolling .attn-back-label {
 }
 .rail-toggle-input:checked ~ .rail-scrim {
   display: block;
+}
+/* Mobile / tablet overlay drawer: dim the page behind the open rail, and lock
+   body scroll so the feed doesn't slide under the open menu. Scoped to ≤1079px
+   (overlay drawer; no scrollbar-reflow there). The :has() scroll-lock degrades
+   gracefully on older engines — the dim still applies. */
+@media (max-width: 1079px) {
+  .rail-toggle-input:checked ~ .rail-scrim {
+    background: rgba(20, 20, 19, 0.34);
+  }
+  html:has(.rail-toggle-input:checked) {
+    overflow: hidden;
+  }
 }
 
 /* Wide desktop: measure holds; extra width → margin only. (Years

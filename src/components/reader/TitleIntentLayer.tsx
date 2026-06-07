@@ -58,15 +58,13 @@ export function TitleIntentLayer({
           <span className="dot-sep" aria-hidden="true">·</span>
           <span>{readingTimeLabel(post.reading_time)}</span>
         </div>
-        <button
-          type="button"
-          className="e-label mono"
-          aria-label={`Open intent graph: ${post.intent_label}`}
-          // Phase C: opens Local Constellation. In Phase B this is a
-          // no-op visual affordance; the keyboard focus path is intact.
-        >
-          {post.intent_label}
-        </button>
+        {/* Intent label — a non-interactive marker until Phase C wires it to the
+            Local Constellation. Rendered as a <span>, not a <button>: a styled,
+            focusable control that does nothing on tap is a phantom target next
+            to the real title link (mis-taps on touch) and is announced as a
+            broken control by screen readers. Restore the <button> + min-height
+            44px hit area when it actually opens something. */}
+        <span className="e-label mono">{post.intent_label}</span>
         <h2 className="e-title" id={headingId}>
           <a href={`/post/${post.slug}`}>{post.title}</a>
         </h2>
