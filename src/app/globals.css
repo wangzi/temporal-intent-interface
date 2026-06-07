@@ -1067,6 +1067,87 @@ html.is-scrolling .ask-ai-dot-label,
   outline: none;
   color: var(--dot);
 }
+/* Pre-tap clarity note — what choosing a prompt does. */
+.ask-ai-note {
+  margin: 10px 0 0;
+  font-size: 0.625rem;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--system-faint);
+}
+/* Backdrop only exists for the mobile bottom sheet (laptop+ panel needs none). */
+.ask-ai-backdrop {
+  display: none;
+}
+@keyframes ask-ai-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes ask-ai-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Mobile / tablet: the prompt panel becomes a bottom sheet. The dot opens it
+   (instead of silently copying), so the action is labeled and the prompt angles
+   are reachable on a phone too; choosing one copies + opens AI Mode. */
+@media (max-width: 1079px) {
+  .ask-ai-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 61;
+    background: rgba(20, 20, 19, 0.34);
+    animation: ask-ai-fade 0.2s var(--ease);
+  }
+  .ask-ai-panel {
+    right: auto;
+    left: 0;
+    top: auto;
+    bottom: 0;
+    z-index: 62; /* above the backdrop (61) + the ☰ FAB (60) */
+    width: auto;
+    max-width: none;
+    text-align: left;
+    padding: 18px 22px calc(20px + env(safe-area-inset-bottom, 0px));
+    border: 0;
+    border-top: 1px solid var(--rule);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.18);
+    animation: ask-ai-sheet-in 0.22s var(--ease);
+  }
+  .ask-ai-panel-head {
+    text-align: left;
+    margin-bottom: 10px;
+  }
+  .ask-ai-opt {
+    text-align: left;
+    padding: 13px 0; /* ≥44px touch row */
+    font-size: 1rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--rule) 55%, transparent);
+  }
+  .ask-ai-ask {
+    margin-top: 6px;
+    padding-top: 12px;
+  }
+  .ask-ai-input {
+    text-align: left;
+    font-size: 1rem;
+    min-height: 40px;
+  }
+  .ask-ai-note {
+    text-align: left;
+    font-size: 0.6875rem;
+  }
+}
 
 /* ============================================================
    Terminal hero — the head of the spine. A CLI status readout: two text rows
@@ -1565,6 +1646,17 @@ html.is-scrolling .attn-back-label {
   .enrich .statement,
   .enrich .insight {
     font-size: 1.0625rem;
+  }
+
+  /* Demote the decorative live-clock hero on a phone: it has no navigational
+     value and shouldn't own the top of the first screen, so the sort toggle +
+     feed come up. The spine head retunes to the sort row below (the hero's
+     ~70px no longer sits above it). */
+  .hero-term {
+    display: none;
+  }
+  .spine {
+    top: 18px;
   }
 
   /* The inline topbar filter chips belong to 701–1079px only. On
