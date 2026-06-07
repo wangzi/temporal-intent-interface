@@ -37,7 +37,6 @@ function copyTextSync(text: string): void {
     // best effort — the copy is non-critical to opening AI Mode
   }
 }
-const PANEL_MIN_WIDTH = 1080; // below this there's no left margin → direct action
 const TOAST_MS = 4500;
 
 const PROMPTS: { label: string; prefix: string }[] = [
@@ -87,8 +86,11 @@ export function AskAiDot({ title }: { title: string }) {
   }
 
   function onDotClick(): void {
-    if (window.innerWidth >= PANEL_MIN_WIDTH) setOpen((o) => !o);
-    else send(""); // narrow: no left margin → copy + open directly
+    // Open the prompt panel at every width — on mobile it renders as a labeled
+    // bottom sheet (see globals.css). Picking a prompt is what copies the
+    // article + opens AI Mode, so the new tab is always a deliberate, explained
+    // action rather than a silent tap into a surprise new tab.
+    setOpen((o) => !o);
   }
 
   useEffect(() => {
@@ -131,6 +133,16 @@ export function AskAiDot({ title }: { title: string }) {
         </span>
       </button>
 
+      {/* Backdrop behind the mobile bottom sheet (CSS-hidden on laptop+). Tap to
+          dismiss. */}
+      {open ? (
+        <div
+          className="ask-ai-backdrop"
+          aria-hidden="true"
+          onClick={() => setOpen(false)}
+        />
+      ) : null}
+
       {open ? (
         <div className="ask-ai-panel" role="menu" aria-label="Ask Google AI">
           <p className="ask-ai-panel-head mono">Ask Google AI</p>
@@ -162,12 +174,16 @@ export function AskAiDot({ title }: { title: string }) {
               aria-label="Ask your own question about this article"
             />
           </form>
+          {/* Pre-tap clarity: what choosing a prompt actually does. */}
+          <p className="ask-ai-note mono">
+            Copies the article, then opens Google AI Mode to paste.
+          </p>
         </div>
       ) : null}
 
       {copied ? (
         <div className="ask-ai-toast mono" role="status" aria-live="polite">
-          Copied — paste it into Google AI Mode (⌘/Ctrl + V)
+          Article copied — paste it into Google AI Mode.
         </div>
       ) : null}
     </div>
