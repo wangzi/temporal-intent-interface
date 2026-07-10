@@ -589,20 +589,45 @@ body.nav-open .scrim {
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
 }
-/* Studio bridge — the spine's terminal action. The timeline runs down into
-   this footer's top edge; the link sits at the line's foot and bridges out to
-   journalkit's authoring surface. Quiet by default; the red accent on
-   hover/focus ties it to the dot + sort-toggle accent language. */
-.site-footer-studio {
-  color: var(--system);
+/* Shell-prompt footer — the spine terminates into a live shell. A faint
+   `zw@z:~$` prompt, the outbound links (LinkedIn + Studio) as the typed
+   command in --ink (red on hover/focus), and a blinking block cursor. */
+.site-footer-cli {
   font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+.site-footer-prompt {
+  color: var(--system-faint);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.site-footer-cmd {
+  color: var(--ink);
   transition: color 0.15s var(--ease);
 }
-.site-footer-studio:hover,
-.site-footer-studio:focus-visible {
+.site-footer-cmd:hover,
+.site-footer-cmd:focus-visible {
   color: var(--dot);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+/* Blinking block cursor — the terminal "ready" pulse. */
+.site-footer-cursor {
+  margin-left: 0.15ch;
+  color: var(--dot);
+  animation: footer-blink 1.1s steps(1, end) infinite;
+}
+@keyframes footer-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
 }
 
 /* ============================================================
@@ -2038,7 +2063,8 @@ html.is-scrolling .attn-back-label {
      affected, so the ✻ clock sparkle + load-more pulse are killed by name. */
   .hero-prompt,
   .load-more-stone,
-  .ask-ai-panel {
+  .ask-ai-panel,
+  .site-footer-cursor {
     animation: none !important;
   }
 }

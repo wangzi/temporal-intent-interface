@@ -1,8 +1,8 @@
-// SSR site footer — the spine's terminal zone. The timeline (.spine) runs
-// down into this footer's top edge, so the footer reads as the line's foot.
-// It carries the Studio bridge: "Studio / Sign in →" links to journalkit's
-// authoring surface (studio.stillinlove.co), sitting at the end of the spine.
-// Server component — part of the SSR'd HTML, so it works with JS off.
+// SSR site footer — the spine's terminal zone. The timeline (.spine) runs down
+// into this footer's top edge, so it reads as the line's foot: a minimal shell
+// prompt (`zw@z:~$`) whose "typed command" is the outbound links (LinkedIn +
+// the Studio bridge), trailed by a blinking cursor. Server component — part of
+// the SSR'd HTML, so it works with JS off (the cursor just stops blinking).
 
 export function Footer(_props: {
   entryCount?: number;
@@ -10,10 +10,27 @@ export function Footer(_props: {
 }) {
   return (
     <footer className="site-footer mono" aria-label="Site footer">
-      <a className="site-footer-studio" href="https://studio.stillinlove.co">
-        Studio / Sign in <span aria-hidden="true">→</span>
-      </a>
-      <span className="site-footer-est">Est. 2021</span>
+      <span className="site-footer-cli">
+        <span className="site-footer-prompt" aria-hidden="true">
+          zw@z:~$
+        </span>{" "}
+        <a
+          className="site-footer-cmd"
+          href="https://www.linkedin.com/in/wzi/"
+          target="_blank"
+          rel="me noopener noreferrer"
+          aria-label="LinkedIn profile (opens in a new tab)"
+        >
+          linkedin<span aria-hidden="true">↗</span>
+        </a>{" "}
+        <a className="site-footer-cmd" href="https://studio.stillinlove.co">
+          studio<span aria-hidden="true">↗</span>
+        </a>
+        <span className="site-footer-cursor" aria-hidden="true">
+          ▮
+        </span>
+      </span>
+      <span className="site-footer-est">D.o.B 2016</span>
     </footer>
   );
 }
