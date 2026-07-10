@@ -13,7 +13,7 @@ export function Footer(_props: {
       <span className="site-footer-cli">
         <span className="site-footer-prompt" aria-hidden="true">
           zw@z:~$
-        </span>{" "}
+        </span>
         <a
           className="site-footer-cmd"
           href="https://www.linkedin.com/in/wzi/"
@@ -21,14 +21,14 @@ export function Footer(_props: {
           rel="me noopener noreferrer"
           aria-label="LinkedIn profile (opens in a new tab)"
         >
-          linkedin<span aria-hidden="true">↗</span>
-        </a>{" "}
-        <a className="site-footer-cmd" href="https://studio.stillinlove.co">
-          studio<span aria-hidden="true">↗</span>
+          linkedin<span className="site-footer-arrow" aria-hidden="true">↗</span>
         </a>
-        <span className="site-footer-cursor" aria-hidden="true">
-          ▮
-        </span>
+        <a className="site-footer-cmd" href="https://studio.stillinlove.co">
+          studio<span className="site-footer-arrow" aria-hidden="true">↗</span>
+          <span className="site-footer-cursor" aria-hidden="true">
+            ▮
+          </span>
+        </a>
       </span>
       <span className="site-footer-est">D.o.B 2016</span>
     </footer>
