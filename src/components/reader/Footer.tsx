@@ -30,7 +30,7 @@ export function Footer(_props: {
           </span>
         </a>
       </span>
-      <span className="site-footer-est">D.o.B 2016</span>
+      <span className="site-footer-est">boot: 2016</span>
     </footer>
   );
 }
