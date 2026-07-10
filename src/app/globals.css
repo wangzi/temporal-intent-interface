@@ -591,8 +591,14 @@ body.nav-open .scrim {
 }
 /* Shell-prompt footer — the spine terminates into a live shell. A faint
    `zw@z:~$` prompt, the outbound links (LinkedIn + Studio) as the typed
-   command in --ink (red on hover/focus), and a blinking block cursor. */
+   command in --ink (red on hover/focus), and a blinking block cursor.
+   Flex + gap (not manual whitespace) sets the inter-word rhythm — reliable
+   across browsers, unlike a literal " " text node. */
 .site-footer-cli {
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--ink);
@@ -613,9 +619,17 @@ body.nav-open .scrim {
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
-/* Blinking block cursor — the terminal "ready" pulse. */
+/* A little breathing room before the "opens externally" arrow — flush
+   against the word read as a typo, but a full word-gap read as a separate
+   token. */
+.site-footer-arrow {
+  margin-left: 0.2em;
+}
+/* Blinking block cursor — the terminal "ready" pulse. Nested inside the last
+   command (not a flex sibling), so it hugs "studio↗" tightly instead of
+   inheriting the same gap used between words. */
 .site-footer-cursor {
-  margin-left: 0.15ch;
+  margin-left: 2px;
   color: var(--dot);
   animation: footer-blink 1.1s steps(1, end) infinite;
 }
