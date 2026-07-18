@@ -15,9 +15,14 @@
 // empty extraction would make every "no email found" check pass vacuously.
 
 import { readFileSync, writeFileSync } from "node:fs";
-import { inflateSync } from "node:zlib";
 
 import { chromium } from "playwright-core";
+
+import {
+  extractPdfText,
+  pdfMediaBoxes,
+  pdfPageCount,
+} from "./lib/pdf-text.mjs";
 
 const BASE_URL = process.env.BASE_URL ?? "http://127.0.0.1:3100";
 const OUT = process.env.PDF_OUT ?? "/tmp/tii-resume.pdf";
@@ -78,11 +83,8 @@ check(
 const buf = readFileSync(OUT);
 const raw = buf.toString("latin1");
 
-const counts = [...raw.matchAll(/\/Count\s+(\d+)/g)].map((m) => Number(m[1]));
-const pageCount = counts.length ? Math.max(...counts) : 0;
-const boxes = [...raw.matchAll(/\/MediaBox\s*\[\s*([\d.\s-]+?)\]/g)].map((m) =>
-  m[1].trim().split(/\s+/).map(Number),
-);
+const pageCount = pdfPageCount(raw);
+const boxes = pdfMediaBoxes(raw);
 const isLetter = (b) =>
   Math.abs(b[2] - b[0] - 612) < 1.5 && Math.abs(b[3] - b[1] - 792) < 1.5;
 
@@ -94,109 +96,15 @@ check(
 );
 
 // ── text ───────────────────────────────────────────────────────────────────
-const objects = new Map();
-for (const m of raw.matchAll(/(\d+)\s+0\s+obj\b/g)) {
-  const start = m.index + m[0].length;
-  const end = raw.indexOf("endobj", start);
-  if (end === -1) continue;
-  const body = raw.slice(start, end);
-  const si = body.indexOf("stream");
-  let streamText = null;
-  if (si !== -1) {
-    let s = start + si + 6;
-    if (buf[s] === 0x0d) s++;
-    if (buf[s] === 0x0a) s++;
-    const e = raw.indexOf("endstream", s);
-    if (e !== -1) {
-      try {
-        streamText = inflateSync(buf.subarray(s, e)).toString("latin1");
-      } catch {
-        streamText = buf.subarray(s, e).toString("latin1");
-      }
-    }
-  }
-  objects.set(Number(m[1]), {
-    dict: si === -1 ? body : body.slice(0, si),
-    streamText,
-  });
-}
-
-function parseCMap(text) {
-  const map = new Map();
-  const hexToStr = (h) => {
-    let out = "";
-    for (let i = 0; i + 4 <= h.length; i += 4) {
-      const code = parseInt(h.slice(i, i + 4), 16);
-      if (!Number.isNaN(code) && code !== 0) out += String.fromCharCode(code);
-    }
-    return out;
-  };
-  for (const block of text.matchAll(/beginbfchar([\s\S]*?)endbfchar/g)) {
-    for (const p of block[1].matchAll(/<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g)) {
-      map.set(parseInt(p[1], 16), hexToStr(p[2]));
-    }
-  }
-  for (const block of text.matchAll(/beginbfrange([\s\S]*?)endbfrange/g)) {
-    for (const p of block[1].matchAll(
-      /<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g,
-    )) {
-      const lo = parseInt(p[1], 16);
-      const hi = parseInt(p[2], 16);
-      const base = parseInt(p[3], 16);
-      for (let c = lo; c <= hi && c - lo < 65536; c++) {
-        map.set(c, String.fromCharCode(base + (c - lo)));
-      }
-    }
-  }
-  return map;
-}
-
-const nameToObj = new Map();
-for (const [, obj] of objects) {
-  for (const fd of obj.dict.matchAll(/\/Font\s*<<([\s\S]*?)>>/g)) {
-    for (const e of fd[1].matchAll(/\/(F\d+)\s+(\d+)\s+0\s+R/g)) {
-      nameToObj.set(e[1], Number(e[2]));
-    }
-  }
-}
-
-const fontMaps = new Map();
-for (const [name, objNum] of nameToObj) {
-  const tu = objects.get(objNum)?.dict.match(/\/ToUnicode\s+(\d+)\s+0\s+R/);
-  const cmap = tu && objects.get(Number(tu[1]))?.streamText;
-  if (cmap) fontMaps.set(name, parseCMap(cmap));
-}
-
-let text = "";
-for (const [, obj] of objects) {
-  const s = obj.streamText;
-  if (!s || !/\bTj\b|\bTJ\b/.test(s)) continue;
-  let current = null;
-  let lastY = null;
-  for (const m of s.matchAll(
-    /\/(F\d+)\s+[\d.]+\s+Tf|<([0-9A-Fa-f]*)>\s*Tj|1 0 0 -1 ([\d.-]+) ([\d.-]+) Tm/g,
-  )) {
-    if (m[1]) {
-      current = fontMaps.get(m[1]) ?? null;
-    } else if (m[4] !== undefined) {
-      const y = Number(m[4]);
-      if (lastY !== null && Math.abs(y - lastY) > 0.5) text += "\n";
-      lastY = y;
-    } else if (m[2] !== undefined && current) {
-      for (let i = 0; i + 2 <= m[2].length; i += 2) {
-        text += current.get(parseInt(m[2].slice(i, i + 2), 16)) ?? "";
-      }
-    }
-  }
-  text += "\n";
-}
-
+const extracted = extractPdfText(buf);
+const text = extracted.text;
+const fontsDecoded = extracted.fontsDecoded;
 const flat = text.replace(/\s+/g, " ");
 writeFileSync("/tmp/tii-resume-extracted.txt", text);
 
 // Guard against the whole text section passing vacuously on an empty extract.
 check(
-  fontMaps.size > 0,
+  fontsDecoded > 0,
   "decoded no font CMaps — text assertions would be vacuous",
 );
 check(
@@ -231,7 +139,7 @@ console.log(
       pageSize: [...new Set(boxes.map((b) => b.join("x")))],
       allUsLetter: boxes.every(isLetter),
       printMedia: inPrint,
-      fontsDecoded: fontMaps.size,
+      fontsDecoded,
       extractedChars: flat.length,
       emails,
       phoneShaped: phones,

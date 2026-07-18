@@ -447,12 +447,52 @@ cp .env.example .env.local
 # Phase B: JOURNALKIT_FIXTURE_MODE=true is the default.
 
 pnpm dev          # http://localhost:3000
+pnpm format:check # prettier (also enforced in CI, before typecheck)
 pnpm typecheck    # tsc --noEmit (strict + noUncheckedIndexedAccess)
 pnpm lint         # next lint
+pnpm test         # vitest
 pnpm build        # next build (production verification)
 ```
 
 When the engine API goes live, set `JOURNALKIT_API_URL` + `JOURNALKIT_API_KEY` and flip `JOURNALKIT_FIXTURE_MODE=false`.
+
+### Verification harnesses
+
+These drive a real browser or read generated artifacts, so they are **not** part
+of hosted CI — Chrome and the private source PDF are not CI inputs. Run them
+locally against a production-mode server, a preview URL, or production.
+
+```bash
+pnpm verify:api    # deterministic snapshot fixture on :4010 (needed for /s/)
+pnpm verify:ui     # route x viewport matrix; overflow, console + CSP violations
+pnpm verify:print  # the printed resume: 2 US Letter pages, no contact details
+pnpm verify:source # every resume claim vs. the source PDF  (see below)
+```
+
+### Changing resume data requires `verify:source`
+
+**Any edit to `src/lib/resume/data.ts` must be followed by:**
+
+```bash
+RESUME_SOURCE_PDF='/path/to/Resume.pdf' pnpm verify:source
+```
+
+The resume is a public factual record about a real person, and the locked rule
+is that every claim comes from the source PDF and nothing else — no
+embellishing, no inferring, no rounding a metric, no resolving "Present" to a
+year. `verify:source` parses `data.ts` through the TypeScript AST, checks the
+PDF's SHA-256 against the `sourceSha256` recorded in the record, and requires
+every natural-language string to appear verbatim in the document. It carries
+negative controls, so it fails if a metric or an ordinary word is altered.
+
+The PDF is private — it contains an email and phone number that must never
+ship — so it is never committed and its path is supplied by the operator. The
+script prints only counts, the hash, and unmatched strings from `data.ts`.
+
+If you add or remove a claim, the pinned string counts in
+`scripts/verify-source-fidelity.mjs` change too. That is deliberate: it forces
+the new record to be re-checked against the document rather than silently
+widened.
 
 ---
 
