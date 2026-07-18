@@ -1,11 +1,19 @@
-// Security headers. The CSP ships REPORT-ONLY first so a mistake can't break
-// the reader; it is promoted to enforcing only after a preview deploy reports
-// zero violations. Sources are the exact origins this site actually talks to —
-// no wildcards, and no 'unsafe-eval' or data: for scripts outside development.
+// Security headers. The CSP shipped REPORT-ONLY first so a mistake couldn't
+// break the reader, and is now ENFORCING. Sources are the exact origins this
+// site actually talks to — no wildcards, and no 'unsafe-eval' or data: for
+// scripts outside development.
+//
+// Promotion evidence — preview z-stillinlove-62gf1vrne at commit 7b59f78:
+// 36 rows (4 routes x 9 viewport/scheme configs), 0 violations, with the
+// harness listening for securitypolicyviolation. That listener is what makes
+// the zero worth anything: the previous filter kept only console type "error",
+// while Chrome reports CSP violations at type "info", so it had literally never
+// been able to see one. Its first real run caught Vercel's preview toolbar.
 //
 // Next is used here without nonces (its documented static-friendly policy), so
 // 'unsafe-inline' is required for the framework's inline bootstrap script and
 // for styled JSX/inline style attributes.
+//
 // Built as a pure function of its two environment flags so the production
 // policy can be asserted directly (see src/lib/security/csp.test.ts). An
 // untested "production is unaffected" claim about a security header is worth
@@ -78,8 +86,9 @@ const isPreview = process.env.VERCEL_ENV === "preview";
 const contentSecurityPolicy = buildContentSecurityPolicy({ isDev, isPreview });
 
 const securityHeaders = [
-  // Report-only during rollout — see Task 6.4 for promotion to enforcing.
-  { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy },
+  // Enforcing. A violation now blocks the resource rather than logging it, so
+  // widen this only with a preview run that shows the new origin is needed.
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   // No includeSubDomains / preload: this domain is not the apex owner of every
   // subdomain and preload is irreversible in practice.
   { key: "Strict-Transport-Security", value: "max-age=63072000" },
