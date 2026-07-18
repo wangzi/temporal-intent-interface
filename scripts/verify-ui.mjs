@@ -27,6 +27,8 @@ import { join } from "node:path";
 
 import { chromium } from "playwright-core";
 
+import { resumeAccessCookies } from "./lib/resume-gate.mjs";
+
 const BASE_URL = (process.env.BASE_URL ?? "http://127.0.0.1:3100").replace(
   /\/+$/,
   "",
@@ -79,6 +81,11 @@ const isExpected404Noise = (route, text) =>
 
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 
+// The resume sits behind a pre-publication gate. Unlock once, then seed every
+// context — otherwise the matrix would happily verify the unlock curtain and
+// report /resume as green.
+const accessCookies = await resumeAccessCookies(BASE_URL, browser);
+
 for (const { w, scheme } of MATRIX) {
   const ctx = await browser.newContext({
     viewport: { width: w, height: 900 },
@@ -86,6 +93,8 @@ for (const { w, scheme } of MATRIX) {
     hasTouch: w === 390,
     deviceScaleFactor: 1,
   });
+
+  if (accessCookies.length) await ctx.addCookies(accessCookies);
 
   for (const route of ROUTES) {
     const page = await ctx.newPage();
@@ -175,6 +184,7 @@ const ctx = await browser.newContext({
   viewport: { width: 1280, height: 900 },
   colorScheme: "light",
 });
+if (accessCookies.length) await ctx.addCookies(accessCookies);
 const page = await ctx.newPage();
 
 // Escape closes the CSS-only rail disclosure.

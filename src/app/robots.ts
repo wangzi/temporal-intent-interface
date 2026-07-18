@@ -1,12 +1,16 @@
 // robots.txt (served at /robots.txt). Snapshots (/s/) are link-only and already
 // noindex; the BFF (/api) is not content. Everything else is crawlable.
 //
-// AI crawlers are allowed DELIBERATELY rather than by default. This site
-// publishes a machine-readable resume, so being read accurately by assistants
-// is the point. Each vendor is named with its official token, and every AI
-// group repeats the same /s/ and /api/ exclusions as the wildcard group — an
-// explicit group does NOT inherit the wildcard rules, so omitting them would
-// silently open the snapshot and BFF paths to exactly these agents.
+// AI crawlers are named DELIBERATELY rather than left to the default: the
+// intent is for a machine-readable resume to be read accurately by assistants.
+// But the resume is NOT PUBLISHED YET (src/lib/resume/gate.ts), so /resume and
+// its machine-readable surfaces are disallowed for the moment. Remove those
+// entries in the same change that removes the gate.
+//
+// Each vendor is named with its official token, and every AI group repeats the
+// same exclusions as the wildcard group — an explicit group does NOT inherit
+// the wildcard rules, so omitting them would silently open those paths to
+// exactly these agents.
 //
 // Tokens (vendor documentation):
 //   OpenAI       OAI-SearchBot (search), GPTBot (training)
@@ -30,18 +34,22 @@ const AI_CRAWLERS = [
   "Google-Extended",
 ];
 
+// Snapshots and the BFF are permanently excluded. The resume entries are
+// temporary and come out with the gate.
+const DISALLOW = ["/s/", "/api/", "/resume", "/resume.json", "/llms.txt"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/s/", "/api/"],
+        disallow: DISALLOW,
       },
       {
         userAgent: AI_CRAWLERS,
         allow: "/",
-        disallow: ["/s/", "/api/"],
+        disallow: DISALLOW,
       },
     ],
     sitemap: `${SITE}/sitemap.xml`,

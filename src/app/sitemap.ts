@@ -1,6 +1,10 @@
-// Sitemap (served at /sitemap.xml) — home, the resume, and every published
-// post. Role views (/resume?role=…) are deliberately absent: they are noindex
-// views of the same document and all canonicalize to /resume.
+// Sitemap (served at /sitemap.xml) — home and every published post.
+//
+// /resume is deliberately ABSENT while it sits behind the pre-publication gate
+// (src/lib/resume/gate.ts): a sitemap is an invitation to crawl, and the page
+// now answers crawlers with a redirect to an unlock form. Re-add the entry in
+// the same change that removes the gate. Role views (/resume?role=…) stay out
+// regardless — they are noindex views that canonicalize to /resume.
 import type { MetadataRoute } from "next";
 
 import { listPosts } from "@/lib/engine/client";
@@ -26,7 +30,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { url: `${SITE}/`, changeFrequency: "daily", priority: 1 },
-    { url: `${SITE}/resume`, changeFrequency: "monthly", priority: 0.9 },
     ...postEntries,
   ];
 }
