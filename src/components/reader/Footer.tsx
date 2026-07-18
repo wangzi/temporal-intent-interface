@@ -4,10 +4,7 @@
 // and the Studio bridge), trailed by a blinking cursor. Server component — part
 // of the SSR'd HTML, so it works with JS off (the cursor just stops blinking).
 
-export function Footer(_props: {
-  entryCount?: number;
-  updatedISO?: string | null;
-}) {
+export function Footer() {
   // `mono` sits on the children, not the <footer>: the element's own font
   // decides how `--measure` (66ch) computes, and the post-route footer has to
   // resolve the SAME column width as the article to land on the spine.

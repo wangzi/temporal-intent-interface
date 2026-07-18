@@ -17,7 +17,6 @@ import {
   PostsListResponseSchema,
   PostDetailResponseSchema,
   SearchResponseSchema,
-  TopicsResponseSchema,
 } from "./schemas";
 import type {
   FocusResponse,
@@ -29,8 +28,6 @@ import type {
   SearchParams,
   SearchResponse,
   SearchResult,
-  TopicFacet,
-  TopicsResponse,
 } from "./types";
 
 export class EngineError extends Error {
@@ -173,19 +170,6 @@ export async function getFocusRoute(
   return FocusRouteResponseSchema.parse(raw);
 }
 
-/** GET /api/v1/topics — facets (topic + post count) over published posts. */
-export async function listTopics(): Promise<TopicsResponse> {
-  if (env.JOURNALKIT_FIXTURE_MODE) {
-    const raw = await fixtureGet("posts");
-    if (!raw) throw new EngineError("fixture posts.json missing", 500);
-    const { posts } = PostsListResponseSchema.parse(raw);
-    return { topics: fixtureFacets(posts) };
-  }
-
-  const raw = await fetchJSON("/topics");
-  return TopicsResponseSchema.parse(raw);
-}
-
 // In-process sort + filter for the fixture path. The real engine is
 // expected to do this server-side, so this code is only exercised in
 // fixture mode (JOURNALKIT_FIXTURE_MODE=true).
@@ -218,26 +202,6 @@ function applyListParams(
   });
 
   return { posts: [...pinned, ...rest], next_cursor: null };
-}
-
-// Fixture-only topic facets — mirrors the engine's count-once-per-post shape so
-// the rail renders offline. Real facets come from GET /api/v1/topics.
-function fixtureFacets(posts: PostSummary[]): TopicFacet[] {
-  const byKey = new Map<string, { topic: string; count: number }>();
-  for (const p of posts) {
-    const seen = new Set<string>();
-    for (const t of p.topics ?? []) {
-      const key = t.toLowerCase();
-      if (!key || seen.has(key)) continue;
-      seen.add(key);
-      const cur = byKey.get(key);
-      if (cur) cur.count += 1;
-      else byKey.set(key, { topic: t, count: 1 });
-    }
-  }
-  return [...byKey.values()].sort(
-    (a, b) => b.count - a.count || a.topic.localeCompare(b.topic),
-  );
 }
 
 // Fixture-only search — offline approximation over the summary fields (fixtures

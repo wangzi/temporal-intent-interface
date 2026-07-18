@@ -523,19 +523,6 @@ body.nav-open .scrim {
   }
 }
 
-.now-label {
-  font-family: var(--mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--system-faint);
-  padding: 24px 0 8px var(--content-pad);
-  /* Top lead-in: just enough that the latest entry can reach the focus
-     line and be focused at the top (less than the bottom reach — a full
-     mirror felt too empty). */
-  margin-top: 18vh;
-}
-
 /* ============================================================
    Site footer — reserved placeholder zone (--footer-h tall).
    The spine terminates at this footer's top edge. Today it carries
@@ -576,33 +563,6 @@ body.nav-open .scrim {
   .col:has(.attn-inner) .site-footer {
     padding-left: var(--spine-x);
   }
-}
-.site-footer-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 16px;
-}
-.site-footer-brand {
-  color: var(--ink);
-}
-.site-footer-brand span {
-  color: var(--dot);
-}
-.site-footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.site-footer-link {
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--system-faint);
-  transition: color 0.15s;
-}
-.site-footer-link:hover {
-  color: var(--ink);
 }
 .site-footer-est {
   color: var(--system-faint);
@@ -1657,28 +1617,6 @@ html.is-scrolling .attn-back-label {
 /* ============================================================
    Keyboard hint chip (laptop+)
    ============================================================ */
-.kbd-hint {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 35;
-  font-family: var(--mono);
-  font-size: 0.6875rem;
-  color: var(--system-faint);
-  background: color-mix(in srgb, var(--field) 80%, transparent);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--rule);
-  border-radius: 7px;
-  padding: 8px 11px;
-  display: none;
-  line-height: 1.7;
-}
-
-.kbd-hint kbd {
-  color: var(--system);
-  font-family: var(--mono);
-}
-
 /* ============================================================
    Breakpoints — how horizontal space is spent.
    Vertical = navigation everywhere. Horizontal is layout only.
@@ -1842,11 +1780,6 @@ html.is-scrolling .attn-back-label {
   }
   /* (Post-route spine override now lives globally as `.attn-inner
      .spine`, above — it wins by specificity at every breakpoint.) */
-  /* Now-label aligns with the content column, not the meta gutter. */
-  .now-label {
-    padding-top: 0;
-    padding-left: calc(var(--spine-x) + var(--content-pad));
-  }
   /* Push entry content past the spine; meta uses the now-free left gutter. */
   .entry {
     padding-left: calc(var(--spine-x) + var(--content-pad));
@@ -1878,9 +1811,6 @@ html.is-scrolling .attn-back-label {
   .e-meta time,
   .e-meta .e-meta-ago,
   .e-meta > span:last-of-type {
-    display: block;
-  }
-  .kbd-hint {
     display: block;
   }
 }

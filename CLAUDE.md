@@ -81,8 +81,14 @@ Source of truth: `~/Desktop/session2_tii/canonical_prd.md` (PRD v1, 2026-05-30).
 | `tailwindcss` | `^4.0.0` | CSS-first config via `@theme inline` in `src/app/globals.css` |
 | `@tailwindcss/postcss` | `^4.0.0` | PostCSS plugin |
 | `postcss` | `^8.5.0` | |
-| `clsx` | `^2.1.1` | Conditional class joining |
-| `tailwind-merge` | `^2.6.0` | Deduplicates conflicting Tailwind classes |
+
+> **This codebase is hand-written CSS, not utility-driven.** Tailwind is present
+> for its preflight reset and the `@theme inline` token block only — the only
+> utility classes anywhere are on `not-found.tsx`. `clsx` and `tailwind-merge`
+> were removed (never used; no `cn()` helper exists), and `tailwind.config.ts`
+> was deleted because v4 CSS-first config means it was never loaded (no
+> `@config` directive). For a new surface, add scoped CSS — don't reach for
+> utilities or re-add a config file.
 
 ### Engine boundary
 | Package | Version | Role |
@@ -116,7 +122,6 @@ Source of truth: `~/Desktop/session2_tii/canonical_prd.md` (PRD v1, 2026-05-30).
 ├── package.json
 ├── pnpm-lock.yaml
 ├── tsconfig.json              strict + noUncheckedIndexedAccess; @/* → ./src/*
-├── tailwind.config.ts         minimal v4 stub (CSS-first lives in globals.css)
 ├── postcss.config.mjs         @tailwindcss/postcss
 ├── next.config.mjs
 ├── vercel.json                { "framework": "nextjs" }

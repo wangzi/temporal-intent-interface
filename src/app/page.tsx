@@ -24,6 +24,8 @@ import {
   listPosts,
   searchPosts,
 } from "@/lib/engine/client";
+import type { Metadata } from "next";
+
 import type {
   FocusResponse,
   FocusRouteResponse,
@@ -47,6 +49,13 @@ import { TerminalHeroIsland } from "@/components/reader/TerminalHeroIsland";
 import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
+
+// The archive owns this canonical (it used to live on the root layout, where
+// it leaked to every route). The filtered modes — ?focus / ?q / ?sort — are
+// views of the same collection, so they all consolidate to "/".
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const EMPTY_FOCUS: FocusResponse = { categories: [], routes: [] };
 

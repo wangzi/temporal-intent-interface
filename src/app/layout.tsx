@@ -28,9 +28,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://z.stillinlove.co",
   ),
-  // Default canonical → home; the filtered archive modes (?focus/?q/?sort)
-  // consolidate here. The post route overrides this with its own canonical.
-  alternates: { canonical: "/" },
+  // NOTE: deliberately NO `alternates.canonical` here. Next merges metadata
+  // shallowly, so a canonical on the ROOT layout is inherited by every route
+  // that doesn't override it — which silently declares each new page a
+  // duplicate of the homepage and drops it from search. Each route sets its
+  // own canonical (see app/page.tsx and post/[slug]/page.tsx).
   openGraph: {
     siteName: "z.",
     type: "website",
