@@ -2,7 +2,7 @@
   "name": "tii",
   "private": true,
   "version": "0.0.1",
-  "description": "Temporal Intent Interface — the public reader at z.stillinlove.co. Consumes journalkit's read API server-side; holds no durable state.",
+  "description": "Temporal Intent Interface \u2014 the public reader at z.stillinlove.co. Consumes journalkit's read API server-side; holds no durable state.",
   "packageManager": "pnpm@10.33.2",
   "engines": {
     "node": ">=20"
@@ -12,7 +12,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",
@@ -31,7 +35,9 @@
     "eslint-config-next": "^15.1.0",
     "playwright-core": "^1.60.0",
     "postcss": "^8.5.0",
+    "prettier": "^3.9.5",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.10"
   }
 }

@@ -1,0 +1,10 @@
+.next
+node_modules
+pnpm-lock.yaml
+reports
+public/fonts
+public/og
+# macOS/iCloud duplicates — gitignored, must never be formatted back in
+* 2.*
+# Engine fixtures are captures of real API responses — keep byte-faithful
+src/lib/engine/fixtures

@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref (saves minutes on rapid pushes).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: typecheck · lint · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Runs the same gate used locally. `next build` does NOT typecheck
+      # non-emitted files, so tsc --noEmit is a separate, load-bearing step.
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
+        env:
+          # Build without engine credentials: fixture mode keeps the engine
+          # client off the network so CI never needs a real API key.
+          JOURNALKIT_FIXTURE_MODE: "true"
+          NEXT_PUBLIC_SITE_URL: https://z.stillinlove.co
+          JOURNALKIT_API_URL: https://studio.stillinlove.co/api/v1
