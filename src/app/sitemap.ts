@@ -1,4 +1,6 @@
-// Sitemap (served at /sitemap.xml) — home + every published post.
+// Sitemap (served at /sitemap.xml) — home, the resume, and every published
+// post. Role views (/resume?role=…) are deliberately absent: they are noindex
+// views of the same document and all canonicalize to /resume.
 import type { MetadataRoute } from "next";
 
 import { listPosts } from "@/lib/engine/client";
@@ -24,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { url: `${SITE}/`, changeFrequency: "daily", priority: 1 },
+    { url: `${SITE}/resume`, changeFrequency: "monthly", priority: 0.9 },
     ...postEntries,
   ];
 }

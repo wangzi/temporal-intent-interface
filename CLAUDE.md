@@ -408,7 +408,7 @@ These must stay in lockstep. If they diverge, neither side ships the change unti
 - **No API key in client code.** Ever.
 - **Provenance is in the DOM.** Every text-rendering component sets `data-text-origin="canonical|generated"`.
 - **Errors from BFF:** thrown to `notFound()` on 404; otherwise bubble. Phase B keeps it simple; Phase C may add an error envelope.
-- **No `dangerouslySetInnerHTML` outside `<CanonicalBody>`.** That component is the single trust seam.
+- **No `dangerouslySetInnerHTML` outside two named components.** `<CanonicalBody>` is the trust seam for engine-sanitized post HTML. `<JsonLd>` (`src/components/seo/JsonLd.tsx`) is the _only_ other approved seam: JSON-LD must be emitted as raw script text or React escapes it into invalid JSON. `JsonLd` accepts a plain object (never a string, so no caller can hand it markup) and serializes via `JSON.stringify(...).replace(/</g, "\\u003c")`, which closes the `</script>` break-out. **These two are exhaustive — do not add a third, and do not widen either.**
 - **Reader pages must render with JS disabled.** Test before merging anything that touches the read path.
 - **One client island.** `ReaderControlsIsland` owns all scroll + keyboard + dot state. Don't fragment it into multiple islands without an explicit reason.
 
@@ -504,7 +504,8 @@ Inherited reader-binding rules from PRD §17 plus TII-specific additions.
 13. Schema changes happen in journalkit, never here. TII has no schema.
 14. No state / data-fetching / form / test library without an explicit decision.
 15. Push to main only with explicit user authorization.
-16. CanonicalBody is the only `dangerouslySetInnerHTML` site. Don't add others.
+16. CanonicalBody (post HTML) and JsonLd (structured data) are the ONLY two
+    `dangerouslySetInnerHTML` sites. Don't add a third; don't widen either.
 17. The engine sanitizes HTML (PRD §9 D16). TII does NOT re-sanitize.
 ```
 

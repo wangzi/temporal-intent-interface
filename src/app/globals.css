@@ -5,10 +5,12 @@
      tokens  → design primitives (colors, type, fonts)
      base    → reset + shared utilities
      prose   → long-form typography (.prose / .attn-body)
+     resume  → the /resume surface only (composes prose)
      reader  → the journal reader only
 */
 @import "tailwindcss";
 @import "../styles/tokens.css";
 @import "../styles/base.css";
 @import "../styles/prose.css";
+@import "../styles/resume.css";
 @import "../styles/reader.css";

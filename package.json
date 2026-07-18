@@ -16,7 +16,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "verify:ui": "node scripts/verify-ui.mjs",
+    "verify:api": "node scripts/verify-fixture-api.mjs",
+    "verify:print": "node scripts/verify-print.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",
