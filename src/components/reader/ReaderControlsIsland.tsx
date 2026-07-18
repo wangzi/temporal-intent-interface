@@ -355,9 +355,16 @@ export function ReaderControlsIsland(): null {
           }
           break;
         }
-        case "Escape":
-          // Step 8 hooks rail-close here; no-op until then.
+        case "Escape": {
+          // Close the nav rail. It's a CSS-only disclosure (a checkbox in
+          // TemporalLayout), so closing it means unchecking the box.
+          const railToggle = document.getElementById("rail-toggle");
+          if (railToggle instanceof HTMLInputElement && railToggle.checked) {
+            e.preventDefault();
+            railToggle.checked = false;
+          }
           break;
+        }
       }
     }
 
