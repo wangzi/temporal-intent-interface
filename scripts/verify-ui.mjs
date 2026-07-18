@@ -90,11 +90,28 @@ for (const { w, scheme } of MATRIX) {
   for (const route of ROUTES) {
     const page = await ctx.newPage();
     const errors = [];
+    const cspViolations = [];
     page.on("console", (m) => {
       if (m.type() === "error" && !isExpected404Noise(route, m.text()))
         errors.push(m.text());
     });
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
+
+    // CSP violations are reported by Chrome at console level `info`, not
+    // `error`, so the filter above silently drops every one of them. The
+    // policy also ships without report-uri/report-to, which means that without
+    // this listener nothing anywhere observes a violation — and "we saw no
+    // reports" would be evidence of nothing while still reading like a pass.
+    // This matters most right before the report-only policy is promoted to
+    // enforcing, when a missed violation becomes a hard block in production.
+    await page.exposeFunction("__reportCsp", (v) => cspViolations.push(v));
+    await page.addInitScript(() => {
+      document.addEventListener("securitypolicyviolation", (e) => {
+        window.__reportCsp?.(
+          `${e.effectiveDirective} <- ${e.blockedURI || "(inline)"}`,
+        );
+      });
+    });
 
     const resp = await page.goto(BASE_URL + route.path, {
       waitUntil: "networkidle",
@@ -132,6 +149,8 @@ for (const { w, scheme } of MATRIX) {
       spineX: m.spineX,
       consoleErrors: errors.length,
       errorSample: errors.slice(0, 2),
+      cspViolations: cspViolations.length,
+      cspSample: cspViolations.slice(0, 3),
       shot,
     });
 
@@ -140,6 +159,8 @@ for (const { w, scheme } of MATRIX) {
       fail(`${at}: status ${status} !== expected ${route.expect}`);
     if (m.overflow > 0) fail(`${at}: horizontal overflow ${m.overflow}px`);
     if (errors.length) fail(`${at}: console error: ${errors[0]}`);
+    if (cspViolations.length)
+      fail(`${at}: CSP violation: ${cspViolations.join("; ")}`);
     if (!m.field || !m.ink || !m.measure)
       fail(`${at}: design tokens unresolved`);
 
@@ -288,6 +309,7 @@ const summary = {
   ).map(([status, count]) => ({ status: Number(status), count })),
   overflowRows: rows.filter((r) => r.overflow > 0).length,
   consoleErrorRows: rows.filter((r) => r.consoleErrors > 0).length,
+  cspViolationRows: rows.filter((r) => r.cspViolations > 0).length,
 };
 
 writeFileSync(

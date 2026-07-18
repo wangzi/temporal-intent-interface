@@ -263,9 +263,26 @@ const resumeInput = {
 } as const;
 
 /**
+ * Object.freeze is shallow, which is not enough here. This is a module
+ * singleton shared by every request the server handles, and the values below
+ * are statements about a real person. One in-place `.sort()`, `.reverse()` or
+ * `.splice()` on a nested array — the exact operations role filtering reaches
+ * for — would silently reorder or drop a published claim for the remaining
+ * lifetime of the process, with no error and nothing to notice from outside.
+ * Freezing the whole tree turns that class of mistake into an immediate throw.
+ */
+function deepFreeze<T>(value: T): T {
+  if (value && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const nested of Object.values(value)) deepFreeze(nested);
+  }
+  return value;
+}
+
+/**
  * Parsed at module initialization: an invalid or privacy-violating resume
  * throws on import rather than rendering.
  */
-export const resume: Resume = Object.freeze(
+export const resume: Resume = deepFreeze(
   ResumeSchema.parse(resumeInput),
 ) as Resume;

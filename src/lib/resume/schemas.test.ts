@@ -175,30 +175,133 @@ describe("privacy: email and phone are excluded and structurally rejected", () =
     );
   });
 
-  it.each(["email", "Email", "e-mail", "telephone", "phone", "mobile", "fax"])(
-    "rejects the forbidden key %s",
-    (key) => {
-      expect(() => assertNoPrivateContact({ [key]: "anything" })).toThrow(
-        /forbidden key/,
-      );
-    },
-  );
+  it.each([
+    // Typographic separators — what a word processor produces when you paste
+    // a contact line. An ASCII-only separator class misses every one of these.
+    ["en dash", "678–464–0214"],
+    ["em dash", "678—464—0214"],
+    ["figure dash", "678‒464‒0214"],
+    ["non-breaking hyphen", "678‑464‑0214"],
+    ["minus sign", "678−464−0214"],
+    ["non-breaking space", "678 464 0214"],
+  ])("rejects a phone written with a %s", (_label, value) => {
+    expect(() => assertNoPrivateContact({ deep: [value] })).toThrow(
+      /phone-shaped/,
+    );
+  });
 
-  it("does not mistake plain years or metrics for phone numbers", () => {
+  it("rejects a phone stored as a number rather than a string", () => {
+    // Numbers used to fall through every branch of the walk unexamined.
+    expect(() => assertNoPrivateContact({ contact: 6784640214 })).toThrow(
+      /phone-shaped/,
+    );
+    expect(() => assertNoPrivateContact([16784640214])).toThrow(/phone-shaped/);
+  });
+
+  it.each([
+    "email",
+    "Email",
+    "e-mail",
+    "telephone",
+    "phone",
+    "mobile",
+    "fax",
+    // Compound and plural forms. The previous word-boundary pattern let all
+    // of these through, which mattered most in jsonld.ts — a hand-built
+    // object literal that no strict schema ever validates.
+    "emailAddress",
+    "contactEmail",
+    "emails",
+    "phoneNumber",
+    "phones",
+    "mobileNumber",
+    "faxNumber",
+    "telephoneNumber",
+  ])("rejects the forbidden key %s", (key) => {
+    expect(() => assertNoPrivateContact({ [key]: "anything" })).toThrow(
+      /forbidden key/,
+    );
+  });
+
+  it("rejects private contact inside a Map or Set", () => {
+    expect(() =>
+      assertNoPrivateContact(new Map([["notes", "reach me at a@b.com"]])),
+    ).toThrow(/email-shaped/);
+    expect(() => assertNoPrivateContact(new Set(["678-464-0214"]))).toThrow(
+      /phone-shaped/,
+    );
+  });
+
+  it("does not mistake years, metrics or long round numbers for phones", () => {
     expect(() =>
       assertNoPrivateContact({
         years: "2007–2009",
         metric: "1.5M+ users, 140K+ app downloads, $980K+",
         span: "2006-2015",
+        // Ten digits, but not a dialable NANP number (area code starts with 1).
+        bigRoundNumber: 1000000000,
+        scaled: "accelerated Android adoption to >1B devices worldwide",
       }),
     ).not.toThrow();
   });
 
-  it("rejects a resume that reintroduces contact details", () => {
+  it("rejects a resume whose claim text reintroduces contact details", () => {
+    // Injected into an ALLOWED field on purpose. Adding a stray `email` key to
+    // person instead would fail PersonSchema.strict() with unrecognized_keys
+    // and never reach the privacy refinement — so that test would still pass
+    // if the privacy rule were deleted outright. This one cannot.
+    const first = resume.experience[0]!;
+    const position = first.positions[0]!;
+    const tainted = {
+      ...resume,
+      experience: [
+        {
+          ...first,
+          positions: [
+            {
+              ...position,
+              claims: [
+                { ...position.claims[0]!, text: "Reach me at 678-464-0214." },
+                ...position.claims.slice(1),
+              ],
+            },
+            ...first.positions.slice(1),
+          ],
+        },
+        ...resume.experience.slice(1),
+      ],
+    };
+    expect(() => ResumeSchema.parse(tainted)).toThrow(/resume privacy/);
+  });
+
+  it("still rejects a forbidden key on a strict object", () => {
     const tainted = {
       ...resume,
       person: { ...resume.person, email: "someone@example.com" },
     };
     expect(() => ResumeSchema.parse(tainted)).toThrow();
+  });
+});
+
+describe("the exported resume is deeply immutable", () => {
+  it("freezes nested arrays and objects, not just the root", () => {
+    expect(Object.isFrozen(resume)).toBe(true);
+    expect(Object.isFrozen(resume.experience)).toBe(true);
+    const entry = resume.experience[0]!;
+    expect(Object.isFrozen(entry)).toBe(true);
+    expect(Object.isFrozen(entry.positions)).toBe(true);
+    expect(Object.isFrozen(entry.positions[0]!.claims)).toBe(true);
+    expect(Object.isFrozen(entry.positions[0]!.claims[0]!)).toBe(true);
+    expect(Object.isFrozen(resume.person.summary)).toBe(true);
+  });
+
+  it("throws rather than silently reordering a published claim in place", () => {
+    // The hazard this guards: a module singleton mutated for the lifetime of
+    // the server process, altering a real person's record on every request.
+    const claims = resume.experience[0]!.positions[0]!.claims;
+    expect(() => (claims as { sort: () => void }).sort()).toThrow();
+    expect(() =>
+      (claims as unknown as unknown[]).push({ id: "x", text: "y" }),
+    ).toThrow();
   });
 });

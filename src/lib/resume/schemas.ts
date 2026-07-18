@@ -22,30 +22,74 @@ import { z } from "zod";
  * walks the whole object and rejects private-looking KEYS and VALUES, so a
  * future edit that pastes a contact line in cannot silently ship.
  */
-const PRIVATE_KEY_PATTERN =
-  /(^|[^a-z])(e?mail|telephone|phone|mobile|fax)([^a-z]|$)/i;
+// Substring match, not a word-boundary match. An earlier version anchored on
+// ([^a-z]|$), which under /i also excludes A-Z and therefore let every
+// camelCase and plural form through: emailAddress, phoneNumber, contactEmail,
+// mobileNumber, emails, phones. No legitimate key in this data contains these
+// stems, so matching anywhere in the key costs nothing and closes the hole.
+const PRIVATE_KEY_PATTERN = /(e?mail|telephone|phone|mobile|fax)/i;
 const EMAIL_PATTERN = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
-// US phone shapes: 678-464-0214, (678) 464-0214, 678.464.0214, +1 678 464 0214
+// US phone shapes: 678-464-0214, (678) 464-0214, 678.464.0214, +1 678 464 0214.
+// (?<!\d) stops a match from starting midway through a longer run of digits.
 const US_PHONE_PATTERN =
-  /(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}(?!\d)/;
+  /(?<!\d)(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}(?!\d)/g;
 
-/** Years like 2006 or 1999 must not be mistaken for phone fragments. */
+// Typographic separators. Without this, "678–464–0214" (en dashes, which is
+// what a word processor produces) defeats the ASCII-only separator class.
+const UNICODE_DASHES = /[‐-―−﹘﹣－]/g;
+const UNICODE_SPACES = /[  -   　]/g;
+
+/**
+ * True for a North American dialable number.
+ *
+ * Checked against NANP rules (area and exchange codes both start 2-9) rather
+ * than raw digit count, so a ten-digit metric like 1000000000 is not mistaken
+ * for a phone number while a real number still is.
+ */
+function isDialable(digits: string): boolean {
+  const local =
+    digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  return /^[2-9]\d{2}[2-9]\d{6}$/.test(local);
+}
+
+/** Years like 2006, and metrics like "1.5M+", must not read as phone numbers. */
 function looksLikePhone(value: string): boolean {
-  const digits = value.replace(/\D/g, "");
-  if (digits.length < 10) return false;
-  return US_PHONE_PATTERN.test(value);
+  if (value.replace(/\D/g, "").length < 10) return false;
+  const normalized = value
+    .replace(UNICODE_DASHES, "-")
+    .replace(UNICODE_SPACES, " ");
+  for (const match of normalized.matchAll(US_PHONE_PATTERN)) {
+    if (isDialable(match[0].replace(/\D/g, ""))) return true;
+  }
+  return false;
 }
 
 export function assertNoPrivateContact(value: unknown, path = "$"): void {
-  if (typeof value === "string") {
-    if (EMAIL_PATTERN.test(value))
+  // Numbers are checked as their decimal text. A phone stored as a number
+  // rather than a string used to fall through every branch below unexamined.
+  if (typeof value === "string" || typeof value === "number") {
+    const text = String(value);
+    if (EMAIL_PATTERN.test(text))
       throw new Error(`resume privacy: email-shaped value at ${path}`);
-    if (looksLikePhone(value))
+    if (looksLikePhone(text))
       throw new Error(`resume privacy: phone-shaped value at ${path}`);
     return;
   }
   if (Array.isArray(value)) {
     value.forEach((v, i) => assertNoPrivateContact(v, `${path}[${i}]`));
+    return;
+  }
+  if (value instanceof Map) {
+    for (const [k, v] of value) {
+      if (typeof k === "string" && PRIVATE_KEY_PATTERN.test(k))
+        throw new Error(`resume privacy: forbidden key "${k}" at ${path}`);
+      assertNoPrivateContact(v, `${path}.${String(k)}`);
+    }
+    return;
+  }
+  if (value instanceof Set) {
+    let i = 0;
+    for (const v of value) assertNoPrivateContact(v, `${path}[${i++}]`);
     return;
   }
   if (value && typeof value === "object") {
