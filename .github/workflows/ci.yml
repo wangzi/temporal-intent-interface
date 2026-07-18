@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   verify:
-    name: typecheck · lint · test · build
+    name: format · typecheck · lint · test · build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,8 +28,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Runs the same gate used locally. `next build` does NOT typecheck
-      # non-emitted files, so tsc --noEmit is a separate, load-bearing step.
+      # Runs the same gate used locally. Formatting comes first: it is the
+      # cheapest check and the one most likely to differ between a local
+      # working tree and a fresh checkout, so failing here costs seconds
+      # instead of a full build.
+      - run: pnpm format:check
+
+      # `next build` does NOT typecheck non-emitted files, so tsc --noEmit is
+      # a separate, load-bearing step.
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
