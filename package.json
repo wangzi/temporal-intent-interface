@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "verify:ui": "node scripts/verify-ui.mjs",
     "verify:api": "node scripts/verify-fixture-api.mjs",
-    "verify:print": "node scripts/verify-print.mjs"
+    "verify:print": "node scripts/verify-print.mjs",
+    "verify:source": "node scripts/verify-source-fidelity.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.107.0",
