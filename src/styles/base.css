@@ -1,0 +1,94 @@
+/* ============================================================
+   BASE — reset + global element defaults + shared utilities
+   (.skip-link, .mono, .sr). Surface-agnostic.
+   ============================================================ */
+
+/* ============================================================
+   Base
+   ============================================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto;
+  /* Opt out of scroll anchoring. The scan-density reveal is opacity-only
+     (no layout change), so there's nothing for the browser to anchor
+     against; and the reader manages its own scroll (fixed dot + keyboard
+     nav). Left off so the browser never nudges scrollY under us. */
+  overflow-anchor: none;
+}
+
+body {
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100%;
+  overflow-anchor: none;
+}
+
+::selection {
+  background: rgba(229, 72, 77, 0.16);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Skip-to-content — first focusable element; off-screen until focused. */
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px
+    calc(16px + env(safe-area-inset-left, 0px));
+  background: var(--ink);
+  color: var(--field);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  border-radius: 0 0 6px 0;
+  transform: translateY(-130%);
+  transition: transform 0.16s var(--ease);
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* The skip target receives focus programmatically; no ring on the whole main. */
+#reader-main:focus {
+  outline: none;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}

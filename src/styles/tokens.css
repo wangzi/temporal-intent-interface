@@ -1,0 +1,125 @@
+/* ============================================================
+   TOKENS — design primitives. Surface-agnostic: any new surface (resume,
+   portfolio) can rely on these. Colors/type here; LAYOUT tokens that are
+   reader-specific (--spine-x, --content-pad, --meta-width) are re-declared
+   per breakpoint in reader.css.
+   ============================================================ */
+
+/* ============================================================
+   Design tokens — PRD §13.
+   Light defaults; dark overrides below.
+   ============================================================ */
+@theme inline {
+  --color-field: #fcfcfa;
+  --color-ink: #1a1a1a;
+  --color-ink-soft: #3a3a3a;
+  --color-system: #6b6b6b;
+  --color-system-faint: #9a9a95;
+  --color-dot: #e5484d;
+  --color-branch: #c9c9c4;
+  --color-focus: #2b6cb0;
+  --color-rule: #ececE8;
+
+  --font-serif:
+    "Newsreader", Georgia, "Times New Roman", serif;
+  /* SF Mono on Apple devices (named first so it wins where it's installed);
+     self-hosted iA Writer Duo S as the cross-platform backup BEFORE the
+     ui-monospace generic, so non-Apple readers get iA Writer rather than the
+     OS default mono. Menlo/monospace close it out. */
+  --font-mono:
+    "SF Mono", SFMono-Regular, "iA Writer Duo S", ui-monospace, Menlo, monospace;
+}
+
+/* iA Writer Duo S — self-hosted mono fallback for non-Apple platforms.
+   SIL Open Font License (github.com/iaolo/iA-Fonts). woff2 in /public/fonts.
+   `font-display: swap` mirrors the serif; `local()` short-circuits the
+   download for anyone who already has the family installed. */
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S"),
+    url("/fonts/iAWriterDuoS-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S Italic"),
+    url("/fonts/iAWriterDuoS-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S Bold"),
+    url("/fonts/iAWriterDuoS-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "iA Writer Duo S";
+  src:
+    local("iA Writer Duo S Bold Italic"),
+    url("/fonts/iAWriterDuoS-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* Aliases so prototype-ported CSS keeps reading `var(--ink)` etc. */
+  --field: var(--color-field);
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink-soft);
+  --system: var(--color-system);
+  --system-faint: var(--color-system-faint);
+  --dot: var(--color-dot);
+  --branch: var(--color-branch);
+  --focus: var(--color-focus);
+  --rule: var(--color-rule);
+
+  --serif: var(--font-serif);
+  --mono: var(--font-mono);
+
+  /* Fluid type — text size responds to horizontal space, then caps. */
+  --t-meta: 0.75rem;
+  --t-label: 0.8125rem;
+  --t-body: clamp(1.0625rem, 1rem + 0.4vw, 1.1875rem);
+  --t-insight: 0.9375rem;
+  --t-title-scan: clamp(1.35rem, 1.08rem + 1.05vw, 1.62rem);
+  --t-title-read: clamp(1.7rem, 1.25rem + 1.5vw, 2.15rem);
+
+  /* Layout — line-length cap never grows past --measure. */
+  --measure: 66ch;
+  --gutter: 0px;
+  --content-pad: 64px;
+  --rail-w: 0px;
+  /* Rail drawer width when the circle toggle reveals it. */
+  --rail-reveal-w: min(82vw, 300px);
+  --index-w: 0px;
+  --spine-x: 28px;
+  --dot-vh: 40;
+  /* Footer hidden for now → no reserved footer space, so the spine
+     terminates at the page bottom. Restore to 300px to bring it back. */
+  --footer-h: 44px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-field: #0e0e0e;
+    --color-ink: #eceae4;
+    --color-ink-soft: #c4c0b6;
+    --color-system: #9a9a92;
+    --color-system-faint: #6b6b63;
+    --color-dot: #ff5a5f;
+    --color-branch: #3a3a36;
+    --color-rule: #222220;
+  }
+}
