@@ -86,7 +86,6 @@ export default async function Home({
   try {
     focus = await listFocus();
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("[home] focus error:", err);
   }
 
@@ -96,7 +95,6 @@ export default async function Home({
     try {
       routeData = await getFocusRoute(activeRoute);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("[home] focus route error:", err);
     }
 
@@ -118,7 +116,6 @@ export default async function Home({
         results = (await searchPosts({ q: query, focus: [activeRoute] }))
           .results;
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error("[home] focus search error:", err);
       }
       entries = results;
@@ -189,7 +186,6 @@ export default async function Home({
     try {
       results = (await searchPosts({ q: query })).results;
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("[home] search error:", err);
     }
     const heading =
@@ -256,7 +252,6 @@ export default async function Home({
       cursor = response.next_cursor;
     }
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("[home] engine error:", err);
   }
 

@@ -96,7 +96,6 @@ export default async function PostPage({
     try {
       focus = await listFocus();
     } catch (focusErr) {
-      // eslint-disable-next-line no-console
       console.error("[post] focus error:", focusErr);
     }
 
