@@ -1,0 +1,180 @@
+/* ============================================================
+   RESUME — the /resume surface. Namespaced under `.resume` so nothing
+   here can reach the reader, and so the reader's layout tokens
+   (--spine-x, --content-pad, the ~66ch column cap) do not reach it.
+
+   Imported AFTER prose.css and BEFORE reader.css: it composes the shared
+   prose typography but must not win over reader rules on shared elements.
+   ============================================================ */
+
+.resume {
+  /* Wider than the reader's prose measure: a CV is a structured document,
+     not a single column of long-form prose. */
+  --resume-measure: 44rem;
+  max-width: var(--resume-measure);
+  margin: 0 auto;
+  padding: 72px 24px 96px;
+  color: var(--ink);
+}
+
+/* The shared .prose layer caps paragraphs at the reader's 66ch measure. A CV
+   line is short and structured, so opt out of that cap inside the resume only. */
+.resume .prose p,
+.resume .prose li,
+.resume .prose h2,
+.resume .prose h3 {
+  max-width: none;
+}
+
+/* ── Head ─────────────────────────────────────────────────────────────── */
+.resume-head {
+  margin-bottom: 48px;
+}
+
+.resume-name {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.resume-headline {
+  margin-top: 10px;
+  font-family: var(--serif);
+  font-size: var(--t-body);
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.resume-meta {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--system);
+}
+
+.resume-link {
+  color: var(--ink);
+  transition: color 0.15s var(--ease);
+}
+.resume-link:hover,
+.resume-link:focus-visible {
+  color: var(--dot);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.resume-arrow {
+  margin-left: 0.2em;
+}
+
+.resume-summary {
+  margin-top: 26px;
+}
+.resume-summary p + p {
+  margin-top: 0.9em;
+}
+
+/* ── Sections ─────────────────────────────────────────────────────────── */
+.resume-section {
+  margin-top: 52px;
+}
+
+.resume-section-title {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.resume-entry {
+  margin-top: 34px;
+  /* Keep an employer and its first bullets together when printing. */
+  break-inside: avoid;
+}
+
+.resume-entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 20px;
+}
+
+.resume-org {
+  font-family: var(--serif);
+  font-size: 1.375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.resume-when,
+.resume-when-inline {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--system-faint);
+}
+
+.resume-position {
+  margin-top: 14px;
+}
+
+.resume-role {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--system);
+}
+
+.resume-team {
+  color: var(--system-faint);
+}
+
+.resume-role-when {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--system-faint);
+}
+
+.resume-claims {
+  margin-top: 10px;
+  padding-left: 1.1em;
+}
+
+.resume-claims li,
+.resume-education li {
+  margin-top: 0.5em;
+  /* Long unbroken tokens (URLs, protocol names) must wrap, not overflow. */
+  overflow-wrap: anywhere;
+}
+
+.resume-education {
+  margin-top: 16px;
+  padding-left: 1.1em;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .resume {
+    padding: 40px 20px 72px;
+  }
+  .resume-section {
+    margin-top: 40px;
+  }
+  .resume-entry-head {
+    /* Stack org and dates rather than squeezing them onto one line. */
+    display: block;
+  }
+  .resume-when {
+    display: block;
+    margin-top: 2px;
+  }
+}

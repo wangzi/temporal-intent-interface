@@ -14,6 +14,12 @@ export function Footer() {
         <span className="site-footer-prompt" aria-hidden="true">
           zw@z:~$
         </span>
+        {/* Internal, so no ↗ — the arrow marks links that leave the site. The
+            footer is the only sitewide off-surface affordance, so /resume is
+            reachable from every page without inventing a new nav concept. */}
+        <a className="site-footer-cmd" href="/resume">
+          resume
+        </a>
         <a
           className="site-footer-cmd"
           href="https://www.linkedin.com/in/wzi/"
