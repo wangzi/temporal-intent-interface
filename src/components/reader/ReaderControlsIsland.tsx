@@ -129,10 +129,30 @@ function setDotBig(big: boolean): void {
   else dot.classList.remove("big");
 }
 
+// Inputs that swallow our keyboard shortcuts because the user is TYPING into
+// them. A checkbox/radio takes no text, so it must NOT count: clicking the rail
+// toggle's <label> focuses its checkbox, and treating that as editable made
+// Escape a no-op exactly when the rail was open (its most common path).
+const NON_TEXT_INPUT_TYPES = new Set([
+  "checkbox",
+  "radio",
+  "button",
+  "submit",
+  "reset",
+  "file",
+  "image",
+  "range",
+  "color",
+]);
+
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   const tag = target.tagName;
-  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  if (tag === "INPUT") {
+    const type = (target as HTMLInputElement).type.toLowerCase();
+    return !NON_TEXT_INPUT_TYPES.has(type);
+  }
+  if (tag === "TEXTAREA" || tag === "SELECT") return true;
   if (target.isContentEditable) return true;
   return false;
 }
