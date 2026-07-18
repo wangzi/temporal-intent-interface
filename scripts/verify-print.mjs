@@ -23,6 +23,7 @@ import {
   pdfMediaBoxes,
   pdfPageCount,
 } from "./lib/pdf-text.mjs";
+import { resumeAccessCookies } from "./lib/resume-gate.mjs";
 
 const BASE_URL = process.env.BASE_URL ?? "http://127.0.0.1:3100";
 const OUT = process.env.PDF_OUT ?? "/tmp/tii-resume.pdf";
@@ -51,7 +52,11 @@ const check = (ok, message) => {
 
 // ── generate ───────────────────────────────────────────────────────────────
 const browser = await chromium.launch({ channel: "chrome" });
-const page = await browser.newPage();
+// Past the pre-publication gate, or this would print the unlock curtain.
+const accessCookies = await resumeAccessCookies(BASE_URL, browser);
+const context = await browser.newContext();
+if (accessCookies.length) await context.addCookies(accessCookies);
+const page = await context.newPage();
 await page.goto(`${BASE_URL}/resume`, { waitUntil: "networkidle" });
 await page.emulateMedia({ media: "print" });
 

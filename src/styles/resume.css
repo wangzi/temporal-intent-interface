@@ -169,6 +169,82 @@
   padding-left: 1.1em;
 }
 
+/* ── Pre-publication gate ─────────────────────────────────────────────────
+   The unlock curtain. Reuses the resume's measure and colours so it reads as
+   part of the same surface rather than a system error page. */
+.resume-unlock {
+  padding-top: 22vh;
+  max-width: 30rem;
+}
+.resume-unlock-title {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.resume-unlock-note {
+  margin: 10px 0 0;
+  color: var(--system);
+  line-height: 1.55;
+}
+.resume-unlock-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+.resume-unlock-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+.resume-unlock-input {
+  flex: 1 1 8rem;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 0.9375rem;
+  letter-spacing: 0.3em;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+}
+.resume-unlock-input:focus-visible {
+  outline: none;
+  border-color: var(--dot);
+}
+.resume-unlock-submit {
+  padding: 8px 14px;
+  font-size: 0.75rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s var(--ease),
+    color 0.15s var(--ease);
+}
+.resume-unlock-submit:hover,
+.resume-unlock-submit:focus-visible {
+  color: var(--dot);
+  border-color: var(--dot);
+  outline: none;
+}
+.resume-unlock-error {
+  margin: 12px 0 0;
+  font-size: 0.75rem;
+  color: var(--dot);
+}
+.resume-unlock-back {
+  margin: 30px 0 0;
+  font-size: 0.75rem;
+}
+
 /* ── Role views ───────────────────────────────────────────────────────────
    Plain links, so the switcher works with JS off. Styled as system chrome
    (mono, faint) to sit clearly apart from the canonical record it filters. */
