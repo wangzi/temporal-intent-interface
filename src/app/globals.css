@@ -552,10 +552,30 @@ body.nav-open .scrim {
   align-items: baseline;
   justify-content: space-between;
   gap: 10px 28px;
-  font-family: var(--mono);
-  font-size: 0.6875rem;
+  /* NOTE: no font-family/font-size here — the children carry `mono` + their own
+     size. This element must inherit the body font so `--measure` (66ch) resolves
+     to the SAME width the article uses; otherwise the post-route column box
+     below can't line the prompt up with the spine. */
   letter-spacing: 0.06em;
   color: var(--system-faint);
+}
+/* Post route: the article column is centred, so its spine sits at .attn-inner's
+   left edge — NOT at --spine-x (which is the archive's gutter). Give the footer
+   the same column box as the article so the prompt's first character lands
+   exactly on the spine. The left inset then mirrors the spine's own offset
+   inside .attn-inner: 0 at laptop, --spine-x on mobile (where the spine moves
+   into the gutter — see the ≤767px block). */
+.col:has(.attn-inner) .site-footer {
+  max-width: calc(var(--measure) + 100px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0;
+  padding-right: 28px; /* matches .attn-inner's right padding */
+}
+@media (max-width: 767px) {
+  .col:has(.attn-inner) .site-footer {
+    padding-left: var(--spine-x);
+  }
 }
 .site-footer-meta {
   display: flex;
@@ -598,7 +618,9 @@ body.nav-open .scrim {
   display: inline-flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 4px 12px;
+  /* Wide column gap so each command reads as a separate token (and is an
+     easier tap target on touch) rather than one run-on string. */
+  gap: 6px 24px;
   font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--ink);
