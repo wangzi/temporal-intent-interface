@@ -1,16 +1,19 @@
 // SSR site footer — the spine's terminal zone. The timeline (.spine) runs down
 // into this footer's top edge, so it reads as the line's foot: a minimal shell
-// prompt (`zw@z:~$`) whose "typed command" is the outbound links (LinkedIn +
-// the Studio bridge), trailed by a blinking cursor. Server component — part of
-// the SSR'd HTML, so it works with JS off (the cursor just stops blinking).
+// prompt (`zw@z:~$`) whose "typed command" is the outbound links (LinkedIn, IG,
+// and the Studio bridge), trailed by a blinking cursor. Server component — part
+// of the SSR'd HTML, so it works with JS off (the cursor just stops blinking).
 
 export function Footer(_props: {
   entryCount?: number;
   updatedISO?: string | null;
 }) {
+  // `mono` sits on the children, not the <footer>: the element's own font
+  // decides how `--measure` (66ch) computes, and the post-route footer has to
+  // resolve the SAME column width as the article to land on the spine.
   return (
-    <footer className="site-footer mono" aria-label="Site footer">
-      <span className="site-footer-cli">
+    <footer className="site-footer" aria-label="Site footer">
+      <span className="site-footer-cli mono">
         <span className="site-footer-prompt" aria-hidden="true">
           zw@z:~$
         </span>
@@ -23,6 +26,15 @@ export function Footer(_props: {
         >
           linkedin<span className="site-footer-arrow" aria-hidden="true">↗</span>
         </a>
+        <a
+          className="site-footer-cmd"
+          href="https://www.instagram.com/yo.zi.ira/"
+          target="_blank"
+          rel="me noopener noreferrer"
+          aria-label="Instagram profile (opens in a new tab)"
+        >
+          IG<span className="site-footer-arrow" aria-hidden="true">↗</span>
+        </a>
         <a className="site-footer-cmd" href="https://studio.stillinlove.co">
           studio<span className="site-footer-arrow" aria-hidden="true">↗</span>
           <span className="site-footer-cursor" aria-hidden="true">
@@ -30,7 +42,7 @@ export function Footer(_props: {
           </span>
         </a>
       </span>
-      <span className="site-footer-est">boot: 2016</span>
+      <span className="site-footer-est mono">boot: 2016</span>
     </footer>
   );
 }
