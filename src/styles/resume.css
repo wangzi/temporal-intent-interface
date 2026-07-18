@@ -169,6 +169,61 @@
   padding-left: 1.1em;
 }
 
+/* ── Role views ───────────────────────────────────────────────────────────
+   Plain links, so the switcher works with JS off. Styled as system chrome
+   (mono, faint) to sit clearly apart from the canonical record it filters. */
+.resume-roles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 14px;
+  margin-top: 34px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.resume-roles-label {
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+.resume-roles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.resume-role-link {
+  font-size: 0.75rem;
+  color: var(--system);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s var(--ease);
+}
+.resume-role-link:hover,
+.resume-role-link:focus-visible {
+  color: var(--ink);
+  border-bottom-color: var(--rule);
+}
+/* The active lens carries the site's accent — the one red mark on the page. */
+.resume-role-link[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--dot);
+}
+
+/* Announces that the reader is looking at a subset, and links back. */
+.resume-lens-note {
+  margin: 14px 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--system-faint);
+}
+.resume-lens-note .resume-link {
+  color: var(--system);
+}
+
 /* ── Ask AI placement ─────────────────────────────────────────────────────
    The control itself is shared (components/ai). Only its position differs:
    the reader anchors it to the article spine via --spine-x, which the resume
