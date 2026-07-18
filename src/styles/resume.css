@@ -7,10 +7,18 @@
    prose typography but must not win over reader rules on shared elements.
    ============================================================ */
 
-.resume {
+/* The measure is shared by the document and by the Ask AI control, which
+   mounts as a sibling of <main> (so its own labels can't leak into the text it
+   copies) and therefore can't inherit a token scoped to .resume. Defined on
+   both roots rather than restated as a literal in two places. */
+.resume,
+.resume-ask-ai {
   /* Wider than the reader's prose measure: a CV is a structured document,
      not a single column of long-form prose. */
   --resume-measure: 44rem;
+}
+
+.resume {
   max-width: var(--resume-measure);
   margin: 0 auto;
   padding: 72px 24px 96px;
@@ -159,6 +167,40 @@
 .resume-education {
   margin-top: 16px;
   padding-left: 1.1em;
+}
+
+/* ── Ask AI placement ─────────────────────────────────────────────────────
+   The control itself is shared (components/ai). Only its position differs:
+   the reader anchors it to the article spine via --spine-x, which the resume
+   has no equivalent of. Below 1080px the shared CSS already renders the panel
+   as a full-width bottom sheet, which needs nothing from us — so every rule
+   here is desktop-only.
+
+   Two-class selectors, so they win over the single-class reader rules
+   regardless of the fact that resume.css is imported first. */
+@media (min-width: 1080px) {
+  .resume-ask-ai .ask-ai-dot {
+    /* 44px left of the column edge — anchored to the text, not the viewport,
+       so it tracks the measure instead of drifting into empty space on wide
+       screens. No Back node to clear here, so it sits at the attention line. */
+    left: calc(50vw - var(--resume-measure) / 2 - 44px);
+    top: 40vh;
+  }
+  .resume-ask-ai .ask-ai-panel {
+    /* Opens rightward from the dot. The reader's panel opens leftward into the
+       margin beside the spine; the resume's left margin is too narrow for that
+       at 1080px, so flip it and let the panel overlay the column instead. */
+    right: auto;
+    left: calc(50vw - var(--resume-measure) / 2 - 44px);
+    bottom: calc(60vh - 1rem);
+    max-width: none;
+    text-align: left;
+  }
+  .resume-ask-ai .ask-ai-panel-head,
+  .resume-ask-ai .ask-ai-opt,
+  .resume-ask-ai .ask-ai-note {
+    text-align: left;
+  }
 }
 
 /* ── Mobile ───────────────────────────────────────────────────────────── */

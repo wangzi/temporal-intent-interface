@@ -1,45 +1,17 @@
 "use client";
 
-// Post-route "Ask AI" control on the article spine. Click the red dot →
-// (laptop+) a panel slides into the empty space LEFT of the spine with one-tap
-// prompt angles; pick one → copy "<prompt>\n\n<article>" to the clipboard and
-// open Google AI Mode in a new tab to paste. On narrow viewports (no left
-// margin) the dot copies the article + opens AI Mode directly.
+// Post-route "Ask AI" control on the article spine. Click the red dot → a
+// panel opens with one-tap prompt angles (a labeled bottom sheet on mobile);
+// pick one → copy "<prompt>\n\n<article>" and open Google AI Mode to paste.
 //
-// No backend, no key — the AI runs on Google's side. Pure client enhancement;
-// JS-off readers never see it. The dot's vertical position is CSS; the island
-// sets its x (and --spine-vpx, used to anchor the panel) onto the spine.
+// The mechanics live in components/ai — this file is just the article's
+// configuration of them: its prompts, its source text, its wording. The dot's
+// vertical position is CSS; the island sets its x (and --spine-vpx, used to
+// anchor the panel) onto the spine.
 
-import { useEffect, useRef, useState } from "react";
+import { AskAi, type AiPrompt } from "@/components/ai/AskAi";
 
-const AI_MODE_URL = "https://www.google.com/search?udm=50";
-
-// SYNCHRONOUS clipboard write (hidden textarea + execCommand). We can't use the
-// async navigator.clipboard.writeText here: it's fired-and-forgotten right
-// before window.open(), which steals focus, and writeText fails the instant the
-// document loses focus — leaving the clipboard stuck on a previous copy (every
-// prompt then pasted the same text). execCommand('copy') completes within the
-// click gesture, before the new tab takes focus.
-function copyTextSync(text: string): void {
-  try {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.setAttribute("readonly", "");
-    ta.style.cssText =
-      "position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;pointer-events:none";
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    ta.setSelectionRange(0, text.length);
-    document.execCommand("copy");
-    document.body.removeChild(ta);
-  } catch {
-    // best effort — the copy is non-critical to opening AI Mode
-  }
-}
-const TOAST_MS = 4500;
-
-const PROMPTS: { label: string; prefix: string }[] = [
+const PROMPTS: readonly AiPrompt[] = [
   { label: "TL;DR", prefix: "Give a tight TL;DR of this article." },
   {
     label: "1st Principle",
@@ -59,134 +31,27 @@ const PROMPTS: { label: string; prefix: string }[] = [
 ];
 
 export function AskAiDot({ title }: { title: string }) {
-  const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [question, setQuestion] = useState("");
-  const rootRef = useRef<HTMLDivElement>(null);
-  const timer = useRef<number | null>(null);
-
   function articleText(): string {
     const body = document.querySelector<HTMLElement>(".attn-body");
     const bodyText = body ? body.innerText.trim() : "";
     return bodyText ? `${title}\n\n${bodyText}` : title;
   }
 
-  // Copy "<prompt>\n\n<article>", then open the AI Mode tab SYNCHRONOUSLY within
-  // the gesture (awaiting first lets the browser block the popup).
-  function send(prefix: string): void {
-    const article = articleText();
-    const payload = prefix ? `${prefix}\n\n${article}` : article;
-    // Copy first (synchronously, while focused), THEN open the tab.
-    copyTextSync(payload);
-    window.open(AI_MODE_URL, "_blank", "noopener,noreferrer");
-    setOpen(false);
-    setQuestion("");
-    setCopied(true);
-    if (timer.current !== null) window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCopied(false), TOAST_MS);
-  }
-
-  function onDotClick(): void {
-    // Open the prompt panel at every width — on mobile it renders as a labeled
-    // bottom sheet (see globals.css). Picking a prompt is what copies the
-    // article + opens AI Mode, so the new tab is always a deliberate, explained
-    // action rather than a silent tap into a surprise new tab.
-    setOpen((o) => !o);
-  }
-
-  useEffect(() => {
-    return () => {
-      if (timer.current !== null) window.clearTimeout(timer.current);
-    };
-  }, []);
-
-  // Close the panel on outside-click / Escape.
-  useEffect(() => {
-    if (!open) return;
-    function onDown(e: MouseEvent): void {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    function onKey(e: KeyboardEvent): void {
-      if (e.key === "Escape") setOpen(false);
-    }
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
-
   return (
-    <div className="ask-ai" ref={rootRef}>
-      <button
-        type="button"
-        className={`ask-ai-dot${open ? " is-open" : ""}`}
-        onClick={onDotClick}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label="Ask Google AI about this article"
-      >
-        <span className="ask-ai-dot-label mono" aria-hidden="true">
-          Ask AI →
-        </span>
-      </button>
-
-      {/* Backdrop behind the mobile bottom sheet (CSS-hidden on laptop+). Tap to
-          dismiss. */}
-      {open ? (
-        <div
-          className="ask-ai-backdrop"
-          aria-hidden="true"
-          onClick={() => setOpen(false)}
-        />
-      ) : null}
-
-      {open ? (
-        <div className="ask-ai-panel" role="menu" aria-label="Ask Google AI">
-          <p className="ask-ai-panel-head mono">Ask Google AI</p>
-          {PROMPTS.map((p) => (
-            <button
-              key={p.label}
-              type="button"
-              role="menuitem"
-              className="ask-ai-opt mono"
-              onClick={() => send(p.prefix)}
-            >
-              {p.label}
-              <span aria-hidden="true"> →</span>
-            </button>
-          ))}
-          <form
-            className="ask-ai-ask"
-            onSubmit={(e) => {
-              e.preventDefault();
-              send(question.trim());
-            }}
-          >
-            <input
-              className="ask-ai-input mono"
-              type="text"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask your own…"
-              aria-label="Ask your own question about this article"
-            />
-          </form>
-          {/* Pre-tap clarity: what choosing a prompt actually does. */}
-          <p className="ask-ai-note mono">
-            Copies the article, then opens Google AI Mode to paste.
-          </p>
-        </div>
-      ) : null}
-
-      {copied ? (
-        <div className="ask-ai-toast mono" role="status" aria-live="polite">
-          Article copied — paste it into Google AI Mode.
-        </div>
-      ) : null}
-    </div>
+    <AskAi
+      prompts={PROMPTS}
+      getSource={articleText}
+      labels={{
+        dot: "Ask AI →",
+        dotAria: "Ask Google AI about this article",
+        head: "Ask Google AI",
+        note: "Copies the article, then opens Google AI Mode to paste.",
+        toast: "Article copied — paste it into Google AI Mode.",
+        freeForm: {
+          placeholder: "Ask your own…",
+          aria: "Ask your own question about this article",
+        },
+      }}
+    />
   );
 }

@@ -15,6 +15,7 @@
 import type { Metadata } from "next";
 
 import { Footer } from "@/components/reader/Footer";
+import { ResumeAskAi } from "@/components/resume/ResumeAskAi";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { resume } from "@/lib/resume/data";
 import { resumeJsonLd } from "@/lib/resume/jsonld";
@@ -160,6 +161,10 @@ export default function ResumePage() {
           </ul>
         </section>
       </main>
+      {/* Mounted outside <main id="resume-main"> on purpose: it reads that
+          element's innerText, so keeping it a sibling guarantees its own dot
+          and panel labels never end up in what gets copied. */}
+      <ResumeAskAi />
       <Footer />
     </>
   );
