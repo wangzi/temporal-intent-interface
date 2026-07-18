@@ -46,41 +46,44 @@ Source of truth: `~/Desktop/session2_tii/canonical_prd.md` (PRD v1, 2026-05-30).
 
 ## 3. Repo & branches
 
-| | |
-|---|---|
-| GitHub | `https://github.com/wangzi/z` (existing repo, reused per owner override of PRD §19 default `wangzi/tii`) |
-| Local working tree | `/Users/zw/Desktop/tii/` |
-| Visibility | Private |
-| Default branch | `main` (production — auto-deploys to Vercel project `halftimes-projects/z-stillinlove-co` on push) |
-| Current work | `feat/phase-b-scaffold` (13 serial commits; one preview URL per commit) |
-| Archival | `design/editions`, `design/dispatch`, `design/log`, `docs/claude-md` — 2026-05-27 design exploration; **do not delete** |
-| Commit trailer | `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` |
-| Pushing to `main` | Requires explicit per-push user authorization ("ship it" / "yes, push to main") per PRD §17.12 |
+|                    |                                                                                                                         |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| GitHub             | `https://github.com/wangzi/z` (existing repo, reused per owner override of PRD §19 default `wangzi/tii`)                |
+| Local working tree | `/Users/zw/Desktop/tii/`                                                                                                |
+| Visibility         | Private                                                                                                                 |
+| Default branch     | `main` (production — auto-deploys to Vercel project `halftimes-projects/z-stillinlove-co` on push)                      |
+| Current work       | `feat/phase-b-scaffold` (13 serial commits; one preview URL per commit)                                                 |
+| Archival           | `design/editions`, `design/dispatch`, `design/log`, `docs/claude-md` — 2026-05-27 design exploration; **do not delete** |
+| Commit trailer     | `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`                                                  |
+| Pushing to `main`  | Requires explicit per-push user authorization ("ship it" / "yes, push to main") per PRD §17.12                          |
 
 ---
 
 ## 4. Tech stack (exact versions, pinned)
 
 ### Runtime / toolchain
-| | |
-|---|---|
-| Node.js | `>= 20` (Vercel default) |
-| Package manager | `pnpm@10.33.2` (pinned via `packageManager` field) |
-| Bundler | Next.js built-in (Turbopack-eligible; Webpack today) |
+
+|                 |                                                      |
+| --------------- | ---------------------------------------------------- |
+| Node.js         | `>= 20` (Vercel default)                             |
+| Package manager | `pnpm@10.33.2` (pinned via `packageManager` field)   |
+| Bundler         | Next.js built-in (Turbopack-eligible; Webpack today) |
 
 ### Frameworks
-| Package | Version | Role |
-|---|---|---|
-| `next` | `^15.1.0` | App Router, server components, route handlers, middleware |
-| `react` / `react-dom` | `^19.0.0` | UI runtime |
-| `typescript` | `^5.7.0` | Strict + `noUncheckedIndexedAccess` |
+
+| Package               | Version   | Role                                                      |
+| --------------------- | --------- | --------------------------------------------------------- |
+| `next`                | `^15.1.0` | App Router, server components, route handlers, middleware |
+| `react` / `react-dom` | `^19.0.0` | UI runtime                                                |
+| `typescript`          | `^5.7.0`  | Strict + `noUncheckedIndexedAccess`                       |
 
 ### Styling
-| Package | Version | Role |
-|---|---|---|
-| `tailwindcss` | `^4.0.0` | CSS-first config via `@theme inline` in `src/app/globals.css` |
-| `@tailwindcss/postcss` | `^4.0.0` | PostCSS plugin |
-| `postcss` | `^8.5.0` | |
+
+| Package                | Version  | Role                                                          |
+| ---------------------- | -------- | ------------------------------------------------------------- |
+| `tailwindcss`          | `^4.0.0` | CSS-first config via `@theme inline` in `src/app/globals.css` |
+| `@tailwindcss/postcss` | `^4.0.0` | PostCSS plugin                                                |
+| `postcss`              | `^8.5.0` |                                                               |
 
 > **This codebase is hand-written CSS, not utility-driven.** Tailwind is present
 > for its preflight reset and the `@theme inline` token block only — the only
@@ -91,21 +94,24 @@ Source of truth: `~/Desktop/session2_tii/canonical_prd.md` (PRD v1, 2026-05-30).
 > utilities or re-add a config file.
 
 ### Engine boundary
-| Package | Version | Role |
-|---|---|---|
-| `zod` | `^3.24.1` | Env validation + engine response guard at the BFF boundary |
-| `server-only` | `^0.0.1` | Marks `src/lib/engine/client.ts`; build fails if a client component imports it |
+
+| Package       | Version   | Role                                                                           |
+| ------------- | --------- | ------------------------------------------------------------------------------ |
+| `zod`         | `^3.24.1` | Env validation + engine response guard at the BFF boundary                     |
+| `server-only` | `^0.0.1`  | Marks `src/lib/engine/client.ts`; build fails if a client component imports it |
 
 ### Fonts
-| Family | Loaded via | Role |
-|---|---|---|
-| Newsreader | `next/font/google` (opsz 6..72, 400/500/600 + italic 400) | Canonical author serif |
-| JetBrains Mono | `next/font/google` (400/500) | System / metadata / generated text |
+
+| Family         | Loaded via                                                | Role                               |
+| -------------- | --------------------------------------------------------- | ---------------------------------- |
+| Newsreader     | `next/font/google` (opsz 6..72, 400/500/600 + italic 400) | Canonical author serif             |
+| JetBrains Mono | `next/font/google` (400/500)                              | System / metadata / generated text |
 
 ### Lint
-| Package | Version | Role |
-|---|---|---|
-| `eslint` | `^8.57.0` | |
+
+| Package              | Version   | Role                       |
+| -------------------- | --------- | -------------------------- |
+| `eslint`             | `^8.57.0` |                            |
 | `eslint-config-next` | `^15.1.0` | Next's recommended ruleset |
 
 **Deliberate omissions (Hard Rule §17.11):** no state library (Zustand/Redux/Jotai), no data-fetching library (TanStack Query/SWR), no form library, no test library. Playwright lands in Phase C per PRD §18.
@@ -215,17 +221,17 @@ These bind reader code. Violating one breaks product integrity.
 
 ### Color (light → dark via `@media (prefers-color-scheme: dark)`)
 
-| Token | Light | Dark | Role |
-|---|---|---|---|
-| `--color-field` | `#fcfcfa` | `#0e0e0e` | reading background |
-| `--color-ink` | `#1a1a1a` | `#eceae4` | canonical serif body |
-| `--color-ink-soft` | `#3a3a3a` | `#c4c0b6` | secondary serif (snippet) |
-| `--color-system` | `#6b6b6b` | `#9a9a92` | mono / metadata / generated |
+| Token                  | Light     | Dark      | Role                           |
+| ---------------------- | --------- | --------- | ------------------------------ |
+| `--color-field`        | `#fcfcfa` | `#0e0e0e` | reading background             |
+| `--color-ink`          | `#1a1a1a` | `#eceae4` | canonical serif body           |
+| `--color-ink-soft`     | `#3a3a3a` | `#c4c0b6` | secondary serif (snippet)      |
+| `--color-system`       | `#6b6b6b` | `#9a9a92` | mono / metadata / generated    |
 | `--color-system-faint` | `#9a9a95` | `#6b6b63` | labels, timestamps, faint mono |
-| `--color-dot` | `#e5484d` | `#ff5a5f` | the single red accent |
-| `--color-branch` | `#c9c9c4` | `#3a3a36` | spine + relation lines |
-| `--color-focus` | `#2b6cb0` | `#2b6cb0` | `:focus-visible` ring |
-| `--color-rule` | `#ececE8` | `#222220` | hairline dividers |
+| `--color-dot`          | `#e5484d` | `#ff5a5f` | the single red accent          |
+| `--color-branch`       | `#c9c9c4` | `#3a3a36` | spine + relation lines         |
+| `--color-focus`        | `#2b6cb0` | `#2b6cb0` | `:focus-visible` ring          |
+| `--color-rule`         | `#ececE8` | `#222220` | hairline dividers              |
 
 **Contrast:** dot ≥3:1 against `--field` (non-text graphic, WCAG 1.4.11); mono text ≥4.5:1; color is never the sole signal.
 
@@ -367,10 +373,10 @@ Mirrors the same back-reference Atomic's `CLAUDE.md ## External Integrations` ca
 
 The TII ↔ journalkit wire contract is **frozen** at two synchronised references:
 
-| Source | Path | Authority |
-|---|---|---|
-| PRD §9 | `~/Desktop/session2_tii/canonical_prd.md` | Product spec — what each endpoint exposes and why |
-| journalkit §18.6 | `~/Desktop/journalkit/CLAUDE.md` | Engine spec — response shapes, auth, error envelopes |
+| Source           | Path                                      | Authority                                            |
+| ---------------- | ----------------------------------------- | ---------------------------------------------------- |
+| PRD §9           | `~/Desktop/session2_tii/canonical_prd.md` | Product spec — what each endpoint exposes and why    |
+| journalkit §18.6 | `~/Desktop/journalkit/CLAUDE.md`          | Engine spec — response shapes, auth, error envelopes |
 
 These must stay in lockstep. If they diverge, neither side ships the change until both are updated.
 
@@ -410,10 +416,10 @@ These must stay in lockstep. If they diverge, neither side ships the change unti
 
 ## 12. Progressive-enhancement contract
 
-| Reader | What they see |
-|---|---|
+| Reader     | What they see                                                                                                                                                                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **JS off** | Full reverse-chronological `<ol>` with semantic markup; **all `.enrich` blocks visible** (denser, not broken); titles are real links; post pages fully readable; static dot at `top: 40vh`; mobile menu via `<details>`; URL filters work via SSR |
-| **JS on** | Same content, plus: `ReaderControlsIsland` mounts → `useLayoutEffect` measures each `.enrich` height → adds `.collapsed` class to all but the first → scroll/keyboard/settle take over → dot left-aligns precisely to the spine bbox |
+| **JS on**  | Same content, plus: `ReaderControlsIsland` mounts → `useLayoutEffect` measures each `.enrich` height → adds `.collapsed` class to all but the first → scroll/keyboard/settle take over → dot left-aligns precisely to the spine bbox              |
 
 **No flash, no shift.** Server HTML = full content. Hydration mutation is post-paint with measured heights.
 
@@ -423,12 +429,12 @@ These must stay in lockstep. If they diverge, neither side ships the change unti
 
 All validated at boot via `src/lib/env.ts` (zod). Missing/malformed → fail loud at import. There's one carve-out: during `NEXT_PHASE === "phase-production-build"`, env validation accepts placeholder values so `next build` works without real secrets in CI.
 
-| Var | Scope | Used for |
-|---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Vercel + `.env.local` | Absolute URLs (OG, canonical). No trailing slash. Local: `http://localhost:3000`. Prod: `https://z.stillinlove.co`. |
-| `JOURNALKIT_API_URL` | Server-only | journalkit engine base, e.g. `https://studio.stillinlove.co/api/v1` |
-| `JOURNALKIT_API_KEY` | Server-only | Bearer token to the engine. **Never** prefix with `NEXT_PUBLIC_`. |
-| `JOURNALKIT_FIXTURE_MODE` | Server-only | When `true`, engine client reads from local fixture JSON. Phase B default. |
+| Var                       | Scope                 | Used for                                                                                                            |
+| ------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`    | Vercel + `.env.local` | Absolute URLs (OG, canonical). No trailing slash. Local: `http://localhost:3000`. Prod: `https://z.stillinlove.co`. |
+| `JOURNALKIT_API_URL`      | Server-only           | journalkit engine base, e.g. `https://studio.stillinlove.co/api/v1`                                                 |
+| `JOURNALKIT_API_KEY`      | Server-only           | Bearer token to the engine. **Never** prefix with `NEXT_PUBLIC_`.                                                   |
+| `JOURNALKIT_FIXTURE_MODE` | Server-only           | When `true`, engine client reads from local fixture JSON. Phase B default.                                          |
 
 ---
 
@@ -452,14 +458,14 @@ When the engine API goes live, set `JOURNALKIT_API_URL` + `JOURNALKIT_API_KEY` a
 
 ## 15. Build & deploy
 
-| | |
-|---|---|
-| Host | Vercel (project `halftimes-projects/z-stillinlove-co`) |
-| Trigger | Push to any branch → auto-preview; merge to `main` → auto-deploy to `z.stillinlove.co` |
-| Build command | `next build` (= `pnpm build`) |
-| Output | Next.js default |
-| Node | 20 (Vercel default) |
-| Preview deployments | Public — SSO/Deployment Protection is currently disabled to enable design review |
+|                     |                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| Host                | Vercel (project `halftimes-projects/z-stillinlove-co`)                                 |
+| Trigger             | Push to any branch → auto-preview; merge to `main` → auto-deploy to `z.stillinlove.co` |
+| Build command       | `next build` (= `pnpm build`)                                                          |
+| Output              | Next.js default                                                                        |
+| Node                | 20 (Vercel default)                                                                    |
+| Preview deployments | Public — SSO/Deployment Protection is currently disabled to enable design review       |
 
 ### Phase B branch flow
 

@@ -26,8 +26,9 @@
   /* Safe-area: the bar background extends under the notch; its content is
      padded clear of it (top + landscape left/right insets). */
   height: calc(52px + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) max(18px, env(safe-area-inset-right, 0px))
-    0 max(18px, env(safe-area-inset-left, 0px));
+  padding: env(safe-area-inset-top, 0px)
+    max(18px, env(safe-area-inset-right, 0px)) 0
+    max(18px, env(safe-area-inset-left, 0px));
   background: color-mix(in srgb, var(--field) 86%, transparent);
   backdrop-filter: blur(10px);
 }
@@ -1178,7 +1179,6 @@ html.is-scrolling .attn-back-label {
   }
 }
 
-
 .attn-label {
   font-family: var(--mono);
   font-size: var(--t-label);
@@ -1203,7 +1203,6 @@ html.is-scrolling .attn-back-label {
   margin-bottom: 36px;
 }
 
-
 .attn-hint {
   font-family: var(--mono);
   font-size: 0.6875rem;
@@ -1211,7 +1210,7 @@ html.is-scrolling .attn-back-label {
   margin-top: 42px;
   letter-spacing: 0.04em;
 }
-   ============================================================ */
+============================================================ */
 /* ============================================================
    Breakpoints — how horizontal space is spent.
    Vertical = navigation everywhere. Horizontal is layout only.
@@ -2020,4 +2019,3 @@ html.is-scrolling .attn-back-label {
   font-size: var(--t-meta);
   color: var(--dot);
 }
-

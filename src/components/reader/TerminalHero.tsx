@@ -8,7 +8,11 @@ export function TerminalHero() {
   return (
     <div className="hero-term mono" data-hero-root>
       <div className="hero-term-line" data-hero-line="clock" aria-hidden="true">
-        <span className="hero-prompt" data-hero-prompt="clock" aria-hidden="true">
+        <span
+          className="hero-prompt"
+          data-hero-prompt="clock"
+          aria-hidden="true"
+        >
           ✻
         </span>
         <span

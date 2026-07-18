@@ -21,7 +21,10 @@ export function Footer() {
           rel="me noopener noreferrer"
           aria-label="LinkedIn profile (opens in a new tab)"
         >
-          linkedin<span className="site-footer-arrow" aria-hidden="true">↗</span>
+          linkedin
+          <span className="site-footer-arrow" aria-hidden="true">
+            ↗
+          </span>
         </a>
         <a
           className="site-footer-cmd"
@@ -30,10 +33,16 @@ export function Footer() {
           rel="me noopener noreferrer"
           aria-label="Instagram profile (opens in a new tab)"
         >
-          IG<span className="site-footer-arrow" aria-hidden="true">↗</span>
+          IG
+          <span className="site-footer-arrow" aria-hidden="true">
+            ↗
+          </span>
         </a>
         <a className="site-footer-cmd" href="https://studio.stillinlove.co">
-          studio<span className="site-footer-arrow" aria-hidden="true">↗</span>
+          studio
+          <span className="site-footer-arrow" aria-hidden="true">
+            ↗
+          </span>
           <span className="site-footer-cursor" aria-hidden="true">
             ▮
           </span>

@@ -28,7 +28,9 @@ describe("engine fixtures satisfy their schemas", () => {
   });
 
   it("posts.json parses as a posts list", () => {
-    expect(() => PostsListResponseSchema.parse(read("posts.json"))).not.toThrow();
+    expect(() =>
+      PostsListResponseSchema.parse(read("posts.json")),
+    ).not.toThrow();
   });
 
   it("focus.json parses as a focus index", () => {

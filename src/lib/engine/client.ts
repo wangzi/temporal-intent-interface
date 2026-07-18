@@ -96,7 +96,8 @@ export async function listPosts(
 export async function getPost(slug: string): Promise<PostDetailResponse> {
   if (env.JOURNALKIT_FIXTURE_MODE) {
     const raw = await fixtureGet(`post-${slug}`);
-    if (!raw) throw new EngineNotFoundError(`fixture post-${slug}.json missing`);
+    if (!raw)
+      throw new EngineNotFoundError(`fixture post-${slug}.json missing`);
     return PostDetailResponseSchema.parse(raw);
   }
 
@@ -164,9 +165,7 @@ export async function getFocusRoute(
     }
     return FocusRouteResponseSchema.parse(raw);
   }
-  const raw = await fetchJSON(
-    `/focus/${encodeURIComponent(routeId)}/entries`,
-  );
+  const raw = await fetchJSON(`/focus/${encodeURIComponent(routeId)}/entries`);
   return FocusRouteResponseSchema.parse(raw);
 }
 
@@ -234,7 +233,10 @@ function fixtureSearch(
       search: {
         score: 1,
         fields: ["fixture"],
-        snippet: (p.intent_statement || p.core_insight || p.title).slice(0, 200),
+        snippet: (p.intent_statement || p.core_insight || p.title).slice(
+          0,
+          200,
+        ),
       },
     });
   }

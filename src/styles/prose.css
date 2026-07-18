@@ -140,26 +140,113 @@
    highlight.js token classes (hljs-*) on code-fence content. Color them to
    match the studio (GitHub light/dark). The :is(.prose, .attn-body) pre panel bg + --ink
    are already theme-aware, so the tokens just track prefers-color-scheme. */
-:is(.prose, .attn-body) .hljs-comment, :is(.prose, .attn-body) .hljs-quote { color: #6e7781; font-style: italic; }
-:is(.prose, .attn-body) .hljs-keyword, :is(.prose, .attn-body) .hljs-selector-tag, :is(.prose, .attn-body) .hljs-doctag, :is(.prose, .attn-body) .hljs-type, :is(.prose, .attn-body) .hljs-name { color: #cf222e; }
-:is(.prose, .attn-body) .hljs-literal, :is(.prose, .attn-body) .hljs-number, :is(.prose, .attn-body) .hljs-variable, :is(.prose, .attn-body) .hljs-template-variable, :is(.prose, .attn-body) .hljs-tag .hljs-attr { color: #0550ae; }
-:is(.prose, .attn-body) .hljs-string, :is(.prose, .attn-body) .hljs-regexp, :is(.prose, .attn-body) .hljs-addition, :is(.prose, .attn-body) .hljs-meta .hljs-string { color: #0a3069; }
-:is(.prose, .attn-body) .hljs-title, :is(.prose, .attn-body) .hljs-section, :is(.prose, .attn-body) .hljs-title.function_ { color: #8250df; }
-:is(.prose, .attn-body) .hljs-built_in, :is(.prose, .attn-body) .hljs-class .hljs-title, :is(.prose, .attn-body) .hljs-title.class_, :is(.prose, .attn-body) .hljs-symbol, :is(.prose, .attn-body) .hljs-bullet, :is(.prose, .attn-body) .hljs-subst { color: #953800; }
-:is(.prose, .attn-body) .hljs-attr, :is(.prose, .attn-body) .hljs-attribute, :is(.prose, .attn-body) .hljs-selector-class, :is(.prose, .attn-body) .hljs-selector-attr, :is(.prose, .attn-body) .hljs-selector-pseudo, :is(.prose, .attn-body) .hljs-link, :is(.prose, .attn-body) .hljs-meta { color: #0550ae; }
-:is(.prose, .attn-body) .hljs-deletion { color: #82071e; }
-:is(.prose, .attn-body) .hljs-emphasis { font-style: italic; }
-:is(.prose, .attn-body) .hljs-strong { font-weight: 600; }
+:is(.prose, .attn-body) .hljs-comment,
+:is(.prose, .attn-body) .hljs-quote {
+  color: #6e7781;
+  font-style: italic;
+}
+:is(.prose, .attn-body) .hljs-keyword,
+:is(.prose, .attn-body) .hljs-selector-tag,
+:is(.prose, .attn-body) .hljs-doctag,
+:is(.prose, .attn-body) .hljs-type,
+:is(.prose, .attn-body) .hljs-name {
+  color: #cf222e;
+}
+:is(.prose, .attn-body) .hljs-literal,
+:is(.prose, .attn-body) .hljs-number,
+:is(.prose, .attn-body) .hljs-variable,
+:is(.prose, .attn-body) .hljs-template-variable,
+:is(.prose, .attn-body) .hljs-tag .hljs-attr {
+  color: #0550ae;
+}
+:is(.prose, .attn-body) .hljs-string,
+:is(.prose, .attn-body) .hljs-regexp,
+:is(.prose, .attn-body) .hljs-addition,
+:is(.prose, .attn-body) .hljs-meta .hljs-string {
+  color: #0a3069;
+}
+:is(.prose, .attn-body) .hljs-title,
+:is(.prose, .attn-body) .hljs-section,
+:is(.prose, .attn-body) .hljs-title.function_ {
+  color: #8250df;
+}
+:is(.prose, .attn-body) .hljs-built_in,
+:is(.prose, .attn-body) .hljs-class .hljs-title,
+:is(.prose, .attn-body) .hljs-title.class_,
+:is(.prose, .attn-body) .hljs-symbol,
+:is(.prose, .attn-body) .hljs-bullet,
+:is(.prose, .attn-body) .hljs-subst {
+  color: #953800;
+}
+:is(.prose, .attn-body) .hljs-attr,
+:is(.prose, .attn-body) .hljs-attribute,
+:is(.prose, .attn-body) .hljs-selector-class,
+:is(.prose, .attn-body) .hljs-selector-attr,
+:is(.prose, .attn-body) .hljs-selector-pseudo,
+:is(.prose, .attn-body) .hljs-link,
+:is(.prose, .attn-body) .hljs-meta {
+  color: #0550ae;
+}
+:is(.prose, .attn-body) .hljs-deletion {
+  color: #82071e;
+}
+:is(.prose, .attn-body) .hljs-emphasis {
+  font-style: italic;
+}
+:is(.prose, .attn-body) .hljs-strong {
+  font-weight: 600;
+}
 
 @media (prefers-color-scheme: dark) {
-  :is(.prose, .attn-body) .hljs-comment, :is(.prose, .attn-body) .hljs-quote { color: #8b949e; }
-  :is(.prose, .attn-body) .hljs-keyword, :is(.prose, .attn-body) .hljs-selector-tag, :is(.prose, .attn-body) .hljs-doctag, :is(.prose, .attn-body) .hljs-type, :is(.prose, .attn-body) .hljs-name { color: #ff7b72; }
-  :is(.prose, .attn-body) .hljs-literal, :is(.prose, .attn-body) .hljs-number, :is(.prose, .attn-body) .hljs-variable, :is(.prose, .attn-body) .hljs-template-variable, :is(.prose, .attn-body) .hljs-tag .hljs-attr { color: #79c0ff; }
-  :is(.prose, .attn-body) .hljs-string, :is(.prose, .attn-body) .hljs-regexp, :is(.prose, .attn-body) .hljs-addition, :is(.prose, .attn-body) .hljs-meta .hljs-string { color: #a5d6ff; }
-  :is(.prose, .attn-body) .hljs-title, :is(.prose, .attn-body) .hljs-section, :is(.prose, .attn-body) .hljs-title.function_ { color: #d2a8ff; }
-  :is(.prose, .attn-body) .hljs-built_in, :is(.prose, .attn-body) .hljs-class .hljs-title, :is(.prose, .attn-body) .hljs-title.class_, :is(.prose, .attn-body) .hljs-symbol, :is(.prose, .attn-body) .hljs-bullet, :is(.prose, .attn-body) .hljs-subst { color: #ffa657; }
-  :is(.prose, .attn-body) .hljs-attr, :is(.prose, .attn-body) .hljs-attribute, :is(.prose, .attn-body) .hljs-selector-class, :is(.prose, .attn-body) .hljs-selector-attr, :is(.prose, .attn-body) .hljs-selector-pseudo, :is(.prose, .attn-body) .hljs-link, :is(.prose, .attn-body) .hljs-meta { color: #79c0ff; }
-  :is(.prose, .attn-body) .hljs-deletion { color: #ffa198; }
+  :is(.prose, .attn-body) .hljs-comment,
+  :is(.prose, .attn-body) .hljs-quote {
+    color: #8b949e;
+  }
+  :is(.prose, .attn-body) .hljs-keyword,
+  :is(.prose, .attn-body) .hljs-selector-tag,
+  :is(.prose, .attn-body) .hljs-doctag,
+  :is(.prose, .attn-body) .hljs-type,
+  :is(.prose, .attn-body) .hljs-name {
+    color: #ff7b72;
+  }
+  :is(.prose, .attn-body) .hljs-literal,
+  :is(.prose, .attn-body) .hljs-number,
+  :is(.prose, .attn-body) .hljs-variable,
+  :is(.prose, .attn-body) .hljs-template-variable,
+  :is(.prose, .attn-body) .hljs-tag .hljs-attr {
+    color: #79c0ff;
+  }
+  :is(.prose, .attn-body) .hljs-string,
+  :is(.prose, .attn-body) .hljs-regexp,
+  :is(.prose, .attn-body) .hljs-addition,
+  :is(.prose, .attn-body) .hljs-meta .hljs-string {
+    color: #a5d6ff;
+  }
+  :is(.prose, .attn-body) .hljs-title,
+  :is(.prose, .attn-body) .hljs-section,
+  :is(.prose, .attn-body) .hljs-title.function_ {
+    color: #d2a8ff;
+  }
+  :is(.prose, .attn-body) .hljs-built_in,
+  :is(.prose, .attn-body) .hljs-class .hljs-title,
+  :is(.prose, .attn-body) .hljs-title.class_,
+  :is(.prose, .attn-body) .hljs-symbol,
+  :is(.prose, .attn-body) .hljs-bullet,
+  :is(.prose, .attn-body) .hljs-subst {
+    color: #ffa657;
+  }
+  :is(.prose, .attn-body) .hljs-attr,
+  :is(.prose, .attn-body) .hljs-attribute,
+  :is(.prose, .attn-body) .hljs-selector-class,
+  :is(.prose, .attn-body) .hljs-selector-attr,
+  :is(.prose, .attn-body) .hljs-selector-pseudo,
+  :is(.prose, .attn-body) .hljs-link,
+  :is(.prose, .attn-body) .hljs-meta {
+    color: #79c0ff;
+  }
+  :is(.prose, .attn-body) .hljs-deletion {
+    color: #ffa198;
+  }
 }
 
 /* Emphasis. */

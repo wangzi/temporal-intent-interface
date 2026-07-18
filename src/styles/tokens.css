@@ -18,10 +18,9 @@
   --color-dot: #e5484d;
   --color-branch: #c9c9c4;
   --color-focus: #2b6cb0;
-  --color-rule: #ececE8;
+  --color-rule: #ecece8;
 
-  --font-serif:
-    "Newsreader", Georgia, "Times New Roman", serif;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
   /* SF Mono on Apple devices (named first so it wins where it's installed);
      self-hosted iA Writer Duo S as the cross-platform backup BEFORE the
      ui-monospace generic, so non-Apple readers get iA Writer rather than the

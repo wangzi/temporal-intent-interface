@@ -5,10 +5,7 @@
 
 import Link from "next/link";
 
-import {
-  formatAbsoluteDate,
-  readingTimeLabel,
-} from "@/lib/format";
+import { formatAbsoluteDate, readingTimeLabel } from "@/lib/format";
 import type { PostDetail } from "@/lib/engine/types";
 
 import { CanonicalBody } from "./CanonicalBody";

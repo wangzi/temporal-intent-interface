@@ -47,7 +47,9 @@ export function TitleIntentLayer({
           >
             {formatScanDate(post.published_at)}
           </time>
-          <span className="dot-sep" aria-hidden="true">·</span>
+          <span className="dot-sep" aria-hidden="true">
+            ·
+          </span>
           <span
             className="e-meta-ago"
             data-relative-from={post.published_at}
@@ -55,7 +57,9 @@ export function TitleIntentLayer({
           >
             {relativeAgo(post.published_at, now)}
           </span>
-          <span className="dot-sep" aria-hidden="true">·</span>
+          <span className="dot-sep" aria-hidden="true">
+            ·
+          </span>
           <span>{readingTimeLabel(post.reading_time)}</span>
         </div>
         {/* Intent label — a non-interactive marker. Deliberately a <span>, not a
