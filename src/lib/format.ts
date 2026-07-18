@@ -71,18 +71,6 @@ export function relativeAgo(iso: string, now: number): string {
   return y === 1 ? "1 year ago" : `${y} years ago`;
 }
 
-/**
- * Whole days elapsed since `iso`, from a deterministic `now` (ms epoch).
- * Floored, never negative; stable across SSR + hydration when `now` matches.
- * Use for the terminal hero's "Last entry N days ago": `relativeAgo` caps
- * day-granularity at 6 days then switches to weeks, so it cannot express
- * "N days" for N >= 7.
- */
-export function daysAgo(iso: string, now: number): number {
-  const then = new Date(iso).getTime();
-  return Math.max(0, Math.floor((now - then) / DAY));
-}
-
 export function readingTimeLabel(minutes: number): string {
   const m = Math.max(1, Math.round(minutes));
   return `${m} min read`;

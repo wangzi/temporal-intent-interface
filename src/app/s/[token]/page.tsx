@@ -17,9 +17,7 @@ export const dynamic = "force-dynamic";
 
 type Params = { params: Promise<{ token: string }> };
 
-export async function generateMetadata({
-  params,
-}: Params): Promise<Metadata> {
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { token } = await params;
   try {
     const snap = await getPublicSnapshot(token);
@@ -64,7 +62,10 @@ export default async function SnapshotPage({ params }: Params) {
                 {formatAbsoluteDate(entry.date)}
               </time>
               {entry.topics.length > 0 ? (
-                <span className="snap-topics"> · {entry.topics.join(" · ")}</span>
+                <span className="snap-topics">
+                  {" "}
+                  · {entry.topics.join(" · ")}
+                </span>
               ) : null}
             </p>
             <h2 className="snap-entry-title">{entry.title}</h2>

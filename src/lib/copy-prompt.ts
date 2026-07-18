@@ -3,9 +3,8 @@
 // dependency, and the prompt is always retrievable even if both
 // clipboard write paths fail (the caller surfaces a fallback dialog).
 //
-// Pure helpers (no React) so they can be unit-tested directly and
-// reused by other clients (Phase C: thought-card kickoff prompt
-// could share this template).
+// Pure helpers (no React) so they can be unit-tested directly and reused by
+// other clients.
 
 export type PostForPrompt = {
   title: string;

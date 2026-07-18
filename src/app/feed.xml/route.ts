@@ -36,7 +36,12 @@ export async function GET() {
     .slice(0, MAX_ITEMS)
     .map((p) => {
       const url = `${SITE}/post/${encodeURIComponent(p.slug)}`;
-      const desc = (p.intent_statement || p.core_insight || p.title || "").trim();
+      const desc = (
+        p.intent_statement ||
+        p.core_insight ||
+        p.title ||
+        ""
+      ).trim();
       const kicker = p.intent_label ? `${esc(p.intent_label)} — ` : "";
       return [
         "    <item>",
@@ -71,7 +76,8 @@ ${items}
   return new Response(xml, {
     headers: {
       "Content-Type": "application/rss+xml; charset=utf-8",
-      "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=3600",
+      "Cache-Control":
+        "public, max-age=0, s-maxage=300, stale-while-revalidate=3600",
     },
   });
 }

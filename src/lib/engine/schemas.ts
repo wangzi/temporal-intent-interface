@@ -68,15 +68,6 @@ export const SearchResponseSchema = z.object({
   results: z.array(SearchResultSchema),
 });
 
-export const TopicFacetSchema = z.object({
-  topic: z.string(),
-  count: z.number(),
-});
-
-export const TopicsResponseSchema = z.object({
-  topics: z.array(TopicFacetSchema),
-});
-
 // ── Focus API guards ────────────────────────────────────────────────────────
 // Critical fields (ids, label, count) are required; descriptive ones default so
 // a minor journalkit drift degrades gracefully rather than blanking the rail.

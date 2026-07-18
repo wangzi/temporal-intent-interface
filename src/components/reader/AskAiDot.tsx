@@ -53,7 +53,8 @@ const PROMPTS: { label: string; prefix: string }[] = [
   },
   {
     label: "ELI5",
-    prefix: "Explain this article like I'm five (ELI5), in simple, plain language.",
+    prefix:
+      "Explain this article like I'm five (ELI5), in simple, plain language.",
   },
 ];
 

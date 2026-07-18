@@ -25,14 +25,14 @@ Nothing persists; state is in-memory for the session.
 
 The lab components are sound; promote them out of the `lab/` namespace:
 
-| From (lab) | To (production) |
-|---|---|
-| `components/lab/footer/FooterColumn|Index|Spine.tsx` | `components/reader/footer/` |
-| `components/lab/footer/ArchiveAsk.tsx` | `components/reader/footer/` |
-| `components/lab/footer/GoBoard.tsx`, `ReviewSheet.tsx` | `components/reader/footer/` |
-| `components/lab/footer/BoardLab.tsx` | → rename **`FooterReview.tsx`** (the production island) |
-| `lib/lab/footer-data.ts`, `lib/lab/archive-search.ts` | `lib/footer/` |
-| `globals.css` `.lf-* / .go-* / .sheet-* / .move-*` | keep (already in globals) |
+| From (lab)                                             | To (production)                                         |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| `components/lab/footer/FooterColumn                    | Index                                                   | Spine.tsx` | `components/reader/footer/` |
+| `components/lab/footer/ArchiveAsk.tsx`                 | `components/reader/footer/`                             |
+| `components/lab/footer/GoBoard.tsx`, `ReviewSheet.tsx` | `components/reader/footer/`                             |
+| `components/lab/footer/BoardLab.tsx`                   | → rename **`FooterReview.tsx`** (the production island) |
+| `lib/lab/footer-data.ts`, `lib/lab/archive-search.ts`  | `lib/footer/`                                           |
+| `globals.css` `.lf-* / .go-* / .sheet-* / .move-*`     | keep (already in globals)                               |
 
 `/lab/footer` stays as the tuning surface (can keep importing from the new paths or stay frozen).
 
@@ -57,27 +57,27 @@ Both are session-only (in-memory, no storage). Recommend **A1** now, **A2** as a
 - **`/post/[slug]`:** today fetches only the single post. The footer's threads/ask need the **corpus**, so either:
   - **(i)** add a `listPosts()` call on the post route (ISR-cached; small cost), or
   - **(ii)** ship a **lite** footer on post pages (studio + colophon only — no corpus-dependent moves).
-  Decision in §6.
+    Decision in §6.
 - **Board is client-only** (rendered after mount) so JS-off readers don't see a dead button; they get the default footer, no board.
 
 ---
 
 ## 5. Hard-rule checks
 
-| Rule | How it's kept |
-|---|---|
-| §17.4 SSR + JS-off | `FooterReview` SSRs the default opening + default moves → complete footer without JS. Board is client-only. |
-| AI summoned, never ambient | The ask stays summoned (reader types). No change. |
-| One red accent | Stones are black/white; red appears only as the framed-move ring + the existing attention dot. |
-| No state library | `useState` / Context only. |
-| No durable state | In-memory session only; no storage, no URL params. |
-| Reduced motion | Sheet opens instantly; no stone flight (already handled). |
+| Rule                       | How it's kept                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| §17.4 SSR + JS-off         | `FooterReview` SSRs the default opening + default moves → complete footer without JS. Board is client-only. |
+| AI summoned, never ambient | The ask stays summoned (reader types). No change.                                                           |
+| One red accent             | Stones are black/white; red appears only as the framed-move ring + the existing attention dot.              |
+| No state library           | `useState` / Context only.                                                                                  |
+| No durable state           | In-memory session only; no storage, no URL params.                                                          |
+| Reduced motion             | Sheet opens instantly; no stone flight (already handled).                                                   |
 
 ---
 
 ## 6. Decisions needed before building
 
-1. **Default opening** — which layout (Closing column / Index / Spine) is the SSR default = the JS-off footer = the initial position? *(Depends on the layout winner — still being chosen.)*
+1. **Default opening** — which layout (Closing column / Index / Spine) is the SSR default = the JS-off footer = the initial position? _(Depends on the layout winner — still being chosen.)_
 2. **State scope** — A1 per-page (reset on nav) or A2 session-wide (root context)?
 3. **Post-route footer** — full (add `listPosts()`) or lite (studio + colophon)?
 4. **Scope of "moves"** — footer-only in v1, or set up to extend to reader-wide toggles (scan-density, lens) later?

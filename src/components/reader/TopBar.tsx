@@ -112,15 +112,13 @@ export function TopBar({
             strokeWidth="1.6"
             aria-hidden="true"
           >
-            <path d={isOpen ? "M6 6l12 12M6 18L18 6" : "M3 6h18M3 12h18M3 18h18"} />
+            <path
+              d={isOpen ? "M6 6l12 12M6 18L18 6" : "M3 6h18M3 12h18M3 18h18"}
+            />
           </svg>
         </button>
       </header>
-      <div
-        className="scrim"
-        aria-hidden="true"
-        onClick={onClose}
-      />
+      <div className="scrim" aria-hidden="true" onClick={onClose} />
     </>
   );
 }

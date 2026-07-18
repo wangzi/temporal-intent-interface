@@ -1,6 +1,7 @@
-// Thin BFF passthrough for GET /api/v1/posts. Reused by Phase C
-// clients (selection layer, prefetching). Phase B page routes do NOT
-// call this — they call engine.listPosts() directly server-side.
+// Thin BFF passthrough for GET /api/v1/posts — the browser-callable edge over
+// the keyed engine. Its one caller is LoadMore, which fetches the next page
+// after hydration. Page routes do NOT use this; they call engine.listPosts()
+// directly server-side.
 
 import { listPosts, EngineError } from "@/lib/engine/client";
 import type { SortOrder } from "@/lib/engine/types";

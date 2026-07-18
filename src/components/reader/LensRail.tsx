@@ -21,7 +21,11 @@ import { useCallback, useEffect, useState } from "react";
 
 import type { Session } from "@supabase/supabase-js";
 
-import { createSnapshot, SnapshotError, type SnapshotMeta } from "@/lib/lens/api";
+import {
+  createSnapshot,
+  SnapshotError,
+  type SnapshotMeta,
+} from "@/lib/lens/api";
 import { getSupabase } from "@/lib/lens/supabase";
 import type {
   FocusCategory,
@@ -210,7 +214,10 @@ export function LensRail({
           sort: currentSort,
           query: query.trim(),
           ...(activeRoute
-            ? { focus: activeRoute, route_label: activeRouteLabel ?? activeRoute }
+            ? {
+                focus: activeRoute,
+                route_label: activeRouteLabel ?? activeRoute,
+              }
             : {}),
         },
       );

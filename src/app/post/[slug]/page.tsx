@@ -14,11 +14,7 @@ import { SelectionLayer } from "@/components/reader/SelectionLayer";
 import { TemporalLayout } from "@/components/reader/TemporalLayout";
 import { AskAiDot } from "@/components/reader/AskAiDot";
 import { AttentionView } from "@/components/reader/AttentionView";
-import {
-  EngineNotFoundError,
-  getPost,
-  listFocus,
-} from "@/lib/engine/client";
+import { EngineNotFoundError, getPost, listFocus } from "@/lib/engine/client";
 import type { FocusResponse } from "@/lib/engine/types";
 
 export const revalidate = 300;
@@ -50,7 +46,10 @@ export async function generateMetadata({
     const description = clip(excerpt, 155);
     // Share-card line leads with the intent label (the hook), like the RSS
     // items, then the excerpt.
-    const cardDescription = clip(label ? `${label} — ${excerpt}` : excerpt, 200);
+    const cardDescription = clip(
+      label ? `${label} — ${excerpt}` : excerpt,
+      200,
+    );
     return {
       title: post.title,
       description,
@@ -97,7 +96,6 @@ export default async function PostPage({
     try {
       focus = await listFocus();
     } catch (focusErr) {
-      // eslint-disable-next-line no-console
       console.error("[post] focus error:", focusErr);
     }
 

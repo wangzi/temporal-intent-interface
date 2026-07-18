@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Pin the workspace root to THIS directory. Next otherwise walks up looking
+  // for lockfiles and can select an ancestor — a stray ~/package-lock.json made
+  // it pick $HOME, which leaked a home-directory file into 13 of 18 route
+  // traces and stopped local builds from reproducing Vercel's.
+  outputFileTracingRoot: import.meta.dirname,
   // Bundle the per-post OG image's Newsreader fonts (read from public/og via
   // fs at render time) into that route's serverless function.
   outputFileTracingIncludes: {

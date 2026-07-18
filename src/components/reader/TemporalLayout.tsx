@@ -1,11 +1,16 @@
-// Three-track grid shell: [nav rail | reading area | time index].
-// Server component; pure markup. Rail and time-index slot widths
-// are driven by CSS custom properties that change per breakpoint
-// (see globals.css §App shell + breakpoints).
+// The READER shell. Server component; pure markup.
 //
-// Phase B step 3 renders only the reading column + the static dot;
-// nav rail (step 8), top bar (step 11), and time index (step 9)
-// slot into `rail` and `timeIndex` props in later steps.
+// Structurally it is: skip link → top bar → a CSS-only rail disclosure
+// (checkbox + fixed overlay drawer + scrim) → the centred reading column.
+//
+// It is declared as a three-track grid [rail | reading area | time index], but
+// both side tracks are vestigial: --rail-w and --index-w are 0px at every
+// breakpoint and `.timeindex` carries no CSS, so the grid computes to
+// `0 1fr 0` everywhere. The rail is an overlay, not a track.
+//
+// This shell is reader-specific — `.reader` hard-codes top padding for the
+// fixed TopBar and `.col` caps at the ~66ch prose measure. A non-reader surface
+// should NOT reuse it; render a bare <main> instead (see /s/[token]).
 
 import type { ReactNode } from "react";
 

@@ -6,6 +6,13 @@
     "skipLibCheck": true,
     "strict": true,
     "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    // macOS is case-insensitive but Vercel's builders are not: without this a
+    // casing typo builds locally and fails in CI.
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -19,6 +26,16 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  // Scoped to src/ (not "**/*") so stray files outside the app can't enter the
+  // program. The "* 2.*" exclude blocks macOS/iCloud duplicate files: they are
+  // gitignored, so they never show up in `git status`, but tsconfig does not
+  // consult git and would otherwise typecheck 6-week-old divergent copies.
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "scripts/**/*.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", "**/* 2.*"]
 }

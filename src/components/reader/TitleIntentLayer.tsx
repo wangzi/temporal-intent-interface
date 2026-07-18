@@ -7,7 +7,7 @@
 //       <h2 id="entry-title-…">
 //         <a href="/post/{slug}">{title}</a>
 //       </h2>
-//       <button aria-label="…">{intent_label}</button>  ← Phase C: opens Local Constellation
+//       <span class="e-label">{intent_label}</span>     ← non-interactive marker
 //     </header>
 //     <ScanDensity />
 //   </article>
@@ -47,7 +47,9 @@ export function TitleIntentLayer({
           >
             {formatScanDate(post.published_at)}
           </time>
-          <span className="dot-sep" aria-hidden="true">·</span>
+          <span className="dot-sep" aria-hidden="true">
+            ·
+          </span>
           <span
             className="e-meta-ago"
             data-relative-from={post.published_at}
@@ -55,15 +57,16 @@ export function TitleIntentLayer({
           >
             {relativeAgo(post.published_at, now)}
           </span>
-          <span className="dot-sep" aria-hidden="true">·</span>
+          <span className="dot-sep" aria-hidden="true">
+            ·
+          </span>
           <span>{readingTimeLabel(post.reading_time)}</span>
         </div>
-        {/* Intent label — a non-interactive marker until Phase C wires it to the
-            Local Constellation. Rendered as a <span>, not a <button>: a styled,
-            focusable control that does nothing on tap is a phantom target next
-            to the real title link (mis-taps on touch) and is announced as a
-            broken control by screen readers. Restore the <button> + min-height
-            44px hit area when it actually opens something. */}
+        {/* Intent label — a non-interactive marker. Deliberately a <span>, not a
+            <button>: a styled, focusable control that does nothing on tap is a
+            phantom target next to the real title link (mis-taps on touch) and is
+            announced as a broken control by screen readers. If this ever becomes
+            interactive, restore the <button> WITH a ≥44px hit area. */}
         <span className="e-label mono">{post.intent_label}</span>
         <h2 className="e-title" id={headingId}>
           <a href={`/post/${post.slug}`}>{post.title}</a>

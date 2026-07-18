@@ -24,6 +24,8 @@ import {
   listPosts,
   searchPosts,
 } from "@/lib/engine/client";
+import type { Metadata } from "next";
+
 import type {
   FocusResponse,
   FocusRouteResponse,
@@ -47,6 +49,13 @@ import { TerminalHeroIsland } from "@/components/reader/TerminalHeroIsland";
 import { TopBar } from "@/components/reader/TopBar";
 
 export const revalidate = 60;
+
+// The archive owns this canonical (it used to live on the root layout, where
+// it leaked to every route). The filtered modes — ?focus / ?q / ?sort — are
+// views of the same collection, so they all consolidate to "/".
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const EMPTY_FOCUS: FocusResponse = { categories: [], routes: [] };
 
@@ -77,7 +86,6 @@ export default async function Home({
   try {
     focus = await listFocus();
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("[home] focus error:", err);
   }
 
@@ -87,7 +95,6 @@ export default async function Home({
     try {
       routeData = await getFocusRoute(activeRoute);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("[home] focus route error:", err);
     }
 
@@ -109,7 +116,6 @@ export default async function Home({
         results = (await searchPosts({ q: query, focus: [activeRoute] }))
           .results;
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error("[home] focus search error:", err);
       }
       entries = results;
@@ -180,7 +186,6 @@ export default async function Home({
     try {
       results = (await searchPosts({ q: query })).results;
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("[home] search error:", err);
     }
     const heading =
@@ -247,7 +252,6 @@ export default async function Home({
       cursor = response.next_cursor;
     }
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error("[home] engine error:", err);
   }
 

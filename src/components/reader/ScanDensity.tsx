@@ -12,7 +12,10 @@ import type { PostSummary } from "@/lib/engine/types";
 export function ScanDensity({
   post,
 }: {
-  post: Pick<PostSummary, "intent_statement" | "core_insight" | "core_insight_visible">;
+  post: Pick<
+    PostSummary,
+    "intent_statement" | "core_insight" | "core_insight_visible"
+  >;
 }) {
   return (
     <div className="enrich">

@@ -86,17 +86,6 @@ export type SearchResponse = {
   results: SearchResult[];
 };
 
-/** One topic facet with the count of posts carrying it. */
-export type TopicFacet = {
-  topic: string;
-  count: number;
-};
-
-/** Returned by GET /api/v1/topics. Sorted by count desc, then label asc. */
-export type TopicsResponse = {
-  topics: TopicFacet[];
-};
-
 export type SearchParams = {
   /** Free-text query. Body-aware on the engine. Omit for a topic-only filter. */
   q?: string;

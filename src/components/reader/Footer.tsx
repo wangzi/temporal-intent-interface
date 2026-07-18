@@ -4,10 +4,7 @@
 // and the Studio bridge), trailed by a blinking cursor. Server component — part
 // of the SSR'd HTML, so it works with JS off (the cursor just stops blinking).
 
-export function Footer(_props: {
-  entryCount?: number;
-  updatedISO?: string | null;
-}) {
+export function Footer() {
   // `mono` sits on the children, not the <footer>: the element's own font
   // decides how `--measure` (66ch) computes, and the post-route footer has to
   // resolve the SAME column width as the article to land on the spine.
@@ -24,7 +21,10 @@ export function Footer(_props: {
           rel="me noopener noreferrer"
           aria-label="LinkedIn profile (opens in a new tab)"
         >
-          linkedin<span className="site-footer-arrow" aria-hidden="true">↗</span>
+          linkedin
+          <span className="site-footer-arrow" aria-hidden="true">
+            ↗
+          </span>
         </a>
         <a
           className="site-footer-cmd"
@@ -33,10 +33,16 @@ export function Footer(_props: {
           rel="me noopener noreferrer"
           aria-label="Instagram profile (opens in a new tab)"
         >
-          IG<span className="site-footer-arrow" aria-hidden="true">↗</span>
+          IG
+          <span className="site-footer-arrow" aria-hidden="true">
+            ↗
+          </span>
         </a>
         <a className="site-footer-cmd" href="https://studio.stillinlove.co">
-          studio<span className="site-footer-arrow" aria-hidden="true">↗</span>
+          studio
+          <span className="site-footer-arrow" aria-hidden="true">
+            ↗
+          </span>
           <span className="site-footer-cursor" aria-hidden="true">
             ▮
           </span>
