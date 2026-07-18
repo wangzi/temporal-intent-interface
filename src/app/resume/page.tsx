@@ -15,7 +15,9 @@
 import type { Metadata } from "next";
 
 import { Footer } from "@/components/reader/Footer";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { resume } from "@/lib/resume/data";
+import { resumeJsonLd } from "@/lib/resume/jsonld";
 
 export const metadata: Metadata = {
   title: `${resume.person.name} — Resume`,
@@ -23,6 +25,12 @@ export const metadata: Metadata = {
   // Explicit: the root layout intentionally sets no canonical, so every route
   // owns its own. Role views (?role=) also canonicalize here.
   alternates: { canonical: "/resume" },
+  openGraph: {
+    title: `${resume.person.name} — Resume`,
+    description: resume.person.headline,
+    url: "/resume",
+    type: "profile",
+  },
 };
 
 /** "2023 — Present" / "2008 — 2013" — year granularity only, by policy. */
@@ -35,6 +43,7 @@ export default function ResumePage() {
 
   return (
     <>
+      <JsonLd data={resumeJsonLd()} />
       <main className="resume" id="resume-main">
         <header className="resume-head">
           <h1 className="resume-name">{person.name}</h1>

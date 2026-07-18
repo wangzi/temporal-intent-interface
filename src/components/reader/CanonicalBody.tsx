@@ -1,8 +1,11 @@
 // Renders sanitized HTML returned by the engine (PRD §9 D16).
 //
 // Trust boundary: the engine sanitizes; TII does NOT re-sanitize.
-// This component is the ONE site where dangerouslySetInnerHTML is
-// used. Do not introduce a second.
+// This component is the trust seam for engine HTML, and one of only TWO
+// approved dangerouslySetInnerHTML sites. The other is <JsonLd>
+// (src/components/seo/JsonLd.tsx), which emits structured data and accepts a
+// plain object rather than markup. Those two are exhaustive — do not introduce
+// a third, and do not widen either.
 //
 // The wrapping div carries data-text-origin="canonical" so every
 // descendant text node inherits canonical provenance unless the
