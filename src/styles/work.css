@@ -1,0 +1,232 @@
+/* ============================================================
+   WORK — the /work surface. Namespaced under `.work`, same shape as
+   resume.css: it composes the shared token, base and prose layers without
+   inheriting the reader's grid.
+
+   Imported after resume.css so the two can share `.resume-link` without a
+   specificity fight.
+   ============================================================ */
+
+.work {
+  --work-measure: 44rem;
+  max-width: var(--work-measure);
+  margin: 0 auto;
+  padding: 72px 24px 96px;
+  color: var(--ink);
+}
+
+.work-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.work-lede {
+  margin: 10px 0 0;
+  color: var(--system);
+  line-height: 1.55;
+}
+
+/* ── Index ────────────────────────────────────────────────────────────── */
+.work-list {
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.work-item {
+  padding: 18px 0;
+  border-top: 1px solid var(--rule);
+}
+.work-item:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.work-item-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.work-item-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s var(--ease);
+}
+.work-item-link:hover .work-item-title,
+.work-item-link:focus-visible .work-item-title {
+  border-bottom-color: var(--dot);
+}
+
+.work-item-when {
+  font-size: 0.75rem;
+  color: var(--system-faint);
+}
+
+.work-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+}
+
+/* An unfinished case says so, rather than looking like a thin one. */
+.work-draft-tag {
+  padding: 2px 6px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  color: var(--system);
+}
+
+/* ── Case ─────────────────────────────────────────────────────────────── */
+.work-back {
+  margin: 0 0 26px;
+  font-size: 0.75rem;
+}
+
+.work-case-when {
+  margin: 6px 0 0;
+  font-size: 0.8125rem;
+  color: var(--system-faint);
+}
+
+.work-draft-note {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--system);
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--dot);
+  border-radius: 6px;
+}
+
+.work-narrative {
+  margin-top: 30px;
+}
+
+.work-section {
+  margin-top: 42px;
+}
+
+.work-section-title {
+  margin: 0 0 14px;
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--system-faint);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Claims resolved from the resume — same measure opt-out as the resume, since
+   a claim line is structured rather than long-form prose. */
+.work-evidence p,
+.work-evidence li {
+  max-width: none;
+}
+.work-evidence li {
+  margin-top: 10px;
+}
+
+.work-evidence-note {
+  margin: 14px 0 0;
+  font-size: 0.625rem;
+  color: var(--system-faint);
+}
+
+/* ── Artifacts ────────────────────────────────────────────────────────── */
+.work-artifact {
+  margin: 0 0 28px;
+}
+
+/* The frame is sandboxed without allow-same-origin (see ArtifactFrame.tsx),
+   so it cannot restyle or escape this box. */
+.work-artifact-frame {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--field);
+}
+
+.work-artifact-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-top: 8px;
+  font-size: 0.6875rem;
+  color: var(--system-faint);
+}
+.work-artifact-title {
+  color: var(--system);
+}
+.work-artifact-desc {
+  flex: 1 1 12rem;
+  line-height: 1.5;
+}
+
+/* ── Media ────────────────────────────────────────────────────────────── */
+.work-media {
+  margin: 0 0 28px;
+}
+.work-media-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+}
+.work-media-caption {
+  margin-top: 8px;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--system-faint);
+}
+
+.work-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+}
+.work-links li {
+  margin-top: 8px;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .work {
+    padding: 40px 20px 72px;
+  }
+  .work-title {
+    font-size: 1.625rem;
+  }
+  .work-item-link {
+    display: block;
+  }
+  .work-item-when {
+    display: block;
+    margin-top: 2px;
+  }
+}
+
+/* ── Print ────────────────────────────────────────────────────────────── */
+@media print {
+  /* Interactive frames are meaningless on paper; the description remains. */
+  .work-artifact-frame,
+  .work-back {
+    display: none;
+  }
+}

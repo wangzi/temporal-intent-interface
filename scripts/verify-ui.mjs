@@ -57,6 +57,10 @@ const ALL_ROUTES = [
   { name: "post", path: `/post/${POST_SLUG}`, expect: 200 },
   { name: "snapshot", path: `/s/${SNAPSHOT_TOKEN}`, expect: 200 },
   { name: "resume", path: "/resume", expect: 200 },
+  // The work index carries the sandboxed artifact frame; the case page carries
+  // claims resolved from the resume.
+  { name: "work", path: "/work", expect: 200 },
+  { name: "workcase", path: "/work/glow-headphones", expect: 200 },
   { name: "notfound", path: "/does-not-exist", expect: 404, expect404: true },
 ];
 const ROUTES = ALL_ROUTES.filter((r) => !SKIP.has(r.name));

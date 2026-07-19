@@ -6,6 +6,8 @@
      base    → reset + shared utilities
      prose   → long-form typography (.prose / .attn-body)
      resume  → the /resume surface only (composes prose)
+     work    → the /work surface only (composes prose; after resume so the
+               two can share .resume-link without a specificity fight)
      reader  → the journal reader only
 */
 @import "tailwindcss";
@@ -13,4 +15,5 @@
 @import "../styles/base.css";
 @import "../styles/prose.css";
 @import "../styles/resume.css";
+@import "../styles/work.css";
 @import "../styles/reader.css";

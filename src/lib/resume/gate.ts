@@ -43,8 +43,19 @@ export const GATED_PATHS = [
   "/resume/opengraph-image",
 ] as const;
 
+/**
+ * The work surface is gated too, as a whole subtree — /work and every case
+ * under /work/<slug>, plus the artifacts and media they embed. An artifact at
+ * /work/artifacts/x/index.html is part of the unpublished portfolio and should
+ * not be reachable just because its URL is guessable.
+ */
+export const GATED_PREFIXES = ["/work"] as const;
+
 export function isGatedPath(pathname: string): boolean {
-  return (GATED_PATHS as readonly string[]).includes(pathname);
+  if ((GATED_PATHS as readonly string[]).includes(pathname)) return true;
+  return (GATED_PREFIXES as readonly string[]).some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
 }
 
 export function isUnlocked(cookieValue: string | undefined): boolean {
