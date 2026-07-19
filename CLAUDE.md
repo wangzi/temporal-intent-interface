@@ -469,6 +469,23 @@ pnpm verify:print  # the printed resume: 2 US Letter pages, no contact details
 pnpm verify:source # every resume claim vs. the source PDF  (see below)
 ```
 
+### The work surface (`/work`)
+
+Portfolio cases live in `src/lib/work/`. Two rules make it safe to co-exist
+with the resume:
+
+- **A case never states a number.** Metrics are referenced by resume claim id
+  and rendered from the record via `src/lib/work/evidence.ts`, so a case cannot
+  drift from what `verify:source` proved. `assertNoLooseMetrics` rejects a
+  narrative containing a metric at parse time.
+- **Dates and employers are derived**, not stored, for any case with an
+  `organizationId`.
+
+Cases are `draft` until someone writes the narrative; the schema refuses to
+publish a case with none. Interactive artifacts and media are self-hosted under
+`public/work/` — see `public/work/README.md`, especially the sandbox rules for
+artifacts (`allow-scripts`, never `allow-same-origin`).
+
 ### Changing resume data requires `verify:source`
 
 **Any edit to `src/lib/resume/data.ts` must be followed by:**

@@ -21,8 +21,12 @@ export function middleware(request: NextRequest) {
 
   const { pathname, search } = request.nextUrl;
 
-  // The page sends people somewhere they can do something about it.
-  if (pathname === "/resume") {
+  // HTML surfaces send people somewhere they can do something about it.
+  if (
+    pathname === "/resume" ||
+    pathname === "/work" ||
+    /^\/work\/[a-z0-9-]+$/.test(pathname)
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = RESUME_UNLOCK_PATH;
     url.search = search ? `?next=${encodeURIComponent(pathname + search)}` : "";
@@ -42,5 +46,13 @@ export function middleware(request: NextRequest) {
 export const config = {
   // Exact paths only. /resume/unlock and its verify handler must stay open,
   // and nothing under the reader may be matched.
-  matcher: ["/resume", "/resume.json", "/llms.txt", "/resume/opengraph-image"],
+  matcher: [
+    "/resume",
+    "/resume.json",
+    "/llms.txt",
+    "/resume/opengraph-image",
+    // The whole work subtree: index, cases, and the artifacts/media they embed.
+    "/work",
+    "/work/:path*",
+  ],
 };

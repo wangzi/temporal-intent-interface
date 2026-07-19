@@ -36,7 +36,14 @@ const AI_CRAWLERS = [
 
 // Snapshots and the BFF are permanently excluded. The resume entries are
 // temporary and come out with the gate.
-const DISALLOW = ["/s/", "/api/", "/resume", "/resume.json", "/llms.txt"];
+const DISALLOW = [
+  "/s/",
+  "/api/",
+  "/resume",
+  "/resume.json",
+  "/llms.txt",
+  "/work",
+];
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -31,8 +31,9 @@ describe("production content security policy", () => {
     ["object-src", "object-src 'none'"],
     ["form-action", "form-action 'self'"],
     ["frame-ancestors", "frame-ancestors 'self'"],
-    ["frame-src", "frame-src 'none'"],
+    ["frame-src", "frame-src 'self'"],
     ["manifest-src", "manifest-src 'self'"],
+    ["media-src", "media-src 'self'"],
   ])("locks %s", (name, expected) => {
     expect(directive(production, name)).toBe(expected);
   });
@@ -99,8 +100,13 @@ describe("conditional allowances stay out of production", () => {
     expect(production).not.toContain("pusher");
   });
 
-  it("closes frame-src entirely in production", () => {
-    expect(directive(production, "frame-src")).toBe("frame-src 'none'");
+  it("allows framing only our own origin, never a third party", () => {
+    // /work embeds interactive artifacts. They are self-hosted so this can
+    // stay at 'self'; containment comes from the frame sandbox, not from CSP
+    // (see src/components/work/ArtifactFrame.tsx). A third-party frame origin
+    // here would mean embedding code we cannot version or review.
+    expect(directive(production, "frame-src")).toBe("frame-src 'self'");
+    expect(directive(production, "frame-src")).not.toContain("http");
   });
 });
 

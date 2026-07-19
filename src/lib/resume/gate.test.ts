@@ -40,6 +40,23 @@ describe("gated surface", () => {
     }
   });
 
+  it("gates the whole work subtree, artifacts and media included", () => {
+    for (const path of [
+      "/work",
+      "/work/glow-headphones",
+      "/work/artifacts/demo/index.html",
+      "/work/media/photo.png",
+    ]) {
+      expect(isGatedPath(path), path).toBe(true);
+    }
+  });
+
+  it("does not gate paths that merely start with the same letters", () => {
+    // "/workshop" is not "/work".
+    expect(isGatedPath("/workshop")).toBe(false);
+    expect(isGatedPath("/working")).toBe(false);
+  });
+
   it("leaves the reader alone", () => {
     for (const path of [
       "/",

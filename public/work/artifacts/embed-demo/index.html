@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Artifact embed demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --field: #fcfcfa;
+        --ink: #1a1a1a;
+        --system: #6b6b6b;
+        --rule: #e4e4e0;
+        --dot: #e5484d;
+        --ok: #2f7d4f;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --field: #131313;
+          --ink: #ededed;
+          --system: #9a9a9a;
+          --rule: #2a2a2a;
+          --ok: #6fcf97;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 20px;
+        background: var(--field);
+        color: var(--ink);
+        font:
+          14px/1.5 ui-monospace,
+          "SF Mono",
+          Menlo,
+          monospace;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        letter-spacing: 0.02em;
+      }
+      p {
+        margin: 0 0 14px;
+        color: var(--system);
+        font-size: 12px;
+      }
+      button {
+        font: inherit;
+        color: var(--ink);
+        background: transparent;
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      button:hover {
+        border-color: var(--dot);
+        color: var(--dot);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+        font-size: 12px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 6px 8px;
+        border-top: 1px solid var(--rule);
+        vertical-align: top;
+      }
+      th {
+        color: var(--system);
+        font-weight: 400;
+      }
+      .ok {
+        color: var(--ok);
+      }
+      .bad {
+        color: var(--dot);
+      }
+      #count {
+        color: var(--dot);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Artifact embed demo</h1>
+    <p>
+      A self-contained page, served from this origin and framed with
+      <code>sandbox="allow-scripts"</code>. Replace this directory with your own
+      artifact.
+    </p>
+
+    <button id="tick">
+      it runs JavaScript — clicked <span id="count">0</span>
+    </button>
+
+    <!-- The interesting part: this artifact tries to reach the page that -->
+    <!-- embeds it, and reports that it cannot. Without allow-same-origin -->
+    <!-- the frame has an opaque origin, so the host's DOM, cookies and -->
+    <!-- credentialed fetches are all unreachable from in here. -->
+    <table>
+      <thead>
+        <tr>
+          <th>containment check</th>
+          <th>result</th>
+        </tr>
+      </thead>
+      <tbody id="checks"></tbody>
+    </table>
+
+    <script>
+      const count = document.getElementById("count");
+      let n = 0;
+      document.getElementById("tick").addEventListener("click", () => {
+        count.textContent = String(++n);
+      });
+
+      // Each probe should FAIL. A pass here would mean the sandbox is wrong.
+      const probes = [
+        [
+          "read host cookies",
+          () => {
+            const c = document.cookie;
+            if (c) throw new Error("readable");
+            return "empty";
+          },
+        ],
+        [
+          "read parent DOM",
+          () => {
+            const href = window.parent.location.href;
+            return `readable: ${href}`;
+          },
+        ],
+        [
+          "read localStorage",
+          () => {
+            window.localStorage.getItem("x");
+            return "readable";
+          },
+        ],
+        [
+          "own origin",
+          () => {
+            // The headline fact. An opaque ("null") origin is what makes every
+            // other protection follow: no credentialed same-origin requests,
+            // no shared storage, no DOM access. Reported rather than probed
+            // with a real fetch, because a blocked request would log a console
+            // error on every page load and the UI harness treats console
+            // errors as failures — correctly.
+            if (window.origin && window.origin !== "null") {
+              return `same-origin: ${window.origin}`;
+            }
+            return "empty";
+          },
+        ],
+      ];
+
+      const tbody = document.getElementById("checks");
+      for (const [label, run] of probes) {
+        let outcome;
+        let good = true;
+        try {
+          const value = run();
+          // "empty" and "attempted" are the safe outcomes; anything readable
+          // would mean containment failed.
+          good = value === "empty";
+          outcome = good ? "blocked (opaque origin)" : `LEAK — ${value}`;
+        } catch (err) {
+          outcome = `blocked (${err.name})`;
+        }
+        const row = document.createElement("tr");
+        const th = document.createElement("th");
+        th.textContent = label;
+        const td = document.createElement("td");
+        td.textContent = outcome;
+        td.className = good ? "ok" : "bad";
+        row.append(th, td);
+        tbody.append(row);
+      }
+    </script>
+  </body>
+</html>

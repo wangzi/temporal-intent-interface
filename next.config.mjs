@@ -44,8 +44,22 @@ export function buildContentSecurityPolicy({
     "form-action 'self'",
     // Matches X-Frame-Options: SAMEORIGIN below.
     "frame-ancestors 'self'",
-    ["frame-src", isPreview ? VERCEL_LIVE_ORIGIN : "'none'"].join(" "),
+    // 'self' — NOT 'none' — because /work embeds interactive artifacts.
+    //
+    // Those artifacts are arbitrary HTML and JavaScript, and they are served
+    // from our own origin, so the CSP alone does not contain them: the frame's
+    // sandbox does. See src/components/work/ArtifactFrame.tsx — the frames get
+    // `sandbox="allow-scripts"` WITHOUT `allow-same-origin`, which puts them in
+    // an opaque origin with no access to our DOM, storage, or credentialed
+    // requests. Widening this to a third-party origin would give up that
+    // control, which is why artifacts are self-hosted and the schema refuses a
+    // remote artifact URL.
+    ["frame-src", isPreview ? `'self' ${VERCEL_LIVE_ORIGIN}` : "'self'"].join(
+      " ",
+    ),
     "manifest-src 'self'",
+    // Self-hosted case media only.
+    "media-src 'self'",
     // data:/blob: are for IMAGES only (OG previews, inline SVG icons) — never scripts.
     ["img-src 'self' data: blob:", isPreview ? VERCEL_ASSETS_ORIGIN : ""]
       .filter(Boolean)
